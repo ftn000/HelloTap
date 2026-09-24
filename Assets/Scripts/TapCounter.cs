@@ -3,20 +3,27 @@ using TMPro;
 using UnityEngine.UI;
 
 /// <summary>
-/// Скрипт счётчика тапов "Hello Tap" с поддержкой сохранения в PlayerPrefs,
-/// смены цвета текста каждые 10 очков через Color.Lerp и кнопки сброса.
+/// Скрипт счётчика тапов "Hello Tap" / "GameDev Clicker".
+/// Поддерживает обратную совместимость с базовой лабораторной (смена цвета текста, PlayerPrefs),
+/// а также интегрируется с GameManager для системы разработки игр, улучшений и пассивного дохода.
 /// </summary>
 public class TapCounter : MonoBehaviour
 {
     private const string ScoreKey = "TapCounter_Score";
 
-    [Header("UI Ссылки")]
+    [Header("Базовые UI Ссылки (Лабораторная работа)")]
     [SerializeField] private TMP_Text counterText;
     [SerializeField] private Button tapButton;
     [SerializeField] private Button resetButton;
 
     [Header("Настройки текста")]
-    [SerializeField] private string scorePrefix = "Счёт: ";
+    [SerializeField] private string scorePrefix = "Строк кода: ";
+
+    [Header("Дополнительные UI Ссылки (GameDev Idle)")]
+    [SerializeField] private TMP_Text moneyText;
+    [SerializeField] private TMP_Text statsText;
+    [SerializeField] private TMP_Text boostTimerText;
+    [SerializeField] private Button energyBoostButton;
 
     [Header("Цветовая палитра (смена каждые 10 очков)")]
     [SerializeField] private Color[] stageColors = new Color[]
@@ -34,12 +41,26 @@ public class TapCounter : MonoBehaviour
 
     private void Awake()
     {
-        // Загрузка сохранённого счёта из PlayerPrefs при старте
+        EnsureGameManagerExists();
         LoadScore();
+    }
+
+    private void EnsureGameManagerExists()
+    {
+        if (GameManager.Instance == null)
+        {
+            GameObject gmGo = new GameObject("GameManager");
+            gmGo.AddComponent<GameManager>();
+        }
     }
 
     private void OnEnable()
     {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnCurrenciesChanged += UpdateUI;
+        }
+
         UpdateUI();
 
         // Подписка на нажатия кнопок (с защитой от повторной подписки)
@@ -54,11 +75,21 @@ public class TapCounter : MonoBehaviour
             resetButton.onClick.RemoveListener(Reset);
             resetButton.onClick.AddListener(Reset);
         }
+
+        if (energyBoostButton != null)
+        {
+            energyBoostButton.onClick.RemoveListener(OnEnergyBoostClicked);
+            energyBoostButton.onClick.AddListener(OnEnergyBoostClicked);
+        }
     }
 
     private void OnDisable()
     {
-        // Отписка от событий при отключении компонента
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnCurrenciesChanged -= UpdateUI;
+        }
+
         if (tapButton != null)
         {
             tapButton.onClick.RemoveListener(Increment);
@@ -69,14 +100,14 @@ public class TapCounter : MonoBehaviour
             resetButton.onClick.RemoveListener(Reset);
         }
 
-        // Сохранение при выгрузке / деактивации объекта
+        if (energyBoostButton != null)
+        {
+            energyBoostButton.onClick.RemoveListener(OnEnergyBoostClicked);
+        }
+
         SaveScore();
     }
 
-    /// <summary>
-    /// Сохранение счёта при сворачивании игры на мобильном устройстве (Android).
-    /// На мобильных ОС OnApplicationPause вызывается надёжнее, чем OnApplicationQuit.
-    /// </summary>
     private void OnApplicationPause(bool pauseStatus)
     {
         if (pauseStatus)
@@ -85,61 +116,104 @@ public class TapCounter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Сохранение счёта при штатном выходе из приложения.
-    /// </summary>
     private void OnApplicationQuit()
     {
         SaveScore();
     }
 
     /// <summary>
-    /// Увеличивает счётчик на 1 очко и обновляет UI.
-    /// Метод публичный для возможности вызова через Unity Inspector (OnClick).
+    /// Увеличивает счётчик на 1 клик, передает действие в GameManager и обновляет UI.
     /// </summary>
     public void Increment()
     {
         counter++;
+
+        Vector2 clickPos = tapButton != null ? (Vector2)tapButton.transform.position : Vector2.zero;
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ClickCode(clickPos);
+        }
+
         UpdateUI();
     }
 
     /// <summary>
-    /// Сбрасывает счётчик до 0, сохраняет результат и обновляет UI.
-    /// Метод публичный для возможности вызова через Unity Inspector (OnClick).
+    /// Сбрасывает счётчики, сохраняет результат и обновляет UI.
     /// </summary>
     public void Reset()
     {
         counter = 0;
         SaveScore();
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ResetAllData();
+        }
+
         UpdateUI();
     }
 
-    /// <summary>
-    /// Сохраняет текущее значение счётчика в постоянное хранилище PlayerPrefs.
-    /// </summary>
+    private void OnEnergyBoostClicked()
+    {
+        if (GameManager.Instance != null)
+        {
+            // Включает буст энергетика (x2 на 30 секунд)
+            GameManager.Instance.ActivateEnergyBoost(30f, 2.0);
+        }
+    }
+
     public void SaveScore()
     {
         PlayerPrefs.SetInt(ScoreKey, counter);
         PlayerPrefs.Save();
     }
 
-    /// <summary>
-    /// Загружает счётчик из PlayerPrefs (по умолчанию 0, если данных нет).
-    /// </summary>
     public void LoadScore()
     {
         counter = PlayerPrefs.GetInt(ScoreKey, 0);
     }
 
     /// <summary>
-    /// Обновляет текстовое отображение и цвет счёта.
+    /// Обновляет текстовое отображение счёта, денег и статов.
     /// </summary>
-    private void UpdateUI()
+    public void UpdateUI()
     {
         if (counterText != null)
         {
-            counterText.text = $"{scorePrefix}{counter}";
+            if (GameManager.Instance != null && GameManager.Instance.CodeLines > 0)
+            {
+                counterText.text = $"{scorePrefix}{NumberFormatter.Format(GameManager.Instance.CodeLines)}";
+            }
+            else
+            {
+                counterText.text = $"{scorePrefix}{counter}";
+            }
             UpdateTextColor();
+        }
+
+        if (moneyText != null && GameManager.Instance != null)
+        {
+            moneyText.text = $"Баланс: {NumberFormatter.Format(GameManager.Instance.Money)} ₽";
+        }
+
+        if (statsText != null && GameManager.Instance != null)
+        {
+            double clickPower = GameManager.Instance.GetCodePerClick();
+            double perSec = GameManager.Instance.GetCodePerSecond();
+            statsText.text = $"+{NumberFormatter.Format(clickPower)} за клик | +{NumberFormatter.Format(perSec)} строк/сек";
+        }
+
+        if (boostTimerText != null && GameManager.Instance != null)
+        {
+            if (GameManager.Instance.IsBoostActive)
+            {
+                boostTimerText.text = $"ЭНЕРГЕТИК x2: {NumberFormatter.FormatTime(GameManager.Instance.BoostTimeRemaining)}";
+                boostTimerText.gameObject.SetActive(true);
+            }
+            else
+            {
+                boostTimerText.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -160,15 +234,11 @@ public class TapCounter : MonoBehaviour
             return;
         }
 
-        // Текущий цветовой этап (0 при 0..9, 1 при 10..19 и т.д.)
-        int currentStage = (counter / 10) % stageColors.Length;
+        int scoreForColor = GameManager.Instance != null ? (int)(GameManager.Instance.CodeLines) : counter;
+        int currentStage = (scoreForColor / 10) % stageColors.Length;
         int nextStage = (currentStage + 1) % stageColors.Length;
 
-        // Доля прогресса внутри текущей десятки [0.0 .. 1.0)
-        float t = (counter % 10) / 10f;
-
-        // Плавная интерполяция цвета между этапами
+        float t = (scoreForColor % 10) / 10f;
         counterText.color = Color.Lerp(stageColors[currentStage], stageColors[nextStage], t);
     }
 }
-
