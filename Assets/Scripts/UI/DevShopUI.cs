@@ -35,8 +35,63 @@ public class DevShopUI : MonoBehaviour
     [Header("Привязанные кнопки проектов")]
     [SerializeField] private List<ProjectButtonBinding> projectBindings = new List<ProjectButtonBinding>();
 
+    [Header("Вкладки магазина")]
+    [SerializeField] private Button tabHardwareBtn;
+    [SerializeField] private Button tabStaffBtn;
+    [SerializeField] private Button tabProjectsBtn;
+    [SerializeField] private GameObject hardwareView;
+    [SerializeField] private GameObject staffView;
+    [SerializeField] private GameObject projectsView;
+
+    public List<UpgradeButtonBinding> UpgradeBindings => upgradeBindings;
+    public List<ProjectButtonBinding> ProjectBindings => projectBindings;
+
+    private int activeTab = 0; // 0: Железо, 1: Персонал, 2: Проекты
+
+    public void SetupTabs(Button bHw, Button bSt, Button bPr, GameObject vHw, GameObject vSt, GameObject vPr)
+    {
+        tabHardwareBtn = bHw;
+        tabStaffBtn = bSt;
+        tabProjectsBtn = bPr;
+        hardwareView = vHw;
+        staffView = vSt;
+        projectsView = vPr;
+        BindTabButtons();
+        SelectTab(0);
+    }
+
+    private void BindTabButtons()
+    {
+        if (tabHardwareBtn != null)
+        {
+            tabHardwareBtn.onClick.RemoveAllListeners();
+            tabHardwareBtn.onClick.AddListener(() => SelectTab(0));
+        }
+        if (tabStaffBtn != null)
+        {
+            tabStaffBtn.onClick.RemoveAllListeners();
+            tabStaffBtn.onClick.AddListener(() => SelectTab(1));
+        }
+        if (tabProjectsBtn != null)
+        {
+            tabProjectsBtn.onClick.RemoveAllListeners();
+            tabProjectsBtn.onClick.AddListener(() => SelectTab(2));
+        }
+    }
+
+    public void SelectTab(int tabIndex)
+    {
+        activeTab = tabIndex;
+        if (hardwareView != null) hardwareView.SetActive(activeTab == 0);
+        if (staffView != null) staffView.SetActive(activeTab == 1);
+        if (projectsView != null) projectsView.SetActive(activeTab == 2);
+    }
+
     private void OnEnable()
     {
+        BindTabButtons();
+        SelectTab(activeTab);
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnCurrenciesChanged += RefreshUI;
@@ -56,6 +111,13 @@ public class DevShopUI : MonoBehaviour
             GameManager.Instance.OnUpgradePurchased -= HandleUpgradePurchased;
             GameManager.Instance.OnProjectCompleted -= HandleProjectCompleted;
         }
+    }
+
+    public void RebindAndRefresh()
+    {
+        BindTabButtons();
+        BindEvents();
+        RefreshUI();
     }
 
     private void BindEvents()
