@@ -176,7 +176,9 @@ def add_button(fid, go_id, target_graphic_id):
     add("    m_PersistentCalls:")
     add("      m_Calls: []")
 
-def add_tmp(fid, go_id, text, fsize=24, fstyle=0, color=(1,1,1,1), align=514):
+def add_tmp(fid, go_id, text, fsize=24, fstyle=0, color=(1,1,1,1), align=514, autosize=0, fmin=12, fmax=None):
+    if fmax is None:
+        fmax = fsize
     add(f"--- !u!114 &{fid}")
     add("MonoBehaviour:")
     add("  m_ObjectHideFlags: 0")
@@ -213,7 +215,9 @@ def add_tmp(fid, go_id, text, fsize=24, fstyle=0, color=(1,1,1,1), align=514):
     add(f"  m_fontSize: {fsize}")
     add(f"  m_fontSizeBase: {fsize}")
     add("  m_fontWeight: 400")
-    add("  m_enableAutoSizing: 0")
+    add(f"  m_enableAutoSizing: {autosize}")
+    add(f"  m_fontSizeMin: {fmin}")
+    add(f"  m_fontSizeMax: {fmax}")
     add(f"  m_fontStyle: {fstyle}")
     add(f"  m_HorizontalAlignment: {align % 256}")
     add(f"  m_VerticalAlignment: {align // 256}")
@@ -838,7 +842,7 @@ add("  m_ReferencePixelsPerUnit: 100")
 add("  m_ScaleFactor: 1")
 add("  m_ReferenceResolution: {x: 1080, y: 1920}")
 add("  m_ScreenMatchMode: 1")
-add("  m_MatchWidthOrHeight: 0.5")
+add("  m_MatchWidthOrHeight: 0")
 add("--- !u!114 &1442568836")
 add("MonoBehaviour:")
 add("  m_ObjectHideFlags: 0")
@@ -861,25 +865,11 @@ add_rect(1400001, 1400000, 1442568835, [], amin=(0,0), amax=(1,1))
 add_cr(1400003, 1400000)
 add_image(1400002, 1400000, None, color=(0.03, 0.035, 0.05, 1.0), raycast=0)
 
-# MobileFrame (Strict 1080x1920 9:16 Portrait Container)
-add_go(1500000, "MobileFrame", [1500001, 1500003, 1500002, 1500004])
-add_rect(1500001, 1500000, 1442568835, [3000001, 3090001, 2010001, 2080001, 4000001, 5000001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(1080, 1920))
+# MobileFrame (Full Responsive Stretch Canvas Container)
+add_go(1500000, "MobileFrame", [1500001, 1500003, 1500002])
+add_rect(1500001, 1500000, 1442568835, [3000001, 3090001, 2010001, 2080001, 4000001, 5000001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(1500003, 1500000)
 add_image(1500002, 1500000, None, color=(0.055, 0.065, 0.09, 1.0), raycast=0)
-add("--- !u!114 &1500004")
-add("MonoBehaviour:")
-add("  m_ObjectHideFlags: 0")
-add("  m_CorrespondingSourceObject: {fileID: 0}")
-add("  m_PrefabInstance: {fileID: 0}")
-add("  m_PrefabAsset: {fileID: 0}")
-add("  m_GameObject: {fileID: 1500000}")
-add("  m_Enabled: 1")
-add("  m_EditorHideFlags: 0")
-add("  m_Script: {fileID: 11500000, guid: " + GUID_RECT_MASK_2D + ", type: 3}")
-add("  m_Name: ")
-add("  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D")
-add("  m_Padding: {x: 0, y: 0, z: 0, w: 0}")
-add("  m_Softness: {x: 0, y: 0}")
 
 # FloatingTextParent
 add_go(3090000, "FloatingTextParent", [3090001])
@@ -961,12 +951,12 @@ add_rect(2020001, 2020000, 2010001, [2021001, 2022001], amin=(0.5, 1), amax=(0.5
 add_go(2021000, "CodeText", [2021001, 2021003, 2021002])
 add_rect(2021001, 2021000, 2020001, [], amin=(0, 0.4), amax=(1, 1), pos=(0, 10), size=(0, 50))
 add_cr(2021003, 2021000)
-add_tmp(2021002, 2021000, "Строк кода: 0", fsize=44, fstyle=1, color=(1,1,1,1), align=514)
+add_tmp(2021002, 2021000, "Строк кода: 0", fsize=38, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=24, fmax=40)
 
 add_go(2022000, "StatsText", [2022001, 2022003, 2022002])
 add_rect(2022001, 2022000, 2020001, [], amin=(0, 0), amax=(1, 0.4), pos=(0, -15), size=(0, 30))
 add_cr(2022003, 2022000)
-add_tmp(2022002, 2022000, "+1.0 за клик  |  +0.0 строк/сек", fsize=20, fstyle=0, color=(0.55, 0.65, 0.75, 1), align=514)
+add_tmp(2022002, 2022000, "+1.0 за клик  |  +0.0 строк/сек", fsize=18, fstyle=0, color=(0.55, 0.65, 0.75, 1), align=514, autosize=1, fmin=13, fmax=19)
 
 # Row 3: Money Text & Passive income
 add_go(2030000, "MoneyBlock", [2030001])
@@ -974,23 +964,52 @@ add_rect(2030001, 2030000, 2010001, [2031001], amin=(0.5, 1), amax=(0.5, 1), pos
 add_go(2031000, "MoneyText", [2031001, 2031003, 2031002])
 add_rect(2031001, 2031000, 2030001, [], amin=(0,0), amax=(1,1))
 add_cr(2031003, 2031000)
-add_tmp(2031002, 2031000, "Баланс: 0 руб.  (+0 руб./сек)", fsize=28, fstyle=1, color=(1.0, 0.82, 0.35, 1), align=514)
+add_tmp(2031002, 2031000, "Баланс: 0 руб.  (+0 руб./сек)", fsize=26, fstyle=1, color=(1.0, 0.82, 0.35, 1), align=514, autosize=1, fmin=18, fmax=28)
 
 # ==============================================================
 # 2. WORKPLACE AREA (Central 9:16 Vertical Workstation & Tap)
 # ==============================================================
 add_go(3000000, "WorkplaceArea", [3000001, 3000002, 3000003])
-add_rect(3000001, 3000000, 1500001, [3010001, 3080001, 3011001, 3021301], amin=(0, 0), amax=(1, 1), pos=(0, -40), size=(0, -440), pivot=(0.5, 0.5))
+add_rect(3000001, 3000000, 1500001, [3010001, 3080001, 3011001], amin=(0, 0), amax=(1, 1), pos=(0, -50), size=(0, -420), pivot=(0.5, 0.5))
 
 # DeskMat (Background desk surface)
 add_go(3010000, "DeskMat", [3010001, 3010003, 3010002])
-add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(1040, 1380))
+add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3010003, 3010000)
 add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
 
+# MonitorFrame (Upper half of workstation)
+add_go(3020000, "MonitorFrame", [3020001, 3020003, 3020002])
+add_rect(3020001, 3020000, 3010001, [3021001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -92), size=(960, 520), pivot=(0.5, 1))
+add_cr(3020003, 3020000)
+add_image(3020002, 3020000, GUID_SPR_MON_FRAME, raycast=0)
+
+# MonitorScreen
+add_go(3021000, "MonitorScreen", [3021001, 3021003, 3021002])
+add_rect(3021001, 3021000, 3020001, [3021101, 3021201, 3021301], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 18), size=(880, 360), pivot=(0.5, 0.5))
+add_cr(3021003, 3021000)
+add_image(3021002, 3021000, GUID_SPR_MON_SCREEN, raycast=0)
+
+# TerminalCodeText (Live C# code on screen)
+add_go(3021100, "TerminalCodeText", [3021101, 3021103, 3021102])
+add_rect(3021101, 3021100, 3021001, [], amin=(0, 0), amax=(0.58, 1), pos=(15, -12), size=(-25, -24), pivot=(0, 1))
+add_cr(3021103, 3021100)
+add_tmp(3021102, 3021100, "// HelloTap Dev v1.4.0\\nusing UnityEngine;\\n> <color=#00FF88>_</color>", fsize=15, fstyle=0, color=(0, 1, 0.55, 1), align=257, autosize=1, fmin=11, fmax=16)
+
+# SecondMonitorPanel (Docs & Metrics)
+add_go(3021200, "SecondMonitorPanel", [3021201, 3021203, 3021202], active=0)
+add_rect(3021201, 3021200, 3021001, [3021211], amin=(0.58, 0.05), amax=(0.98, 0.95), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_cr(3021203, 3021200)
+add_image(3021202, 3021200, None, color=(0.03, 0.05, 0.09, 0.92), raycast=0)
+
+add_go(3021210, "SecondMonitorText", [3021211, 3021213, 3021212])
+add_rect(3021211, 3021210, 3021201, [], amin=(0,0), amax=(1,1), pos=(10, -10), size=(-20, -20), pivot=(0, 1))
+add_cr(3021213, 3021210)
+add_tmp(3021212, 3021210, "<color=#4EC9B0>[DEV DOCS & METRICS]</color>\\nGPU: Integrated\\nAI Copilot: Offline\\nБагов пофикшено: 0\\nБонус ачивок: +0%", fsize=14, fstyle=0, color=(0.35, 0.9, 0.8, 1), align=257, autosize=1, fmin=10, fmax=15)
+
 # ComboBar (Between monitor and keyboard)
 add_go(3012000, "ComboBar", [3012001, 3012003, 3012002])
-add_rect(3012001, 3012000, 3010001, [3012101, 3012201], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, -75), size=(720, 32))
+add_rect(3012001, 3012000, 3010001, [3012101, 3012201], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -628), size=(820, 36), pivot=(0.5, 1))
 add_cr(3012003, 3012000)
 add_image(3012002, 3012000, GUID_SPR_CARD_BG, color=(0.06, 0.08, 0.12, 0.9), img_type=1)
 
@@ -1002,64 +1021,35 @@ add_image(3012102, 3012100, GUID_SPR_BTN_GOLD, color=(0.20, 0.65, 0.95, 0.75), i
 add_go(3012200, "ComboBarText", [3012201, 3012203, 3012202])
 add_rect(3012201, 3012200, 3012001, [], amin=(0,0), amax=(1,1))
 add_cr(3012203, 3012200)
-add_tmp(3012202, 3012200, "ТЕМП ПЕЧАТИ: x1.0 (тапай быстрее для x3.0)", fsize=14, fstyle=1, color=(0.75, 0.82, 0.92, 1), align=514)
-
-# MonitorFrame (Upper half of workstation)
-add_go(3020000, "MonitorFrame", [3020001, 3020003, 3020002])
-add_rect(3020001, 3020000, 3010001, [3021001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 280), size=(940, 520))
-add_cr(3020003, 3020000)
-add_image(3020002, 3020000, GUID_SPR_MON_FRAME, raycast=0)
-
-# MonitorScreen
-add_go(3021000, "MonitorScreen", [3021001, 3021003, 3021002])
-add_rect(3021001, 3021000, 3020001, [3021101, 3021201], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 16), size=(860, 360))
-add_cr(3021003, 3021000)
-add_image(3021002, 3021000, GUID_SPR_MON_SCREEN, raycast=0)
-
-# TerminalCodeText (Live C# code on screen)
-add_go(3021100, "TerminalCodeText", [3021101, 3021103, 3021102])
-add_rect(3021101, 3021100, 3021001, [], amin=(0, 0), amax=(0.58, 1), pos=(0, 0), pivot=(0, 1))
-add_cr(3021103, 3021100)
-add_tmp(3021102, 3021100, "// HelloTap Dev v1.3.0\\nusing UnityEngine;\\n> <color=#00FF88>_</color>", fsize=16, fstyle=0, color=(0, 1, 0.55, 1), align=257)
-
-# SecondMonitorPanel (Docs & Metrics)
-add_go(3021200, "SecondMonitorPanel", [3021201, 3021203, 3021202], active=0)
-add_rect(3021201, 3021200, 3021001, [3021211], amin=(0.58, 0.05), amax=(0.98, 0.95), pos=(0, 0), size=(0, 0))
-add_cr(3021203, 3021200)
-add_image(3021202, 3021200, None, color=(0.03, 0.05, 0.09, 0.92), raycast=0)
-
-add_go(3021210, "SecondMonitorText", [3021211, 3021213, 3021212])
-add_rect(3021211, 3021210, 3021201, [], amin=(0,0), amax=(1,1), pos=(10, -10), size=(-20, -20), pivot=(0, 1))
-add_cr(3021213, 3021210)
-add_tmp(3021212, 3021210, "<color=#4EC9B0>[DEV DOCS & METRICS]</color>\\nGPU: Integrated\\nAI Copilot: Offline\\nБагов пофикшено: 0\\nБонус ачивок: +0%", fsize=14, fstyle=0, color=(0.35, 0.9, 0.8, 1), align=257)
+add_tmp(3012202, 3012200, "ТЕМП ПЕЧАТИ: x1.0 (тапай быстрее для x3.0)", fsize=14, fstyle=1, color=(0.75, 0.82, 0.92, 1), align=514, autosize=1, fmin=10, fmax=15)
 
 # Cat Mascot (sitting peacefully by monitor)
 add_go(3070000, "CatMascot", [3070001, 3070003, 3070002])
-add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-360, 500), size=(200, 140))
+add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-385, -310), size=(180, 130), pivot=(0.5, 0.5))
 add_cr(3070003, 3070000)
 add_image(3070002, 3070000, GUID_SPR_CAT, raycast=0)
 
 # Energy Can (on desk)
 add_go(3060000, "EnergyCan", [3060001, 3060003, 3060002])
-add_rect(3060001, 3060000, 3010001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(380, 510), size=(110, 180))
+add_rect(3060001, 3060000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(395, -310), size=(100, 170), pivot=(0.5, 0.5))
 add_cr(3060003, 3060000)
 add_image(3060002, 3060000, GUID_SPR_ENERGY, raycast=0)
 
 # Coffee Mug
 add_go(3050000, "CoffeeMug", [3050001, 3050003, 3050002])
-add_rect(3050001, 3050000, 3010001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-370, -250), size=(140, 160))
+add_rect(3050001, 3050000, 3010001, [], amin=(0.5, 0), amax=(0.5, 0), pos=(-390, 140), size=(130, 150), pivot=(0.5, 0.5))
 add_cr(3050003, 3050000)
 add_image(3050002, 3050000, GUID_SPR_COFFEE, raycast=0)
 
 # Gaming Mouse
 add_go(3040000, "GamingMouse", [3040001, 3040003, 3040002])
-add_rect(3040001, 3040000, 3010001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(370, -250), size=(120, 190))
+add_rect(3040001, 3040000, 3010001, [], amin=(0.5, 0), amax=(0.5, 0), pos=(390, 140), size=(110, 180), pivot=(0.5, 0.5))
 add_cr(3040003, 3040000)
 add_image(3040002, 3040000, GUID_SPR_MOUSE, raycast=0)
 
 # KeyboardGroup (Lower half of workstation - Main tap zone)
 add_go(3030000, "KeyboardGroup", [3030001])
-add_rect(3030001, 3030000, 3010001, [3031001, 3032001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, -260), size=(720, 270))
+add_rect(3030001, 3030000, 3010001, [3031001, 3032001], amin=(0.5, 0), amax=(0.5, 0), pos=(0, 25), size=(780, 260), pivot=(0.5, 0))
 
 add_go(3031000, "KeyboardImage", [3031001, 3031003, 3031002])
 add_rect(3031001, 3031000, 3030001, [], amin=(0,0), amax=(1,1))
@@ -1080,7 +1070,7 @@ add_button(3080003, 3080000, 3080002)
 
 # ProjectProgressBar (Above monitor on main screen)
 add_go(3011000, "ProjectProgressBar", [3011001, 3011003, 3011002, 3011300])
-add_rect(3011001, 3011000, 3000001, [3011101, 3011201, 3011301], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 600), size=(880, 56))
+add_rect(3011001, 3011000, 3000001, [3011101, 3011201, 3011301], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -22), size=(960, 54), pivot=(0.5, 1))
 add_cr(3011003, 3011000)
 add_image(3011002, 3011000, GUID_SPR_CARD_BG, color=(0.08, 0.10, 0.15, 0.95), img_type=1)
 
@@ -1102,7 +1092,7 @@ add_button(3011303, 3011300, 3011302)
 
 # BugAlertButton (Mini-event button on monitor screen)
 add_go(3021300, "BugAlertButton", [3021301, 3021304, 3021302, 3021303], active=0)
-add_rect(3021301, 3021300, 3000001, [3021311], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 280), size=(360, 60))
+add_rect(3021301, 3021300, 3021001, [3021311], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(320, 56), pivot=(0.5, 0.5))
 add_cr(3021304, 3021300)
 add_image(3021302, 3021300, GUID_SPR_BTN_ORANGE, img_type=1)
 add_button(3021303, 3021300, 3021302)
@@ -1167,42 +1157,42 @@ add("  floatDuration: 0.8")
 # 3. BOTTOM NAVIGATION DOCK (Persistent mobile bottom bar - 3 tabs)
 # ==============================================================
 add_go(2080000, "BottomNavDock", [2080001, 2080003, 2080002, 2080005])
-add_rect(2080001, 2080000, 1500001, [2081001, 2083001, 2082001], amin=(0,0), amax=(1,0), pos=(0,0), size=(0, 180), pivot=(0.5, 0))
+add_rect(2080001, 2080000, 1500001, [2081001, 2083001, 2082001], amin=(0,0), amax=(1,0), pos=(0,0), size=(0, 160), pivot=(0.5, 0))
 add_cr(2080003, 2080000)
 add_image(2080002, 2080000, None, color=(0.07, 0.086, 0.12, 0.98), raycast=0)
 
 # OpenShopBtn («ЖЕЛЕЗО»)
 add_go(2081000, "OpenShopBtn", [2081001, 2081004, 2081002, 2081003])
-add_rect(2081001, 2081000, 2080001, [2081101], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-340, 0), size=(310, 110))
+add_rect(2081001, 2081000, 2080001, [2081101], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-340, 0), size=(310, 100))
 add_cr(2081004, 2081000)
 add_image(2081002, 2081000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(2081003, 2081000, 2081002)
 add_go(2081100, "Txt", [2081101, 2081103, 2081102])
 add_rect(2081101, 2081100, 2081001, [], amin=(0,0), amax=(1,1))
 add_cr(2081103, 2081100)
-add_tmp(2081102, 2081100, "МАГАЗИН", fsize=26, fstyle=1, color=(1,1,1,1), align=514)
+add_tmp(2081102, 2081100, "МАГАЗИН", fsize=24, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=16, fmax=26)
 
 # OpenStaffBtn («КОМАНДА»)
 add_go(2083000, "OpenStaffBtn", [2083001, 2083004, 2083002, 2083003])
-add_rect(2083001, 2083000, 2080001, [2083101], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(310, 110))
+add_rect(2083001, 2083000, 2080001, [2083101], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(310, 100))
 add_cr(2083004, 2083000)
 add_image(2083002, 2083000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(2083003, 2083000, 2083002)
 add_go(2083100, "Txt", [2083101, 2083103, 2083102])
 add_rect(2083101, 2083100, 2083001, [], amin=(0,0), amax=(1,1))
 add_cr(2083103, 2083100)
-add_tmp(2083102, 2083100, "КОМАНДА", fsize=26, fstyle=1, color=(1,1,1,1), align=514)
+add_tmp(2083102, 2083100, "КОМАНДА", fsize=24, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=16, fmax=26)
 
 # OpenProjectsBtn («ПРОЕКТЫ»)
 add_go(2082000, "OpenProjectsBtn", [2082001, 2082004, 2082002, 2082003])
-add_rect(2082001, 2082000, 2080001, [2082101], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(340, 0), size=(310, 110))
+add_rect(2082001, 2082000, 2080001, [2082101], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(340, 0), size=(310, 100))
 add_cr(2082004, 2082000)
 add_image(2082002, 2082000, GUID_SPR_BTN_GOLD, img_type=1)
 add_button(2082003, 2082000, 2082002)
 add_go(2082100, "Txt", [2082101, 2082103, 2082102])
 add_rect(2082101, 2082100, 2082001, [], amin=(0,0), amax=(1,1))
 add_cr(2082103, 2082100)
-add_tmp(2082102, 2082100, "ПРОЕКТЫ", fsize=26, fstyle=1, color=(1,1,1,1), align=514)
+add_tmp(2082102, 2082100, "ПРОЕКТЫ", fsize=24, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=16, fmax=26)
 
 # ==============================================================
 # 4. SHOP MODAL POPUP (Dev-Market Modal Window - Inactive by default!)
@@ -1219,7 +1209,7 @@ add_button(4001003, 4001000, 4001002)
 
 # Modal Card Container
 add_go(4002000, "ModalCard", [4002001, 4002004, 4002002])
-add_rect(4002001, 4002000, 4000001, [4010001, 4020001, 4030001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 20), size=(1020, 1600))
+add_rect(4002001, 4002000, 4000001, [4010001, 4020001, 4030001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 20), size=(1000, 1480))
 add_cr(4002004, 4002000)
 add_image(4002002, 4002000, GUID_SPR_CARD_BG, color=(0.09, 0.11, 0.15, 0.98), img_type=1)
 
@@ -1279,7 +1269,7 @@ add_tmp(4023102, 4023100, "ПРОЕКТЫ", fsize=20, fstyle=1, color=(1,1,1,1),
 
 # ShopScrollView
 add_go(4030000, "ShopScrollView", [4030001, 4030003])
-add_rect(4030001, 4030000, 4002001, [4031001], amin=(0,0), amax=(1,1), pos=(0, -110), size=(-40, -250), pivot=(0.5, 0.5))
+add_rect(4030001, 4030000, 4002001, [4031001], amin=(0,0), amax=(1,1), pos=(0, -85), size=(-50, -210), pivot=(0.5, 0.5))
 add(f"--- !u!114 &4030003")
 add("MonoBehaviour:")
 add("  m_ObjectHideFlags: 0")
@@ -1402,7 +1392,7 @@ def add_upgrade_card(cid, father_id, item_id, title, power, cost):
     add_go(cid+10, "Title", [cid+11, cid+13, cid+12])
     add_rect(cid+11, cid+10, cid+1, [], amin=(0, 1), amax=(0.68, 1), pos=(20, -20), size=(0, 30), pivot=(0, 1))
     add_cr(cid+13, cid+10)
-    add_tmp(cid+12, cid+10, title, fsize=22, fstyle=1, color=(1,1,1,1), align=513)
+    add_tmp(cid+12, cid+10, title, fsize=20, fstyle=1, color=(1,1,1,1), align=513, autosize=1, fmin=14, fmax=22)
 
     # Level
     add_go(cid+20, "Level", [cid+21, cid+23, cid+22])
@@ -1426,7 +1416,7 @@ def add_upgrade_card(cid, father_id, item_id, title, power, cost):
     add_go(cid+50, "CostText", [cid+51, cid+53, cid+52])
     add_rect(cid+51, cid+50, cid+41, [], amin=(0,0), amax=(1,1))
     add_cr(cid+53, cid+50)
-    add_tmp(cid+52, cid+50, cost, fsize=18, fstyle=1, color=(1,1,1,1), align=514)
+    add_tmp(cid+52, cid+50, cost, fsize=17, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=12, fmax=18)
 
 for item in hw_items:
     add_upgrade_card(item[4], 4040001, item[0], item[1], item[2], item[3])
@@ -1444,7 +1434,7 @@ def add_project_card(cid, father_id, item_id, title, req, reward):
     add_go(cid+10, "Title", [cid+11, cid+13, cid+12])
     add_rect(cid+11, cid+10, cid+1, [], amin=(0, 1), amax=(0.68, 1), pos=(20, -20), size=(0, 30), pivot=(0, 1))
     add_cr(cid+13, cid+10)
-    add_tmp(cid+12, cid+10, title, fsize=22, fstyle=1, color=(0.35, 0.70, 1, 1), align=513)
+    add_tmp(cid+12, cid+10, title, fsize=20, fstyle=1, color=(0.35, 0.70, 1, 1), align=513, autosize=1, fmin=14, fmax=22)
 
     # Req
     add_go(cid+20, "Req", [cid+21, cid+23, cid+22])
@@ -1573,7 +1563,7 @@ add("  prestigeBtnText: {fileID: 4065212}")
 
 # 5.1 AchievementToastRoot (active=0)
 add_go(5010000, "AchievementToastRoot", [5010001, 5010003, 5010002], active=0)
-add_rect(5010001, 5010000, 5000001, [5011001, 5012001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -90), size=(760, 110), pivot=(0.5, 1))
+add_rect(5010001, 5010000, 5000001, [5011001, 5012001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -275), size=(960, 115), pivot=(0.5, 1))
 add_cr(5010003, 5010000)
 add_image(5010002, 5010000, GUID_SPR_CARD_BG, color=(0.12, 0.15, 0.22, 0.98), img_type=1)
 
@@ -1599,7 +1589,7 @@ add_image(5021002, 5021000, None, color=(0, 0, 0, 0.82), raycast=1)
 
 # Card
 add_go(5022000, "OfflineCard", [5022001, 5022003, 5022002])
-add_rect(5022001, 5022000, 5020001, [5023001, 5024001, 5025001, 5026001, 5027001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(820, 560))
+add_rect(5022001, 5022000, 5020001, [5023001, 5024001, 5025001, 5026001, 5027001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(900, 620))
 add_cr(5022003, 5022000)
 add_image(5022002, 5022000, GUID_SPR_CARD_BG, color=(0.10, 0.12, 0.17, 0.98), img_type=1)
 
@@ -1623,7 +1613,7 @@ add_tmp(5025002, 5025000, "Ваша команда намайнила:\\n+0 ст
 
 # ClaimNormalBtn
 add_go(5026000, "ClaimNormalBtn", [5026001, 5026004, 5026002, 5026003])
-add_rect(5026001, 5026000, 5022001, [5026101], amin=(0.5, 0), amax=(0.5, 0), pos=(-190, 75), size=(340, 85), pivot=(0.5, 0.5))
+add_rect(5026001, 5026000, 5022001, [5026101], amin=(0.5, 0), amax=(0.5, 0), pos=(-210, 80), size=(360, 90), pivot=(0.5, 0.5))
 add_cr(5026004, 5026000)
 add_image(5026002, 5026000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(5026003, 5026000, 5026002)
@@ -1634,7 +1624,7 @@ add_tmp(5026102, 5026100, "ЗАБРАТЬ x1", fsize=22, fstyle=1, color=(1,1,1,
 
 # ClaimDoubleBtn
 add_go(5027000, "ClaimDoubleBtn", [5027001, 5027004, 5027002, 5027003])
-add_rect(5027001, 5027000, 5022001, [5027101], amin=(0.5, 0), amax=(0.5, 0), pos=(190, 75), size=(340, 85), pivot=(0.5, 0.5))
+add_rect(5027001, 5027000, 5022001, [5027101], amin=(0.5, 0), amax=(0.5, 0), pos=(210, 80), size=(360, 90), pivot=(0.5, 0.5))
 add_cr(5027004, 5027000)
 add_image(5027002, 5027000, GUID_SPR_BTN_GOLD, img_type=1)
 add_button(5027003, 5027000, 5027002)
