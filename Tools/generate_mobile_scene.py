@@ -788,73 +788,72 @@ add("  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}")
 add("  m_LocalPosition: {x: 0, y: 0, z: 0}")
 add("  m_LocalScale: {x: 0, y: 0, z: 0}")
 add("  m_ConstrainProportionsScale: 0")
-add("""  m_Children:
-  - {fileID: 1400001} # OuterBackground
-  - {fileID: 1500001} # MobileFrame (1080x1920 9:16 Portrait)
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
---- !u!223 &1442568838
-Canvas:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442568834}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
-  m_PixelPerfect: 0
-  m_ReceivesEvents: 1
-  m_OverrideSorting: 0
-  m_OverridePixelPerfect: 0
-  m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 25
-  m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
-  m_TargetDisplay: 0
---- !u!114 &1442568837
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442568834}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: " + GUID_CANVAS_SCALER + ", type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 1
-  m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1080, y: 1920}
-  m_ScreenMatchMode: 1
-  m_MatchWidthOrHeight: 0.5
---- !u!114 &1442568836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442568834}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: " + GUID_GRAPHIC_RAYCASTER + ", type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask: {serializedVersion: 2, m_Bits: 4294967295}
-""")
+add("  m_Children:")
+add("  - {fileID: 1400001}") # OuterBackground
+add("  - {fileID: 1500001}") # MobileFrame (1080x1920 9:16 Portrait)
+add("  m_Father: {fileID: 0}")
+add("  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}")
+add("  m_AnchorMin: {x: 0, y: 0}")
+add("  m_AnchorMax: {x: 0, y: 0}")
+add("  m_AnchoredPosition: {x: 0, y: 0}")
+add("  m_SizeDelta: {x: 0, y: 0}")
+add("  m_Pivot: {x: 0, y: 0}")
+add("--- !u!223 &1442568838")
+add("Canvas:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 1442568834}")
+add("  m_Enabled: 1")
+add("  serializedVersion: 3")
+add("  m_RenderMode: 0")
+add("  m_Camera: {fileID: 0}")
+add("  m_PlaneDistance: 100")
+add("  m_PixelPerfect: 0")
+add("  m_ReceivesEvents: 1")
+add("  m_OverrideSorting: 0")
+add("  m_OverridePixelPerfect: 0")
+add("  m_SortingBucketNormalizedSize: 0")
+add("  m_VertexColorAlwaysGammaSpace: 0")
+add("  m_AdditionalShaderChannelsFlag: 25")
+add("  m_UpdateRectTransformForStandalone: 0")
+add("  m_SortingLayerID: 0")
+add("  m_SortingOrder: 0")
+add("  m_TargetDisplay: 0")
+add(f"--- !u!114 &1442568837")
+add("MonoBehaviour:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 1442568834}")
+add("  m_Enabled: 1")
+add("  m_EditorHideFlags: 0")
+add("  m_Script: {fileID: 11500000, guid: " + GUID_CANVAS_SCALER + ", type: 3}")
+add("  m_Name: ")
+add("  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler")
+add("  m_UiScaleMode: 1")
+add("  m_ReferencePixelsPerUnit: 100")
+add("  m_ScaleFactor: 1")
+add("  m_ReferenceResolution: {x: 1080, y: 1920}")
+add("  m_ScreenMatchMode: 1")
+add("  m_MatchWidthOrHeight: 0.5")
+add("--- !u!114 &1442568836")
+add("MonoBehaviour:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 1442568834}")
+add("  m_Enabled: 1")
+add("  m_EditorHideFlags: 0")
+add("  m_Script: {fileID: 11500000, guid: " + GUID_GRAPHIC_RAYCASTER + ", type: 3}")
+add("  m_Name: ")
+add("  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster")
+add("  m_IgnoreReversedGraphics: 1")
+add("  m_BlockingObjects: 0")
+add("  m_BlockingMask: {serializedVersion: 2, m_Bits: 4294967295}")
 
 # OuterBackground (Dark letterbox backdrop outside 9:16 frame)
 add_go(1400000, "OuterBackground", [1400001, 1400003, 1400002])

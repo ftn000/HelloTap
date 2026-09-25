@@ -19,6 +19,42 @@ public static class HelloTapSceneBuilder
     // to prevent overwriting custom scene changes on every Unity Editor launch.
 
 
+    [MenuItem("HelloTap/Fix Orientation (Reset to Portrait 9:16)")]
+    public static void FixScreenOrientation()
+    {
+        PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
+        PlayerSettings.allowedAutorotateToPortrait = true;
+        PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
+        PlayerSettings.allowedAutorotateToLandscapeRight = false;
+        PlayerSettings.allowedAutorotateToLandscapeLeft = false;
+
+        var canvas = Object.FindFirstObjectByType<Canvas>();
+        if (canvas != null)
+        {
+            canvas.transform.localRotation = Quaternion.identity;
+            canvas.transform.localScale = Vector3.one;
+
+            var mobileFrame = canvas.transform.Find("MobileFrame");
+            if (mobileFrame != null)
+            {
+                mobileFrame.localRotation = Quaternion.identity;
+                mobileFrame.localScale = Vector3.one;
+            }
+            EditorUtility.SetDirty(canvas);
+        }
+
+        var cam = Camera.main;
+        if (cam != null)
+        {
+            cam.transform.localRotation = Quaternion.identity;
+            cam.transform.localScale = Vector3.one;
+            EditorUtility.SetDirty(cam);
+        }
+
+        EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        Debug.Log("[HelloTap] Ориентация сброшена в нормальный Portrait (9:16). UpsideDown отключен.");
+    }
+
     [MenuItem("HelloTap/Build Full Scene")]
     public static void BuildCompleteScene()
     {

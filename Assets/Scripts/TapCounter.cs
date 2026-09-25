@@ -48,6 +48,12 @@ public class TapCounter : MonoBehaviour
 
     private void Awake()
     {
+        Screen.orientation = ScreenOrientation.Portrait;
+        Screen.autorotateToPortrait = true;
+        Screen.autorotateToPortraitUpsideDown = false;
+        Screen.autorotateToLandscapeLeft = false;
+        Screen.autorotateToLandscapeRight = false;
+
         EnsureGameManagerExists();
         EnsureEventSystemExists();
         cachedShopUI = Object.FindFirstObjectByType<DevShopUI>();
