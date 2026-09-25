@@ -15,18 +15,9 @@ public static class HelloTapSceneBuilder
 {
     private const string VersionMarker = "HelloTap_Scene_v1_BuildDone";
 
-    [InitializeOnLoadMethod]
-    private static void AutoInit()
-    {
-        EditorApplication.delayCall += () =>
-        {
-            if (!SessionState.GetBool(VersionMarker, false))
-            {
-                SessionState.SetBool(VersionMarker, true);
-                BuildCompleteScene();
-            }
-        };
-    }
+    // AutoInit is preserved for manual builds via MenuItem("HelloTap/Build Full Scene")
+    // to prevent overwriting custom scene changes on every Unity Editor launch.
+
 
     [MenuItem("HelloTap/Build Full Scene")]
     public static void BuildCompleteScene()

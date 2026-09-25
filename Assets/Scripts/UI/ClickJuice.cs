@@ -54,6 +54,16 @@ public class ClickJuice : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
+            GameManager.Instance.OnCodeClicked -= HandleCodeClicked;
+            GameManager.Instance.OnCodeClicked += HandleCodeClicked;
+        }
+    }
+
+    private void Start()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnCodeClicked -= HandleCodeClicked;
             GameManager.Instance.OnCodeClicked += HandleCodeClicked;
         }
     }
@@ -72,7 +82,8 @@ public class ClickJuice : MonoBehaviour
         PlayTypingSound();
 
         // Показ всплывающего текста
-        if (floatingTextPrefab != null && floatingTextParent != null)
+        Transform parent = floatingTextParent != null ? floatingTextParent : transform.parent;
+        if (parent != null)
         {
             string message = isCrit ? $"<color=#FF5555>КРИТ! +{NumberFormatter.Format(amount)}</color>" : $"+{NumberFormatter.Format(amount)}";
             
@@ -82,7 +93,7 @@ public class ClickJuice : MonoBehaviour
                 message = FunnyCodeLines[Random.Range(0, FunnyCodeLines.Length)];
             }
 
-            SpawnFloatingText(message, screenPos, isCrit);
+            SpawnFloatingText(message, screenPos, isCrit, parent);
         }
     }
 
@@ -113,9 +124,27 @@ public class ClickJuice : MonoBehaviour
         targetTransform.localScale = originalScale;
     }
 
-    private void SpawnFloatingText(string text, Vector2 spawnPos, bool isCrit)
+    private void SpawnFloatingText(string text, Vector2 spawnPos, bool isCrit, Transform parent)
     {
-        TMP_Text instance = Instantiate(floatingTextPrefab, floatingTextParent);
+        TMP_Text instance;
+        if (floatingTextPrefab != null)
+        {
+            instance = Instantiate(floatingTextPrefab, parent);
+        }
+        else
+        {
+            GameObject go = new GameObject("FloatingText", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            go.transform.SetParent(parent, false);
+            instance = go.GetComponent<TextMeshProUGUI>();
+            instance.fontSize = 28;
+            instance.fontStyle = FontStyles.Bold;
+            instance.alignment = TextAlignmentOptions.Center;
+            instance.color = new Color(0f, 1f, 0.55f);
+            instance.raycastTarget = false;
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(320f, 60f);
+        }
+
         if (spawnPos != Vector2.zero)
         {
             instance.transform.position = spawnPos + new Vector2(Random.Range(-25f, 25f), Random.Range(-10f, 10f));

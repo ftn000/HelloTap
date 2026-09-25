@@ -18,8 +18,8 @@ public class WorkplaceVisuals : MonoBehaviour
     [Header("Клавиатура")]
     [SerializeField] private Transform keyboardTransform;
     [SerializeField] private Graphic keyboardGlowImage;
-    [SerializeField] private Color keyGlowNormal = new Color(0, 0.89f, 1f, 0.2f);
-    [SerializeField] private Color keyGlowActive = new Color(0, 1f, 0.55f, 0.9f);
+    [SerializeField] private Color keyGlowNormal = new Color(0, 0.89f, 1f, 0f);
+    [SerializeField] private Color keyGlowActive = new Color(0, 1f, 0.55f, 0.35f);
 
     [Header("Кружка кофе / Энергетик")]
     [SerializeField] private Transform coffeeMugTransform;
@@ -65,6 +65,16 @@ public class WorkplaceVisuals : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
+            GameManager.Instance.OnCodeClicked -= HandleCodeClicked;
+            GameManager.Instance.OnCodeClicked += HandleCodeClicked;
+        }
+    }
+
+    private void Start()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnCodeClicked -= HandleCodeClicked;
             GameManager.Instance.OnCodeClicked += HandleCodeClicked;
         }
     }

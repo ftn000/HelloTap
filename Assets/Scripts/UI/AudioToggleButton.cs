@@ -43,7 +43,8 @@ public class AudioToggleButton : MonoBehaviour
     {
         if (buttonText != null && AudioManager.Instance != null)
         {
-            buttonText.text = AudioManager.Instance.IsMuted ? "🔇" : "🔊";
+            buttonText.text = AudioManager.Instance.IsMuted ? "ЗВУК: ВЫКЛ" : "ЗВУК: ВКЛ";
+            buttonText.color = AudioManager.Instance.IsMuted ? new Color(1f, 0.45f, 0.45f) : new Color(0.2f, 0.95f, 0.65f);
         }
     }
 }

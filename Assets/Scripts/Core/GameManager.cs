@@ -8,7 +8,24 @@ using UnityEngine;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    private static GameManager instance;
+    private bool isInitialized = false;
+
+    public static GameManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<GameManager>();
+                if (instance != null)
+                {
+                    instance.EnsureInitialized();
+                }
+            }
+            return instance;
+        }
+    }
 
     private const string SaveKeyPrefix = "DevGameSave_";
 
@@ -51,19 +68,26 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != null && Instance != this)
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
             return;
         }
-        Instance = this;
+        instance = this;
+        EnsureInitialized();
+    }
 
+    public void EnsureInitialized()
+    {
+        if (isInitialized) return;
+        isInitialized = true;
         InitializeDefaultDataIfEmpty();
         LoadGame();
     }
 
     private void Start()
     {
+        EnsureInitialized();
         OnCurrenciesChanged?.Invoke();
     }
 

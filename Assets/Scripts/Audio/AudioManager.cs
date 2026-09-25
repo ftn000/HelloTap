@@ -7,7 +7,18 @@ using UnityEngine;
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
-    public static AudioManager Instance { get; private set; }
+    private static AudioManager instance;
+    public static AudioManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<AudioManager>();
+            }
+            return instance;
+        }
+    }
 
     private const string MutePrefKey = "DevGame_IsMuted";
 
@@ -32,12 +43,12 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
             return;
         }
-        Instance = this;
+        instance = this;
 
         // Создаем источники звука, если не назначены
         if (sfxSource == null)

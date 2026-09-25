@@ -42,11 +42,112 @@ public class DevShopUI : MonoBehaviour
     [SerializeField] private GameObject hardwareView;
     [SerializeField] private GameObject staffView;
     [SerializeField] private GameObject projectsView;
+    [SerializeField] private ScrollRect shopScrollRect;
+
+    [Header("Модальное окно")]
+    [SerializeField] private GameObject shopModalRoot;
+    [SerializeField] private Button openShopBtn;
+    [SerializeField] private Button openStaffBtn;
+    [SerializeField] private Button openProjectsBtn;
+    [SerializeField] private Button closeShopBtn;
+    [SerializeField] private Button backdropCloseBtn;
 
     public List<UpgradeButtonBinding> UpgradeBindings => upgradeBindings;
     public List<ProjectButtonBinding> ProjectBindings => projectBindings;
+    public bool IsModalOpen => shopModalRoot != null && shopModalRoot.activeInHierarchy;
 
     private int activeTab = 0; // 0: Железо, 1: Персонал, 2: Проекты
+
+    private void Awake()
+    {
+        if (shopModalRoot != null)
+        {
+            shopModalRoot.SetActive(false);
+        }
+        BindModalButtons();
+        BindTabButtons();
+    }
+
+    public void OpenShop(int tab = 0)
+    {
+        if (shopModalRoot != null)
+        {
+            if (shopModalRoot.activeSelf && activeTab == tab)
+            {
+                CloseShop();
+                return;
+            }
+            shopModalRoot.SetActive(true);
+        }
+        SelectTab(tab);
+        RefreshUI();
+    }
+
+    public void CloseShop()
+    {
+        if (shopModalRoot != null) shopModalRoot.SetActive(false);
+    }
+
+    public void SetupModal(GameObject modalRoot, Button openShop, Button openProj, Button closeShop, Button openStaff = null, Button backdropClose = null, ScrollRect scrollRect = null)
+    {
+        shopModalRoot = modalRoot;
+        openShopBtn = openShop;
+        openStaffBtn = openStaff;
+        openProjectsBtn = openProj;
+        closeShopBtn = closeShop;
+        backdropCloseBtn = backdropClose;
+        if (scrollRect != null) shopScrollRect = scrollRect;
+        if (shopModalRoot != null) shopModalRoot.SetActive(false);
+        BindModalButtons();
+    }
+
+    private void BindModalButtons()
+    {
+        if (openShopBtn != null)
+        {
+            openShopBtn.onClick.RemoveAllListeners();
+            openShopBtn.onClick.AddListener(() => OpenShop(0));
+        }
+        if (openStaffBtn != null)
+        {
+            openStaffBtn.onClick.RemoveAllListeners();
+            openStaffBtn.onClick.AddListener(() => OpenShop(1));
+        }
+        if (openProjectsBtn != null)
+        {
+            openProjectsBtn.onClick.RemoveAllListeners();
+            openProjectsBtn.onClick.AddListener(() => OpenShop(2));
+        }
+        if (closeShopBtn != null)
+        {
+            closeShopBtn.onClick.RemoveAllListeners();
+            closeShopBtn.onClick.AddListener(CloseShop);
+        }
+        if (backdropCloseBtn != null)
+        {
+            backdropCloseBtn.onClick.RemoveAllListeners();
+            backdropCloseBtn.onClick.AddListener(CloseShop);
+        }
+    }
+
+    private void Start()
+    {
+        SubscribeEvents();
+        BindModalButtons();
+        BindTabButtons();
+        BindEvents();
+        SelectTab(activeTab);
+        RefreshUI();
+    }
+
+    private void Update()
+    {
+        if (IsModalOpen && UnityEngine.InputSystem.Keyboard.current != null &&
+            UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            CloseShop();
+        }
+    }
 
     public void SetupTabs(Button bHw, Button bSt, Button bPr, GameObject vHw, GameObject vSt, GameObject vPr)
     {
@@ -85,20 +186,47 @@ public class DevShopUI : MonoBehaviour
         if (hardwareView != null) hardwareView.SetActive(activeTab == 0);
         if (staffView != null) staffView.SetActive(activeTab == 1);
         if (projectsView != null) projectsView.SetActive(activeTab == 2);
+
+        SetTabButtonVisual(tabHardwareBtn, activeTab == 0);
+        SetTabButtonVisual(tabStaffBtn, activeTab == 1);
+        SetTabButtonVisual(tabProjectsBtn, activeTab == 2);
+
+        if (shopScrollRect != null)
+        {
+            if (activeTab == 0 && hardwareView != null)
+                shopScrollRect.content = hardwareView.GetComponent<RectTransform>();
+            else if (activeTab == 1 && staffView != null)
+                shopScrollRect.content = staffView.GetComponent<RectTransform>();
+            else if (activeTab == 2 && projectsView != null)
+                shopScrollRect.content = projectsView.GetComponent<RectTransform>();
+        }
+    }
+
+    private void SetTabButtonVisual(Button btn, bool isActive)
+    {
+        if (btn == null || btn.targetGraphic == null) return;
+        btn.targetGraphic.color = isActive ? Color.white : new Color(0.60f, 0.68f, 0.78f, 0.85f);
+    }
+
+    private void SubscribeEvents()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnCurrenciesChanged -= RefreshUI;
+            GameManager.Instance.OnCurrenciesChanged += RefreshUI;
+            GameManager.Instance.OnUpgradePurchased -= HandleUpgradePurchased;
+            GameManager.Instance.OnUpgradePurchased += HandleUpgradePurchased;
+            GameManager.Instance.OnProjectCompleted -= HandleProjectCompleted;
+            GameManager.Instance.OnProjectCompleted += HandleProjectCompleted;
+        }
     }
 
     private void OnEnable()
     {
+        BindModalButtons();
         BindTabButtons();
         SelectTab(activeTab);
-
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnCurrenciesChanged += RefreshUI;
-            GameManager.Instance.OnUpgradePurchased += HandleUpgradePurchased;
-            GameManager.Instance.OnProjectCompleted += HandleProjectCompleted;
-        }
-
+        SubscribeEvents();
         BindEvents();
         RefreshUI();
     }
@@ -115,6 +243,7 @@ public class DevShopUI : MonoBehaviour
 
     public void RebindAndRefresh()
     {
+        BindModalButtons();
         BindTabButtons();
         BindEvents();
         RefreshUI();
@@ -183,7 +312,7 @@ public class DevShopUI : MonoBehaviour
             if (upg != null)
             {
                 if (binding.titleText != null) binding.titleText.text = upg.Title;
-                if (binding.costText != null) binding.costText.text = $"{NumberFormatter.Format(upg.GetCurrentCost())} ₽";
+                if (binding.costText != null) binding.costText.text = $"{NumberFormatter.Format(upg.GetCurrentCost())} руб.";
                 if (binding.levelText != null) binding.levelText.text = $"Ур. {upg.CurrentLevel}";
 
                 if (binding.buyButton != null)
@@ -200,7 +329,7 @@ public class DevShopUI : MonoBehaviour
             if (prj != null)
             {
                 if (pBinding.titleText != null) pBinding.titleText.text = prj.Title;
-                if (pBinding.rewardText != null) pBinding.rewardText.text = $"+{NumberFormatter.Format(prj.RewardMoney)} ₽ (+{prj.PassiveMoneyIncomePerSec}/сек)";
+                if (pBinding.rewardText != null) pBinding.rewardText.text = $"+{NumberFormatter.Format(prj.RewardMoney)} руб. (+{prj.PassiveMoneyIncomePerSec}/сек)";
 
                 if (prj.IsCompleted)
                 {
