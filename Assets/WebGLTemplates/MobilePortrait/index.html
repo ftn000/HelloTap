@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
+  <title>{{{ PRODUCT_NAME }}} - GameDev Idle Clicker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0b0f19;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      touch-action: manipulation;
+    }
+    #unity-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      background: #0b0f19;
+      display: block;
+      touch-action: none;
+    }
+    #loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, #1e293b 0%, #0b0f19 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 99;
+      color: #f8fafc;
+      transition: opacity 0.5s ease-out;
+    }
+    .logo-container {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .game-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .game-subtitle {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .progress-bar-wrap {
+      width: 240px;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5), 0 0 12px rgba(56, 189, 248, 0.2);
+      border: 1px solid #334155;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      border-radius: 999px;
+      transition: width 0.2s ease-out;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+    }
+    .progress-text {
+      font-size: 13px;
+      color: #64748b;
+      font-family: monospace;
+      font-weight: 600;
+    }
+    #unity-warning {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      display: none;
+      max-width: 90%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="loading-overlay">
+      <div class="logo-container">
+        <div class="game-title">HelloTap</div>
+        <div class="game-subtitle">GameDev Studio Simulator</div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-text" id="progress-text">0%</div>
+    </div>
+    <div id="unity-warning"></div>
+  </div>
+
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+    const loadingOverlay = document.querySelector("#loading-overlay");
+    const progressFill = document.querySelector("#progress-fill");
+    const progressText = document.querySelector("#progress-text");
+    const warningBanner = document.querySelector("#unity-warning");
+
+    function showBanner(msg, type) {
+      if (type === 'error') {
+        warningBanner.innerText = msg;
+        warningBanner.style.display = 'block';
+      }
+    }
+
+    const buildUrl = "Build";
+    const loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+    const config = {
+      arguments: [],
+      dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+      frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_THREADS
+      workerUrl: buildUrl + "/{{{ WORKER_FILENAME }}}",
+#endif
+#if USE_WASM
+      codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+      symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+#endif
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      showBanner: showBanner,
+      matchWebGLToCanvasSize: true
+    };
+
+    // Prevent default touch gestures (pinch-zoom, pull-down-refresh)
+    document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+    document.addEventListener('touchmove', function (e) {
+      if (e.scale !== 1) { e.preventDefault(); }
+    }, { passive: false });
+
+    // Handle context menu prevention
+    canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+    const script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
+        const pct = Math.round(progress * 100);
+        progressFill.style.width = pct + "%";
+        progressText.innerText = pct + "%";
+      }).then((unityInstance) => {
+        window.unityInstance = unityInstance;
+        loadingOverlay.style.opacity = "0";
+        setTimeout(() => {
+          loadingOverlay.style.display = "none";
+        }, 500);
+      }).catch((message) => {
+        showBanner(message, 'error');
+      });
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>

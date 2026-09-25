@@ -7,6 +7,8 @@
 /.utmp/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
+*.log
+*.tar.gz
 
 # MemoryCaptures
 /[Mm]emoryCaptures/
