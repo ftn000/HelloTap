@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Менеджер звуков для HelloTap GameDev Idle.
 /// Отвечает за звуки механической клавиатуры, криты, звуки покупки железа/помощников,
-/// кассовый звук релиза проектов и активации буста энергетика.
+/// кассовый звук релиза проектов, бусты и авто-приглушение при сворачивании вкладки (Yandex Games).
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
@@ -38,6 +38,7 @@ public class AudioManager : MonoBehaviour
     [Range(0.8f, 1.2f)] [SerializeField] private float maxTypingPitch = 1.06f;
 
     private bool isMuted = false;
+    private bool isFocusLost = false;
 
     public bool IsMuted => isMuted;
 
@@ -50,7 +51,6 @@ public class AudioManager : MonoBehaviour
         }
         instance = this;
 
-        // Создаем источники звука, если не назначены
         if (sfxSource == null)
         {
             sfxSource = gameObject.AddComponent<AudioSource>();
@@ -69,12 +69,16 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        // Подписка на события GameManager
         if (GameManager.Instance != null)
         {
+            GameManager.Instance.OnCodeClicked -= HandleCodeClicked;
             GameManager.Instance.OnCodeClicked += HandleCodeClicked;
+            GameManager.Instance.OnUpgradePurchased -= HandleUpgradePurchased;
             GameManager.Instance.OnUpgradePurchased += HandleUpgradePurchased;
+            GameManager.Instance.OnProjectCompleted -= HandleProjectCompleted;
             GameManager.Instance.OnProjectCompleted += HandleProjectCompleted;
+            GameManager.Instance.OnAchievementUnlocked -= HandleAchievementUnlocked;
+            GameManager.Instance.OnAchievementUnlocked += HandleAchievementUnlocked;
         }
     }
 
@@ -85,7 +89,20 @@ public class AudioManager : MonoBehaviour
             GameManager.Instance.OnCodeClicked -= HandleCodeClicked;
             GameManager.Instance.OnUpgradePurchased -= HandleUpgradePurchased;
             GameManager.Instance.OnProjectCompleted -= HandleProjectCompleted;
+            GameManager.Instance.OnAchievementUnlocked -= HandleAchievementUnlocked;
         }
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        isFocusLost = !hasFocus;
+        ApplyMute();
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        isFocusLost = pauseStatus;
+        ApplyMute();
     }
 
     private void HandleCodeClicked(double amount, bool isCrit, Vector2 pos)
@@ -103,9 +120,14 @@ public class AudioManager : MonoBehaviour
         PlayRelease();
     }
 
+    private void HandleAchievementUnlocked(AchievementData achievement)
+    {
+        PlayRelease();
+    }
+
     public void PlayTyping(bool isCrit = false)
     {
-        if (isMuted) return;
+        if (isMuted || isFocusLost) return;
 
         if (isCrit && critSound != null)
         {
@@ -127,20 +149,33 @@ public class AudioManager : MonoBehaviour
 
     public void PlayUpgrade()
     {
-        if (isMuted || upgradeSound == null) return;
+        if (isMuted || isFocusLost || upgradeSound == null) return;
         sfxSource.PlayOneShot(upgradeSound, 0.85f);
     }
 
     public void PlayRelease()
     {
-        if (isMuted || releaseSound == null) return;
+        if (isMuted || isFocusLost || releaseSound == null) return;
         sfxSource.PlayOneShot(releaseSound, 1.0f);
     }
 
     public void PlayBoost()
     {
-        if (isMuted || boostSound == null) return;
+        if (isMuted || isFocusLost || boostSound == null) return;
         sfxSource.PlayOneShot(boostSound, 0.9f);
+    }
+
+    public void PlayBugHit(bool killed)
+    {
+        if (isMuted || isFocusLost) return;
+        if (killed && releaseSound != null)
+        {
+            sfxSource.PlayOneShot(releaseSound, 0.95f);
+        }
+        else if (critSound != null)
+        {
+            sfxSource.PlayOneShot(critSound, 0.8f);
+        }
     }
 
     public bool ToggleMute()
@@ -154,7 +189,9 @@ public class AudioManager : MonoBehaviour
 
     private void ApplyMute()
     {
-        if (sfxSource != null) sfxSource.mute = isMuted;
-        if (typingSource != null) typingSource.mute = isMuted;
+        bool effectiveMute = isMuted || isFocusLost;
+        if (sfxSource != null) sfxSource.mute = effectiveMute;
+        if (typingSource != null) typingSource.mute = effectiveMute;
+        AudioListener.pause = isFocusLost;
     }
 }

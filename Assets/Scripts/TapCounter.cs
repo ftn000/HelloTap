@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.UI;
 /// <summary>
 /// Скрипт счётчика тапов "Hello Tap" / "GameDev Clicker".
 /// Поддерживает обратную совместимость с базовой лабораторной (смена цвета текста, PlayerPrefs),
-/// а также интегрируется с GameManager для системы разработки игр, улучшений и пассивного дохода.
+/// а также интегрируется с GameManager для системы разработки игр, рангов, комбо и пассивного дохода.
 /// </summary>
 public class TapCounter : MonoBehaviour
 {
@@ -25,6 +25,7 @@ public class TapCounter : MonoBehaviour
     [Header("Дополнительные UI Ссылки (GameDev Idle)")]
     [SerializeField] private TMP_Text moneyText;
     [SerializeField] private TMP_Text statsText;
+    [SerializeField] private TMP_Text rankText;
     [SerializeField] private TMP_Text boostTimerText;
     [SerializeField] private Button energyBoostButton;
 
@@ -43,12 +44,14 @@ public class TapCounter : MonoBehaviour
     private int counter;
     private int lastClickFrame = -1;
     private DevShopUI cachedShopUI;
+    private GameOverlaysUI cachedOverlaysUI;
 
     private void Awake()
     {
         EnsureGameManagerExists();
         EnsureEventSystemExists();
         cachedShopUI = Object.FindFirstObjectByType<DevShopUI>();
+        cachedOverlaysUI = Object.FindFirstObjectByType<GameOverlaysUI>();
         LoadScore();
     }
 
@@ -165,14 +168,18 @@ public class TapCounter : MonoBehaviour
         {
             cachedShopUI = Object.FindFirstObjectByType<DevShopUI>();
         }
+        if (cachedOverlaysUI == null)
+        {
+            cachedOverlaysUI = Object.FindFirstObjectByType<GameOverlaysUI>();
+        }
 
-        // Если открыто модальное окно магазина/проектов — не начисляем тапы по фону
-        if (cachedShopUI != null && cachedShopUI.IsModalOpen)
+        // Если открыто модальное окно магазина или оффлайн-дохода — не начисляем тапы по фону
+        if ((cachedShopUI != null && cachedShopUI.IsModalOpen) ||
+            (cachedOverlaysUI != null && cachedOverlaysUI.IsOfflineModalOpen))
         {
             return;
         }
 
-        // Если клик уже сработал через tapButton.onClick в этом кадре — не дублируем
         if (lastClickFrame == Time.frameCount)
         {
             return;
@@ -222,7 +229,6 @@ public class TapCounter : MonoBehaviour
 
         if (pointerPressed)
         {
-            // Проверяем, не нажал ли игрок на служебную кнопку (Магазин, Проекты, Звук, Сброс, Энергетик)
             if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null)
             {
                 GameObject selected = EventSystem.current.currentSelectedGameObject;
@@ -232,7 +238,6 @@ public class TapCounter : MonoBehaviour
                 }
             }
 
-            // Проверяем попадание в центральную рабочую зону 9:16 (TapButton)
             if (tapButton != null)
             {
                 RectTransform tapRt = tapButton.GetComponent<RectTransform>();
@@ -252,9 +257,6 @@ public class TapCounter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Увеличивает счётчик на 1 клик с указанием позиции нажатия.
-    /// </summary>
     public void IncrementWithPosition(Vector2 clickPos)
     {
         lastClickFrame = Time.frameCount;
@@ -273,9 +275,6 @@ public class TapCounter : MonoBehaviour
         UpdateUI();
     }
 
-    /// <summary>
-    /// Увеличивает счётчик на 1 клик, передает действие в GameManager и обновляет UI.
-    /// </summary>
     public void Increment()
     {
         Vector2 clickPos = Vector2.zero;
@@ -296,9 +295,6 @@ public class TapCounter : MonoBehaviour
         IncrementWithPosition(clickPos);
     }
 
-    /// <summary>
-    /// Сбрасывает счётчики, сохраняет результат и обновляет UI.
-    /// </summary>
     public void Reset()
     {
         counter = 0;
@@ -316,7 +312,6 @@ public class TapCounter : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
-            // Включает буст энергетика (x2 на 30 секунд)
             GameManager.Instance.ActivateEnergyBoost(30f, 2.0);
             if (AudioManager.Instance != null)
             {
@@ -337,9 +332,6 @@ public class TapCounter : MonoBehaviour
         counter = PlayerPrefs.GetInt(ScoreKey, 0);
     }
 
-    /// <summary>
-    /// Обновляет текстовое отображение счёта, денег и статов.
-    /// </summary>
     public void UpdateUI()
     {
         if (counterText != null)
@@ -368,11 +360,17 @@ public class TapCounter : MonoBehaviour
             }
         }
 
+        if (rankText != null && GameManager.Instance != null)
+        {
+            rankText.text = $"Ранг: {GameManager.Instance.GetDeveloperRankTitle()}";
+        }
+
         if (statsText != null && GameManager.Instance != null)
         {
             double clickPower = GameManager.Instance.GetCodePerClick();
             double perSec = GameManager.Instance.GetCodePerSecond();
-            statsText.text = $"+{NumberFormatter.Format(clickPower)} за клик | +{NumberFormatter.Format(perSec)} строк/сек";
+            string rankPart = rankText == null ? $"[{GameManager.Instance.GetDeveloperRankTitle()}]  " : "";
+            statsText.text = $"{rankPart}+{NumberFormatter.Format(clickPower)} за клик | +{NumberFormatter.Format(perSec)} строк/сек";
         }
 
         if (boostTimerText != null && GameManager.Instance != null)
@@ -391,10 +389,6 @@ public class TapCounter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Меняет цвет текста счёта: каждые 10 очков цвет плавно переходит
-    /// к следующему оттенку палитры через Color.Lerp.
-    /// </summary>
     private void UpdateTextColor()
     {
         if (counterText == null || stageColors == null || stageColors.Length == 0)

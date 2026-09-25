@@ -8,6 +8,8 @@ using TMPro;
 /// </summary>
 public class ClickJuice : MonoBehaviour
 {
+    public static ClickJuice Instance { get; private set; }
+
     [Header("Анимация кнопки")]
     [SerializeField] private Transform targetTransform;
     [SerializeField] private float punchScaleFactor = 0.92f;
@@ -43,6 +45,7 @@ public class ClickJuice : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
         if (targetTransform == null)
         {
             targetTransform = transform;
@@ -81,13 +84,15 @@ public class ClickJuice : MonoBehaviour
         PlayPunchEffect();
         PlayTypingSound();
 
-        // Показ всплывающего текста
         Transform parent = floatingTextParent != null ? floatingTextParent : transform.parent;
         if (parent != null)
         {
-            string message = isCrit ? $"<color=#FF5555>КРИТ! +{NumberFormatter.Format(amount)}</color>" : $"+{NumberFormatter.Format(amount)}";
-            
-            // С шансом 15% показываем программистский мем
+            double combo = GameManager.Instance != null ? GameManager.Instance.GetComboMultiplier() : 1.0;
+            string comboTag = combo > 1.01 ? $" <size=75%>(x{combo:F1})</size>" : "";
+            string message = isCrit
+                ? $"<color=#FF5555>КРИТ! +{NumberFormatter.Format(amount)}</color>{comboTag}"
+                : $"+{NumberFormatter.Format(amount)}{comboTag}";
+
             if (!isCrit && Random.value < 0.15f)
             {
                 message = FunnyCodeLines[Random.Range(0, FunnyCodeLines.Length)];
@@ -95,6 +100,13 @@ public class ClickJuice : MonoBehaviour
 
             SpawnFloatingText(message, screenPos, isCrit, parent);
         }
+    }
+
+    public void SpawnCustomPopup(string message, Vector2 screenPos, Color color, bool isLarge = true)
+    {
+        Transform parent = floatingTextParent != null ? floatingTextParent : transform.parent;
+        if (parent == null) return;
+        SpawnFloatingText(message, screenPos, isLarge, parent, color);
     }
 
     public void PlayPunchEffect()
@@ -115,7 +127,6 @@ public class ClickJuice : MonoBehaviour
         {
             elapsed += Time.unscaledDeltaTime;
             float t = elapsed / bounceDuration;
-            // Пружинящая интерполяция (overshoot)
             float bounceT = Mathf.Sin(t * Mathf.PI);
             targetTransform.localScale = Vector3.Lerp(originalScale * punchScaleFactor, originalScale, t) + (originalScale * (bounceT * 0.08f));
             yield return null;
@@ -124,12 +135,13 @@ public class ClickJuice : MonoBehaviour
         targetTransform.localScale = originalScale;
     }
 
-    private void SpawnFloatingText(string text, Vector2 spawnPos, bool isCrit, Transform parent)
+    private void SpawnFloatingText(string text, Vector2 spawnPos, bool isCrit, Transform parent, Color? customColor = null)
     {
         TMP_Text instance;
         if (floatingTextPrefab != null)
         {
             instance = Instantiate(floatingTextPrefab, parent);
+            instance.gameObject.SetActive(true);
         }
         else
         {
@@ -142,7 +154,12 @@ public class ClickJuice : MonoBehaviour
             instance.color = new Color(0f, 1f, 0.55f);
             instance.raycastTarget = false;
             RectTransform rt = go.GetComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(320f, 60f);
+            rt.sizeDelta = new Vector2(360f, 70f);
+        }
+
+        if (customColor.HasValue)
+        {
+            instance.color = customColor.Value;
         }
 
         if (spawnPos != Vector2.zero)
@@ -157,7 +174,7 @@ public class ClickJuice : MonoBehaviour
         instance.text = text;
         if (isCrit)
         {
-            instance.fontSize *= 1.3f;
+            instance.fontSize *= 1.25f;
         }
 
         StartCoroutine(FloatAndFadeRoutine(instance));
