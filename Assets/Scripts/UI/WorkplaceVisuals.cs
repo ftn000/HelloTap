@@ -26,6 +26,12 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Graphic keyboardGlowImage;
     [SerializeField] private Color keyGlowNormal = new Color(0, 0.89f, 1f, 0f);
     [SerializeField] private Color keyGlowActive = new Color(0, 1f, 0.55f, 0.35f);
+    [SerializeField] private Graphic keyGlowW;
+    [SerializeField] private Graphic keyGlowA;
+    [SerializeField] private Graphic keyGlowS;
+    [SerializeField] private Graphic keyGlowD;
+    [SerializeField] private Graphic keyGlowSpace;
+    [SerializeField] private Graphic keyGlowEsc;
 
     [Header("Предметы на столе (Визуальная прогрессия)")]
     [SerializeField] private Transform mouseTransform;
@@ -126,6 +132,13 @@ public class WorkplaceVisuals : MonoBehaviour
             Transform found = transform.Find("DeskMat/CatMascot");
             if (found != null) catTransform = found;
         }
+
+        if (keyGlowW == null) keyGlowW = transform.Find("DeskMat/KeyboardGroup/KeyGlow_W")?.GetComponent<Graphic>();
+        if (keyGlowA == null) keyGlowA = transform.Find("DeskMat/KeyboardGroup/KeyGlow_A")?.GetComponent<Graphic>();
+        if (keyGlowS == null) keyGlowS = transform.Find("DeskMat/KeyboardGroup/KeyGlow_S")?.GetComponent<Graphic>();
+        if (keyGlowD == null) keyGlowD = transform.Find("DeskMat/KeyboardGroup/KeyGlow_D")?.GetComponent<Graphic>();
+        if (keyGlowSpace == null) keyGlowSpace = transform.Find("DeskMat/KeyboardGroup/KeyGlow_Space")?.GetComponent<Graphic>();
+        if (keyGlowEsc == null) keyGlowEsc = transform.Find("DeskMat/KeyboardGroup/KeyGlow_Esc")?.GetComponent<Graphic>();
     }
 
     private void OnEnable()
@@ -487,6 +500,8 @@ public class WorkplaceVisuals : MonoBehaviour
             StartCoroutine(KeyboardTapRoutine());
         }
 
+        FlashKey(isCrit);
+
         if (coffeeMugTransform != null && coffeeMugTransform.gameObject.activeSelf)
         {
             coffeeMugTransform.localRotation = Quaternion.Euler(0, 0, Random.Range(-3f, 3f));
@@ -494,6 +509,71 @@ public class WorkplaceVisuals : MonoBehaviour
 
         UpdateComboVisuals();
         RefreshProgressAndComboUI();
+    }
+
+    private int keyFlashIndex = 0;
+    private Graphic[] activeKeyGlows;
+
+    private void FlashKey(bool isCrit)
+    {
+        if (activeKeyGlows == null || activeKeyGlows.Length == 0)
+        {
+            var list = new List<Graphic>();
+            if (keyGlowW != null) list.Add(keyGlowW);
+            if (keyGlowA != null) list.Add(keyGlowA);
+            if (keyGlowS != null) list.Add(keyGlowS);
+            if (keyGlowD != null) list.Add(keyGlowD);
+            if (keyGlowSpace != null) list.Add(keyGlowSpace);
+            if (keyGlowEsc != null) list.Add(keyGlowEsc);
+            activeKeyGlows = list.ToArray();
+        }
+
+        if (activeKeyGlows.Length == 0) return;
+
+        if (isCrit)
+        {
+            Color goldColor = new Color(1f, 0.88f, 0.25f, 0.95f);
+            foreach (var g in activeKeyGlows)
+            {
+                if (g != null) StartCoroutine(IndividualKeyFlashRoutine(g, goldColor, 0.24f));
+            }
+        }
+        else
+        {
+            Graphic keyToFlash = activeKeyGlows[keyFlashIndex % activeKeyGlows.Length];
+            keyFlashIndex++;
+            Color cyanColor = new Color(0f, 0.95f, 1f, 0.9f);
+            StartCoroutine(IndividualKeyFlashRoutine(keyToFlash, cyanColor, 0.12f));
+
+            if (keyGlowSpace != null && Random.value < 0.35f && keyToFlash != keyGlowSpace)
+            {
+                StartCoroutine(IndividualKeyFlashRoutine(keyGlowSpace, new Color(0f, 0.95f, 1f, 0.8f), 0.14f));
+            }
+        }
+    }
+
+    private IEnumerator IndividualKeyFlashRoutine(Graphic keyGraphic, Color flashColor, float duration)
+    {
+        if (keyGraphic == null) yield break;
+        keyGraphic.color = flashColor;
+        Transform kt = keyGraphic.transform;
+        Vector3 origScale = Vector3.one;
+        kt.localScale = new Vector3(0.92f, 0.92f, 1f);
+
+        float elapsed = 0f;
+        Color clearColor = new Color(flashColor.r, flashColor.g, flashColor.b, 0f);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            keyGraphic.color = Color.Lerp(flashColor, clearColor, t);
+            kt.localScale = Vector3.Lerp(new Vector3(0.92f, 0.92f, 1f), origScale, t);
+            yield return null;
+        }
+
+        keyGraphic.color = clearColor;
+        kt.localScale = origScale;
     }
 
     private void UpdateTerminalDisplay()

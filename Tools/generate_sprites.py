@@ -55,35 +55,16 @@ def make_monitor_frame():
 def make_monitor_screen():
     im = Image.new("RGBA", (800, 320), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    # Background
+    # Clean Dark IDE Screen (no distracting colored bars behind code text)
     d.rectangle([0, 0, 480, 320], fill=(13, 16, 23, 255))
-    # Code Lines (Left IDE Screen)
-    code_colors = [
-        (255, 123, 114, 255), # Red keyword
-        (121, 192, 255, 255), # Blue type
-        (126, 231, 135, 255), # Green string
-        (227, 179, 65, 255),  # Yellow class
-        (139, 148, 158, 255)  # Grey comment
-    ]
-    # Draw simulated code lines
-    code_shapes = [
-        [(20, 20, 80, 26, 0), (90, 20, 210, 26, 3), (220, 20, 280, 26, 1)],
-        [(40, 35, 120, 41, 1), (130, 35, 260, 41, 2)],
-        [(40, 50, 180, 56, 4)],
-        [(40, 65, 90, 71, 0), (100, 65, 190, 71, 1), (200, 65, 250, 71, 3)],
-        [(60, 80, 140, 86, 0), (150, 80, 290, 86, 2)],
-        [(60, 95, 220, 101, 3), (230, 95, 340, 101, 1)],
-        [(60, 110, 110, 116, 0), (120, 110, 240, 116, 2)],
-        [(40, 125, 60, 131, 1)],
-        [(40, 140, 160, 146, 4)],
-        [(40, 155, 100, 161, 0), (110, 155, 280, 161, 3)],
-        [(60, 170, 180, 176, 1), (190, 170, 320, 176, 2)],
-        [(60, 185, 240, 191, 2)],
-        [(40, 200, 70, 206, 1)],
-    ]
-    for line in code_shapes:
-        for x0, y0, x1, y1, c_idx in line:
-            create_rounded_rect(d, (x0, y0, x1, y1), 3, fill=code_colors[c_idx])
+    # Subtle top IDE tab bar
+    d.rectangle([0, 0, 480, 24], fill=(22, 27, 38, 255))
+    # Window controls (macOS / Linux style mini dots)
+    d.ellipse([10, 8, 18, 16], fill=(255, 95, 86, 255))
+    d.ellipse([24, 8, 32, 16], fill=(255, 189, 46, 255))
+    d.ellipse([38, 8, 46, 16], fill=(39, 201, 63, 255))
+    # Vertical divider between IDE and Game View
+    d.line([(485, 0), (485, 320)], fill=(35, 42, 60, 255), width=2)
             
     # Right Game Preview Screen (490, 0, 800, 320)
     d.rectangle([490, 0, 800, 320], fill=(20, 24, 34, 255))

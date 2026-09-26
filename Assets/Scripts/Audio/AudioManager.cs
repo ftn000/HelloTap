@@ -64,7 +64,47 @@ public class AudioManager : MonoBehaviour
         }
 
         isMuted = PlayerPrefs.GetInt(MutePrefKey, 0) == 1;
+        EnsureClips();
         ApplyMute();
+    }
+
+    private void EnsureClips()
+    {
+        if (typingSounds == null || typingSounds.Length == 0)
+        {
+            typingSounds = new AudioClip[4];
+            typingSounds[0] = CreateProceduralSwitchClip("Blue_Click", 4200f, 240f);
+            typingSounds[1] = CreateProceduralSwitchClip("Brown_Bump", 2900f, 210f);
+            typingSounds[2] = CreateProceduralSwitchClip("Speed_Snap", 3800f, 260f);
+            typingSounds[3] = CreateProceduralSwitchClip("Spacebar_Thud", 2200f, 160f);
+        }
+        else
+        {
+            for (int i = 0; i < typingSounds.Length; i++)
+            {
+                if (typingSounds[i] == null)
+                {
+                    typingSounds[i] = CreateProceduralSwitchClip($"Procedural_Key_{i}", 3500f + i * 200f, 220f);
+                }
+            }
+        }
+    }
+
+    private AudioClip CreateProceduralSwitchClip(string clipName, float clickFreq, float thudFreq)
+    {
+        int sampleRate = 44100;
+        int sampleCount = (int)(sampleRate * 0.075f);
+        float[] data = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float click = (Mathf.Sin(2f * Mathf.PI * clickFreq * t) + (Random.value * 2f - 1f) * 0.45f) * Mathf.Exp(-t * 240f);
+            float thud = t >= 0.003f ? Mathf.Sin(2f * Mathf.PI * thudFreq * (t - 0.003f)) * Mathf.Exp(-(t - 0.003f) * 65f) * 0.7f : 0f;
+            data[i] = Mathf.Clamp(click + thud, -1f, 1f);
+        }
+        AudioClip clip = AudioClip.Create(clipName, sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
     }
 
     private void Start()
@@ -128,6 +168,7 @@ public class AudioManager : MonoBehaviour
     public void PlayTyping(bool isCrit = false)
     {
         if (isMuted || isFocusLost) return;
+        AudioListener.pause = false;
 
         if (isCrit && critSound != null)
         {

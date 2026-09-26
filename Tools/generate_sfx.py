@@ -25,38 +25,93 @@ def save_wav(filename, samples):
         wf.writeframes(raw_data)
     print(f"Generated {filename} ({len(samples)/SAMPLE_RATE:.3f}s)")
 
-def make_key_click(base_freq=2500, thud_freq=350, duration=0.065, click_strength=0.9):
+def make_mech_switch_click(switch_type="blue", duration=0.075):
     total_samples = int(SAMPLE_RATE * duration)
     samples = []
+    
+    if switch_type == "blue": # Cherry MX Blue (Crisp tactile click + solid bottom out)
+        click_freq = 4200.0
+        click_decay = 240.0
+        click_amp = 1.0
+        thud_freq = 240.0
+        thud_decay = 65.0
+        spring_ping_freq = 6800.0
+        spring_ping_amp = 0.16
+        bottom_out_delay = 0.003
+    elif switch_type == "brown": # Cherry MX Brown (Tactile bump + deep clack)
+        click_freq = 2900.0
+        click_decay = 180.0
+        click_amp = 0.82
+        thud_freq = 210.0
+        thud_decay = 55.0
+        spring_ping_freq = 5200.0
+        spring_ping_amp = 0.09
+        bottom_out_delay = 0.004
+    elif switch_type == "spacebar": # Heavy Spacebar stabilizer thud + bar clack
+        click_freq = 2200.0
+        click_decay = 160.0
+        click_amp = 0.72
+        thud_freq = 160.0
+        thud_decay = 40.0
+        spring_ping_freq = 4100.0
+        spring_ping_amp = 0.13
+        bottom_out_delay = 0.002
+    else: # Snappy Blue secondary clack
+        click_freq = 3800.0
+        click_decay = 220.0
+        click_amp = 0.92
+        thud_freq = 260.0
+        thud_decay = 70.0
+        spring_ping_freq = 6200.0
+        spring_ping_amp = 0.12
+        bottom_out_delay = 0.003
+
     for i in range(total_samples):
         t = i / SAMPLE_RATE
-        # Fast click impulse
-        env_click = math.exp(-t * 120.0)
-        click_osc = math.sin(2.0 * math.pi * base_freq * t) + 0.4 * (random.random() * 2.0 - 1.0)
         
-        # Bottom-out thud
-        env_thud = math.exp(-t * 60.0)
-        thud_osc = math.sin(2.0 * math.pi * thud_freq * t)
+        # 1. Tactile click transient (crisp leaf snap)
+        env_click = math.exp(-t * click_decay)
+        noise = (random.random() * 2.0 - 1.0)
+        click = (math.sin(2.0 * math.pi * click_freq * t) + 0.45 * noise) * env_click * click_amp
         
-        s = (click_osc * env_click * click_strength) + (thud_osc * env_thud * 0.35)
+        # 2. Metallic spring ping (subtle high-frequency resonance)
+        env_spring = math.exp(-t * 90.0)
+        spring = math.sin(2.0 * math.pi * spring_ping_freq * t) * env_spring * spring_ping_amp
+        
+        # 3. Bottoming-out thud (stem hits the plate slightly after the click)
+        thud = 0.0
+        if t >= bottom_out_delay:
+            t_thud = t - bottom_out_delay
+            env_thud = math.exp(-t_thud * thud_decay)
+            thud = (math.sin(2.0 * math.pi * thud_freq * t_thud) + 
+                    0.35 * math.sin(4.0 * math.pi * thud_freq * t_thud) + 
+                    0.25 * (random.random() * 2.0 - 1.0)) * env_thud * 0.68
+                    
+        s = click + spring + thud
         samples.append(s)
+        
     return samples
 
 def make_crit_click():
-    duration = 0.22
+    duration = 0.24
     total_samples = int(SAMPLE_RATE * duration)
     samples = []
     for i in range(total_samples):
         t = i / SAMPLE_RATE
-        # Sharp click transient
-        env_click = math.exp(-t * 150.0)
-        click = math.sin(2.0 * math.pi * 3200 * t) + 0.6 * (random.random() * 2.0 - 1.0)
+        # Crisp mechanical switch click transient
+        env_click = math.exp(-t * 180.0)
+        click = (math.sin(2.0 * math.pi * 4400.0 * t) + 0.5 * (random.random() * 2.0 - 1.0)) * env_click * 0.85
         
-        # Bright magic chime ring
-        env_bell = math.exp(-t * 18.0)
-        bell = 0.6 * math.sin(2.0 * math.pi * 1760.0 * t) + 0.3 * math.sin(2.0 * math.pi * 3520.0 * t) + 0.2 * math.sin(2.0 * math.pi * 5280.0 * t)
+        # Bright crystalline crit harmonic chime
+        env_bell = math.exp(-t * 16.0)
+        bell = (0.55 * math.sin(2.0 * math.pi * 1760.0 * t) + 
+                0.35 * math.sin(2.0 * math.pi * 3520.0 * t) + 
+                0.20 * math.sin(2.0 * math.pi * 5280.0 * t)) * env_bell
         
-        s = (click * env_click * 0.7) + (bell * env_bell * 0.6)
+        # Low punch
+        thud = math.sin(2.0 * math.pi * 180.0 * t) * math.exp(-t * 50.0) * 0.4
+        
+        s = click + bell + thud
         samples.append(s)
     return samples
 
@@ -138,10 +193,10 @@ def make_boost_sound():
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
-save_wav(os.path.join(out_dir, "click_key1.wav"), make_key_click(base_freq=2500, thud_freq=380, duration=0.06))
-save_wav(os.path.join(out_dir, "click_key2.wav"), make_key_click(base_freq=2800, thud_freq=340, duration=0.055))
-save_wav(os.path.join(out_dir, "click_key3.wav"), make_key_click(base_freq=2300, thud_freq=410, duration=0.065))
-save_wav(os.path.join(out_dir, "click_key4.wav"), make_key_click(base_freq=1800, thud_freq=220, duration=0.075, click_strength=0.7))
+save_wav(os.path.join(out_dir, "click_key1.wav"), make_mech_switch_click("blue"))
+save_wav(os.path.join(out_dir, "click_key2.wav"), make_mech_switch_click("brown"))
+save_wav(os.path.join(out_dir, "click_key3.wav"), make_mech_switch_click("speed"))
+save_wav(os.path.join(out_dir, "click_key4.wav"), make_mech_switch_click("spacebar"))
 save_wav(os.path.join(out_dir, "click_crit.wav"), make_crit_click())
 save_wav(os.path.join(out_dir, "upgrade_buy.wav"), make_upgrade_chime())
 save_wav(os.path.join(out_dir, "project_release.wav"), make_cash_release())
