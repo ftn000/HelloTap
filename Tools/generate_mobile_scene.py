@@ -984,27 +984,27 @@ add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001
 add_cr(3010003, 3010000)
 add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
 
-# MonitorFrame (Upper half of workstation - resized to 820x420 to fit perfectly)
+# MonitorFrame (Upper half of workstation - 840x420 with 756x306 bezel cutout)
 add_go(3020000, "MonitorFrame", [3020001, 3020003, 3020002])
-add_rect(3020001, 3020000, 3010001, [3021001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -250), size=(820, 420), pivot=(0.5, 1))
+add_rect(3020001, 3020000, 3010001, [3021001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -250), size=(840, 420), pivot=(0.5, 1))
 add_cr(3020003, 3020000)
 add_image(3020002, 3020000, GUID_SPR_MON_FRAME, raycast=0)
 
-# MonitorScreen
+# MonitorScreen (Exact 756x306 fit inside MonitorFrame cutout, perfectly centered)
 add_go(3021000, "MonitorScreen", [3021001, 3021003, 3021002])
-add_rect(3021001, 3021000, 3020001, [3021101, 3021201, 3021301, 3021401], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 20), size=(760, 310), pivot=(0.5, 0.5))
+add_rect(3021001, 3021000, 3020001, [3021101, 3021201, 3021301, 3021401], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 27), size=(756, 306), pivot=(0.5, 0.5))
 add_cr(3021003, 3021000)
 add_image(3021002, 3021000, GUID_SPR_MON_SCREEN, raycast=0)
 
-# TerminalCodeText (Live C# code on screen - shifted below the tab header and beside gutter)
+# TerminalCodeText (Live C# code on screen - fitted cleanly in IDE editor area below tab bar)
 add_go(3021100, "TerminalCodeText", [3021101, 3021103, 3021102])
-add_rect(3021101, 3021100, 3021001, [], amin=(0, 0), amax=(0.60, 1), pos=(45, -34), size=(-55, -46), pivot=(0, 1))
+add_rect(3021101, 3021100, 3021001, [], amin=(0, 0), amax=(0.64, 1), pos=(42, -34), size=(-48, -44), pivot=(0, 1))
 add_cr(3021103, 3021100)
-add_tmp(3021102, 3021100, "// HelloTap Dev v1.4.0\\nusing UnityEngine;\\n> <color=#00FF88>_</color>", fsize=14, fstyle=0, color=(0, 1, 0.55, 1), align=257, autosize=1, fmin=10, fmax=15)
+add_tmp(3021102, 3021100, "// HelloTap Dev v1.4.0\\nusing UnityEngine;\\n> <color=#00FF88>_</color>", fsize=13, fstyle=0, color=(0, 1, 0.55, 1), align=257, autosize=1, fmin=10, fmax=14)
 
 # SecondMonitorPanel (Docs & Metrics)
 add_go(3021200, "SecondMonitorPanel", [3021201, 3021203, 3021202], active=0)
-add_rect(3021201, 3021200, 3021001, [3021211], amin=(0.61, 0.05), amax=(0.98, 0.95), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(3021201, 3021200, 3021001, [3021211], amin=(0.65, 0.05), amax=(0.99, 0.95), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3021203, 3021200)
 add_image(3021202, 3021200, None, color=(0.03, 0.05, 0.09, 0.92), raycast=0)
 
@@ -1037,31 +1037,31 @@ add_tmp(3012202, 3012200, "ТЕМП ПЕЧАТИ: x1.0 (тапай быстре�
 
 # Cat Mascot (curled up sleeping peacefully under the keyboard on desk mat)
 add_go(3070000, "CatMascot", [3070001, 3070003, 3070002])
-add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -1210), size=(180, 125), pivot=(0.5, 0.5))
+add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -1210), size=(180, 125), pivot=(0.5, 0.5))
 add_cr(3070003, 3070000)
 add_image(3070002, 3070000, GUID_SPR_CAT, raycast=0)
 
-# Energy Can (on desk beside monitor)
+# Energy Can (placed on the desk mat above mouse)
 add_go(3060000, "EnergyCan", [3060001, 3060003, 3060002])
-add_rect(3060001, 3060000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(450, -420), size=(90, 155), pivot=(0.5, 0.5))
+add_rect(3060001, 3060000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(455, -780), size=(80, 140), pivot=(0.5, 0.5))
 add_cr(3060003, 3060000)
 add_image(3060002, 3060000, GUID_SPR_ENERGY, raycast=0)
 
-# Coffee Mug
+# Coffee Mug (shifted right onto desk mat)
 add_go(3050000, "CoffeeMug", [3050001, 3050003, 3050002])
-add_rect(3050001, 3050000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-430, -960), size=(120, 140), pivot=(0.5, 0.5))
+add_rect(3050001, 3050000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-380, -960), size=(120, 140), pivot=(0.5, 0.5))
 add_cr(3050003, 3050000)
 add_image(3050002, 3050000, GUID_SPR_COFFEE, raycast=0)
 
-# Gaming Mouse
+# Gaming Mouse (positioned cleanly to the right of keyboard)
 add_go(3040000, "GamingMouse", [3040001, 3040003, 3040002])
-add_rect(3040001, 3040000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(430, -960), size=(100, 160), pivot=(0.5, 0.5))
+add_rect(3040001, 3040000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(465, -960), size=(100, 160), pivot=(0.5, 0.5))
 add_cr(3040003, 3040000)
 add_image(3040002, 3040000, GUID_SPR_MOUSE, raycast=0)
 
-# KeyboardGroup (Lower half of workstation - Main tap zone)
+# KeyboardGroup (Lower half of workstation - Main tap zone, shifted right by +35px)
 add_go(3030000, "KeyboardGroup", [3030001])
-add_rect(3030001, 3030000, 3010001, [3031001, 3032001, 3033001, 3034001, 3035001, 3036001, 3037001, 3038001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -835), size=(760, 250), pivot=(0.5, 1))
+add_rect(3030001, 3030000, 3010001, [3031001, 3032001, 3033001, 3034001, 3035001, 3036001, 3037001, 3038001], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -835), size=(760, 250), pivot=(0.5, 1))
 
 add_go(3031000, "KeyboardImage", [3031001, 3031003, 3031002])
 add_rect(3031001, 3031000, 3030001, [], amin=(0,0), amax=(1,1))

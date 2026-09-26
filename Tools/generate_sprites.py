@@ -21,75 +21,75 @@ def make_desk():
     im.save(os.path.join(sprites_dir, "spr_desk_mat.png"))
     print("Created spr_desk_mat.png")
 
-# 2. Sleek Modern Gamedev Monitor Frame & Stand (900 x 480)
+# 2. Sleek Modern Gamedev Monitor Frame & Stand (840 x 420)
 def make_monitor_frame():
-    im = Image.new("RGBA", (900, 480), (0, 0, 0, 0))
+    im = Image.new("RGBA", (840, 420), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    # Monitor Stand Base
-    create_rounded_rect(d, (350, 410, 550, 455), 8, fill=(30, 34, 44, 255), outline=(52, 58, 74, 255), width=2)
-    # Stand Column / Arm
-    d.rectangle([432, 350, 468, 415], fill=(24, 27, 36, 255))
+    # Monitor Stand Base (centered at X=420)
+    create_rounded_rect(d, (330, 396, 510, 416), 6, fill=(30, 34, 44, 255), outline=(52, 58, 74, 255), width=2)
+    # Stand Column / Arm (centered at X=420)
+    d.rectangle([404, 348, 436, 400], fill=(24, 27, 36, 255))
     
-    # Single Sleek Ultrawide Frame (40, 20, 860, 360)
-    create_rounded_rect(d, (40, 20, 860, 360), 14, fill=(20, 23, 31, 255), outline=(46, 54, 72, 255), width=3)
-    # Inner Bezel Screen Cutout (54, 32, 846, 346)
-    create_rounded_rect(d, (54, 32, 846, 346), 6, fill=(10, 12, 17, 255))
-    # Bottom chin power LED (subtle cyan glow)
-    d.ellipse([447, 350, 453, 356], fill=(0, 229, 255, 230))
+    # Single Sleek Ultrawide Frame (Outer Bezel: 30, 18, 810, 348 - width 780, height 330)
+    create_rounded_rect(d, (30, 18, 810, 348), 12, fill=(20, 23, 31, 255), outline=(48, 56, 76, 255), width=3)
+    # Inner Bezel Screen Cutout (42, 30, 798, 336 - exact width 756, height 306, centered at X=420, Y=183)
+    create_rounded_rect(d, (42, 30, 798, 336), 4, fill=(10, 12, 17, 255))
+    # Bottom chin power LED (subtle cyan glow centered at X=420)
+    d.ellipse([417, 341, 423, 347], fill=(0, 229, 255, 230))
     
     im.save(os.path.join(sprites_dir, "spr_monitor_frame.png"))
     print("Created spr_monitor_frame.png")
 
-# 3. Clean Gamedev Monitor Screen (IDE Code Editor + Engine Telemetry)
+# 3. Clean Gamedev Monitor Screen (756 x 306 - exact fit for monitor cutout)
 def make_monitor_screen():
-    im = Image.new("RGBA", (800, 320), (0, 0, 0, 0))
+    im = Image.new("RGBA", (756, 306), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     
-    # ---------------- Left 62%: IDE Code Editor (0, 0, 495, 320) ----------------
-    d.rectangle([0, 0, 495, 320], fill=(10, 13, 19, 255))
+    # ---------------- Left 65%: IDE Code Editor (0, 0, 490, 306) ----------------
+    d.rectangle([0, 0, 490, 306], fill=(10, 13, 19, 255))
     # Top Tab Bar
-    d.rectangle([0, 0, 495, 28], fill=(18, 22, 30, 255))
+    d.rectangle([0, 0, 490, 28], fill=(18, 22, 30, 255))
     # Window controls (macOS / Linux style mini dots)
     d.ellipse([12, 10, 18, 16], fill=(255, 95, 86, 255))
     d.ellipse([24, 10, 30, 16], fill=(255, 189, 46, 255))
     d.ellipse([36, 10, 42, 16], fill=(39, 201, 63, 255))
     
     # Active Editor Tab (GameManager.cs)
-    create_rounded_rect(d, (56, 4, 185, 28), 4, fill=(10, 13, 19, 255), outline=(32, 38, 52, 255), width=1)
-    d.ellipse([64, 12, 70, 18], fill=(0, 180, 216, 255)) # C# icon dot
+    create_rounded_rect(d, (52, 4, 180, 28), 4, fill=(10, 13, 19, 255), outline=(32, 38, 52, 255), width=1)
+    d.ellipse([62, 12, 68, 18], fill=(0, 180, 216, 255)) # C# icon dot
     
     # Line Numbers Gutter
-    d.rectangle([0, 28, 38, 320], fill=(13, 16, 23, 255))
-    d.line([(38, 28), (38, 320)], fill=(25, 30, 42, 255), width=1)
+    d.rectangle([0, 28, 36, 306], fill=(13, 16, 23, 255))
+    d.line([(36, 28), (36, 306)], fill=(25, 30, 42, 255), width=1)
     # Subtle line number markers
-    for idx, ly in enumerate(range(38, 305, 22)):
-        d.rectangle([20, ly+6, 28, ly+8], fill=(42, 50, 68, 200))
+    for idx, ly in enumerate(range(38, 290, 22)):
+        d.rectangle([18, ly+6, 26, ly+8], fill=(42, 50, 68, 200))
         
     # Divider between IDE and Right Engine Viewport
-    d.line([(495, 0), (495, 320)], fill=(35, 42, 58, 255), width=2)
+    d.line([(490, 0), (490, 306)], fill=(32, 38, 52, 255), width=2)
             
-    # ---------------- Right 38%: Game Engine Viewport (496, 0, 800, 320) ----------------
-    d.rectangle([496, 0, 800, 320], fill=(12, 15, 22, 255))
+    # ---------------- Right 35%: Game Engine Viewport (491, 0, 756, 306) ----------------
+    d.rectangle([491, 0, 756, 306], fill=(11, 14, 21, 255))
     # Top Viewport Header Bar
-    d.rectangle([496, 0, 800, 28], fill=(18, 22, 30, 255))
+    d.rectangle([491, 0, 756, 28], fill=(18, 22, 30, 255))
     # Engine status indicator (green dot = 60 FPS active)
-    d.ellipse([508, 11, 516, 19], fill=(0, 255, 136, 255))
+    d.ellipse([504, 11, 512, 19], fill=(0, 255, 136, 255))
     
     # Isometric Tech Grid Lines
-    grid_col = (0, 180, 255, 28)
-    for x in range(510, 790, 35):
-        d.line([(x, 150), (x - 60, 280)], fill=grid_col, width=1)
-        d.line([(x, 150), (x + 60, 280)], fill=grid_col, width=1)
+    grid_col = (0, 180, 255, 24)
+    for x in range(500, 750, 32):
+        d.line([(x, 140), (x - 50, 270)], fill=grid_col, width=1)
+        d.line([(x, 140), (x + 50, 270)], fill=grid_col, width=1)
         
     # Wireframe 3D Gem / Diamond (representing active game asset in scene)
-    cx, cy = 645, 155
-    d.polygon([(cx, cy - 35), (cx + 35, cy), (cx, cy + 35), (cx - 35, cy)], outline=(0, 229, 255, 180), fill=(0, 180, 255, 35))
-    d.line([(cx, cy - 35), (cx, cy + 35)], fill=(0, 229, 255, 160), width=1)
-    d.line([(cx - 35, cy), (cx + 35, cy)], fill=(0, 229, 255, 160), width=1)
+    cx, cy = 623, 145
+    d.polygon([(cx, cy - 32), (cx + 32, cy), (cx, cy + 32), (cx - 32, cy)], outline=(0, 229, 255, 170), fill=(0, 180, 255, 30))
+    d.line([(cx, cy - 32), (cx, cy + 32)], fill=(0, 229, 255, 150), width=1)
+    d.line([(cx - 32, cy), (cx + 32, cy)], fill=(0, 229, 255, 150), width=1)
     
     # Bottom telemetry bar
-    d.rectangle([496, 294, 800, 320], fill=(15, 18, 26, 255))
-    d.line([(496, 294), (800, 294)], fill=(28, 34, 48, 255), width=1)
+    d.rectangle([491, 280, 756, 306], fill=(14, 17, 24, 255))
+    d.line([(491, 280), (756, 280)], fill=(26, 32, 44, 255), width=1)
     
     im.save(os.path.join(sprites_dir, "spr_monitor_screen.png"))
     print("Created spr_monitor_screen.png")
