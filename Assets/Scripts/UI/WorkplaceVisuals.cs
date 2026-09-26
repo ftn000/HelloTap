@@ -139,6 +139,11 @@ public class WorkplaceVisuals : MonoBehaviour
         if (keyGlowD == null) keyGlowD = transform.Find("DeskMat/KeyboardGroup/KeyGlow_D")?.GetComponent<Graphic>();
         if (keyGlowSpace == null) keyGlowSpace = transform.Find("DeskMat/KeyboardGroup/KeyGlow_Space")?.GetComponent<Graphic>();
         if (keyGlowEsc == null) keyGlowEsc = transform.Find("DeskMat/KeyboardGroup/KeyGlow_Esc")?.GetComponent<Graphic>();
+
+        if (monitorScreenGlow == null)
+        {
+            monitorScreenGlow = transform.Find("DeskMat/MonitorFrame/MonitorScreen/MonitorScreenGlow")?.GetComponent<Graphic>();
+        }
     }
 
     private void OnEnable()
@@ -393,6 +398,19 @@ public class WorkplaceVisuals : MonoBehaviour
 
     private void UpdateBugHunt(float dt)
     {
+        if (monitorScreenGlow != null)
+        {
+            if (bugHp > 0)
+            {
+                float pulse = (Mathf.Sin(Time.time * 9f) + 1f) * 0.5f;
+                monitorScreenGlow.color = new Color(1f, 0.12f, 0.15f, 0.10f + pulse * 0.32f);
+            }
+            else if (monitorScreenGlow.color.a > 0.005f)
+            {
+                monitorScreenGlow.color = Color.Lerp(monitorScreenGlow.color, new Color(1f, 0.12f, 0.15f, 0f), dt * 6f);
+            }
+        }
+
         if (bugAlertButton == null) return;
 
         if (bugHp > 0)
@@ -448,6 +466,7 @@ public class WorkplaceVisuals : MonoBehaviour
 
         if (bugHp > 0)
         {
+            HapticFeedback.Vibrate(24);
             if (AudioManager.Instance != null) AudioManager.Instance.PlayBugHit(false);
             if (ClickJuice.Instance != null)
             {
@@ -457,6 +476,7 @@ public class WorkplaceVisuals : MonoBehaviour
         }
         else
         {
+            HapticFeedback.Vibrate(45);
             bugAlertButton.gameObject.SetActive(false);
             bugSpawnTimer = Random.Range(25f, 40f);
 

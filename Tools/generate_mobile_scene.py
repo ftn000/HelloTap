@@ -984,38 +984,44 @@ add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001
 add_cr(3010003, 3010000)
 add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
 
-# MonitorFrame (Upper half of workstation)
+# MonitorFrame (Upper half of workstation - resized to 820x420 to fit perfectly)
 add_go(3020000, "MonitorFrame", [3020001, 3020003, 3020002])
-add_rect(3020001, 3020000, 3010001, [3021001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -250), size=(960, 520), pivot=(0.5, 1))
+add_rect(3020001, 3020000, 3010001, [3021001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -250), size=(820, 420), pivot=(0.5, 1))
 add_cr(3020003, 3020000)
 add_image(3020002, 3020000, GUID_SPR_MON_FRAME, raycast=0)
 
 # MonitorScreen
 add_go(3021000, "MonitorScreen", [3021001, 3021003, 3021002])
-add_rect(3021001, 3021000, 3020001, [3021101, 3021201, 3021301], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 18), size=(880, 360), pivot=(0.5, 0.5))
+add_rect(3021001, 3021000, 3020001, [3021101, 3021201, 3021301, 3021401], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 20), size=(760, 310), pivot=(0.5, 0.5))
 add_cr(3021003, 3021000)
 add_image(3021002, 3021000, GUID_SPR_MON_SCREEN, raycast=0)
 
-# TerminalCodeText (Live C# code on screen - shifted below the tab header)
+# TerminalCodeText (Live C# code on screen - shifted below the tab header and beside gutter)
 add_go(3021100, "TerminalCodeText", [3021101, 3021103, 3021102])
-add_rect(3021101, 3021100, 3021001, [], amin=(0, 0), amax=(0.58, 1), pos=(15, -34), size=(-25, -46), pivot=(0, 1))
+add_rect(3021101, 3021100, 3021001, [], amin=(0, 0), amax=(0.60, 1), pos=(45, -34), size=(-55, -46), pivot=(0, 1))
 add_cr(3021103, 3021100)
-add_tmp(3021102, 3021100, "// HelloTap Dev v1.4.0\\nusing UnityEngine;\\n> <color=#00FF88>_</color>", fsize=15, fstyle=0, color=(0, 1, 0.55, 1), align=257, autosize=1, fmin=11, fmax=16)
+add_tmp(3021102, 3021100, "// HelloTap Dev v1.4.0\\nusing UnityEngine;\\n> <color=#00FF88>_</color>", fsize=14, fstyle=0, color=(0, 1, 0.55, 1), align=257, autosize=1, fmin=10, fmax=15)
 
 # SecondMonitorPanel (Docs & Metrics)
 add_go(3021200, "SecondMonitorPanel", [3021201, 3021203, 3021202], active=0)
-add_rect(3021201, 3021200, 3021001, [3021211], amin=(0.58, 0.05), amax=(0.98, 0.95), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(3021201, 3021200, 3021001, [3021211], amin=(0.61, 0.05), amax=(0.98, 0.95), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3021203, 3021200)
 add_image(3021202, 3021200, None, color=(0.03, 0.05, 0.09, 0.92), raycast=0)
 
 add_go(3021210, "SecondMonitorText", [3021211, 3021213, 3021212])
 add_rect(3021211, 3021210, 3021201, [], amin=(0,0), amax=(1,1), pos=(10, -32), size=(-20, -42), pivot=(0, 1))
 add_cr(3021213, 3021210)
-add_tmp(3021212, 3021210, "<color=#4EC9B0>[DEV DOCS & METRICS]</color>\\nGPU: Integrated\\nAI Copilot: Offline\\nБагов пофикшено: 0\\nБонус ачивок: +0%", fsize=14, fstyle=0, color=(0.35, 0.9, 0.8, 1), align=257, autosize=1, fmin=10, fmax=15)
+add_tmp(3021212, 3021210, "<color=#4EC9B0>[DEV DOCS & METRICS]</color>\\nGPU: Integrated\\nAI Copilot: Offline\\nБагов пофикшено: 0\\nБонус ачивок: +0%", fsize=13, fstyle=0, color=(0.35, 0.9, 0.8, 1), align=257, autosize=1, fmin=10, fmax=14)
+
+# MonitorScreenGlow (Warning pulse during bug event)
+add_go(3021400, "MonitorScreenGlow", [3021401, 3021403, 3021402])
+add_rect(3021401, 3021400, 3021001, [], amin=(0,0), amax=(1,1))
+add_cr(3021403, 3021400)
+add_image(3021402, 3021400, GUID_SPR_CARD_BG, color=(1, 0.12, 0.15, 0), img_type=1, raycast=0)
 
 # ComboBar (Between monitor and keyboard)
 add_go(3012000, "ComboBar", [3012001, 3012003, 3012002])
-add_rect(3012001, 3012000, 3010001, [3012101, 3012201], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -775), size=(820, 36), pivot=(0.5, 1))
+add_rect(3012001, 3012000, 3010001, [3012101, 3012201], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -775), size=(760, 36), pivot=(0.5, 1))
 add_cr(3012003, 3012000)
 add_image(3012002, 3012000, GUID_SPR_CARD_BG, color=(0.06, 0.08, 0.12, 0.9), img_type=1)
 
@@ -1029,27 +1035,27 @@ add_rect(3012201, 3012200, 3012001, [], amin=(0,0), amax=(1,1))
 add_cr(3012203, 3012200)
 add_tmp(3012202, 3012200, "ТЕМП ПЕЧАТИ: x1.0 (тапай быстрее для x3.0)", fsize=14, fstyle=1, color=(0.75, 0.82, 0.92, 1), align=514, autosize=1, fmin=10, fmax=15)
 
-# Cat Mascot (sitting peacefully by monitor)
+# Cat Mascot (curled up sleeping peacefully under the keyboard on desk mat)
 add_go(3070000, "CatMascot", [3070001, 3070003, 3070002])
-add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-385, -500), size=(180, 130), pivot=(0.5, 0.5))
+add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -1210), size=(180, 125), pivot=(0.5, 0.5))
 add_cr(3070003, 3070000)
 add_image(3070002, 3070000, GUID_SPR_CAT, raycast=0)
 
-# Energy Can (on desk)
+# Energy Can (on desk beside monitor)
 add_go(3060000, "EnergyCan", [3060001, 3060003, 3060002])
-add_rect(3060001, 3060000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(395, -500), size=(100, 170), pivot=(0.5, 0.5))
+add_rect(3060001, 3060000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(450, -420), size=(90, 155), pivot=(0.5, 0.5))
 add_cr(3060003, 3060000)
 add_image(3060002, 3060000, GUID_SPR_ENERGY, raycast=0)
 
 # Coffee Mug
 add_go(3050000, "CoffeeMug", [3050001, 3050003, 3050002])
-add_rect(3050001, 3050000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-390, -960), size=(130, 150), pivot=(0.5, 0.5))
+add_rect(3050001, 3050000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-430, -960), size=(120, 140), pivot=(0.5, 0.5))
 add_cr(3050003, 3050000)
 add_image(3050002, 3050000, GUID_SPR_COFFEE, raycast=0)
 
 # Gaming Mouse
 add_go(3040000, "GamingMouse", [3040001, 3040003, 3040002])
-add_rect(3040001, 3040000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(390, -960), size=(110, 180), pivot=(0.5, 0.5))
+add_rect(3040001, 3040000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(430, -960), size=(100, 160), pivot=(0.5, 0.5))
 add_cr(3040003, 3040000)
 add_image(3040002, 3040000, GUID_SPR_MOUSE, raycast=0)
 
@@ -1107,7 +1113,7 @@ add_button(3080003, 3080000, 3080002)
 
 # ProjectProgressBar (Above monitor on main screen)
 add_go(3011000, "ProjectProgressBar", [3011001, 3011003, 3011002, 3011300])
-add_rect(3011001, 3011000, 3000001, [3011101, 3011201, 3011301], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -180), size=(960, 54), pivot=(0.5, 1))
+add_rect(3011001, 3011000, 3000001, [3011101, 3011201, 3011301], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -182), size=(820, 52), pivot=(0.5, 1))
 add_cr(3011003, 3011000)
 add_image(3011002, 3011000, GUID_SPR_CARD_BG, color=(0.08, 0.10, 0.15, 0.95), img_type=1)
 
@@ -1137,7 +1143,7 @@ add_button(3021303, 3021300, 3021302)
 add_go(3021310, "BugAlertText", [3021311, 3021313, 3021312])
 add_rect(3021311, 3021310, 3021301, [], amin=(0,0), amax=(1,1))
 add_cr(3021313, 3021310)
-add_tmp(3021312, 3021310, "[ ! ] БАГ НА ПРОДЕ! [8.5с]", fsize=16, fstyle=1, color=(1, 1, 1, 1), align=514)
+add_tmp(3021312, 3021310, "⚡ ТАПАЙ БЫСТРО! БАГ [8.5с]", fsize=16, fstyle=1, color=(1, 1, 1, 1), align=514)
 
 # WorkplaceVisuals component
 add(f"--- !u!114 &3000002")
@@ -1153,6 +1159,7 @@ add("  m_Script: {fileID: 11500000, guid: " + GUID_WORKPLACE_VISUALS + ", type: 
 add("  m_Name: ")
 add("  m_EditorClassIdentifier: Assembly-CSharp::WorkplaceVisuals")
 add("  monitorCodeText: {fileID: 3021102}")
+add("  monitorScreenGlow: {fileID: 3021402}")
 add("  secondMonitorText: {fileID: 3021212}")
 add("  secondMonitorPanel: {fileID: 3021200}")
 add("  keyboardTransform: {fileID: 3030001}")

@@ -21,65 +21,76 @@ def make_desk():
     im.save(os.path.join(sprites_dir, "spr_desk_mat.png"))
     print("Created spr_desk_mat.png")
 
-# 2. Dual Monitor Frame & Stand (900 x 480)
+# 2. Sleek Modern Gamedev Monitor Frame & Stand (900 x 480)
 def make_monitor_frame():
     im = Image.new("RGBA", (900, 480), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     # Monitor Stand Base
-    create_rounded_rect(d, (370, 430, 530, 470), 8, fill=(35, 38, 48, 255), outline=(60, 65, 80, 255), width=2)
-    # Stand column
-    d.rectangle([435, 370, 465, 435], fill=(30, 32, 40, 255))
+    create_rounded_rect(d, (350, 410, 550, 455), 8, fill=(30, 34, 44, 255), outline=(52, 58, 74, 255), width=2)
+    # Stand Column / Arm
+    d.rectangle([432, 350, 468, 415], fill=(24, 27, 36, 255))
     
-    # Left Monitor (Main IDE) - (50, 40, 560, 375)
-    create_rounded_rect(d, (50, 40, 560, 375), 12, fill=(20, 22, 28, 255), outline=(50, 55, 70, 255), width=3)
-    # Screen area
-    d.rectangle([62, 52, 548, 363], fill=(13, 15, 20, 255))
-    # Top IDE Window Bar
-    d.rectangle([62, 52, 548, 76], fill=(22, 25, 33, 255))
-    d.ellipse([70, 60, 78, 68], fill=(255, 95, 86, 255))   # Red close
-    d.ellipse([84, 60, 92, 68], fill=(255, 189, 46, 255))  # Yellow min
-    d.ellipse([98, 60, 106, 68], fill=(39, 201, 63, 255))  # Green max
-
-    # Right Monitor (Game / Preview) - (575, 70, 860, 375)
-    create_rounded_rect(d, (575, 70, 860, 375), 12, fill=(20, 22, 28, 255), outline=(50, 55, 70, 255), width=3)
-    d.rectangle([585, 82, 850, 363], fill=(15, 18, 24, 255))
-    # Top Bar
-    d.rectangle([585, 82, 850, 104], fill=(24, 28, 38, 255))
-    d.ellipse([592, 89, 598, 95], fill=(0, 229, 255, 255))
-    d.ellipse([603, 89, 609, 95], fill=(0, 255, 136, 255))
+    # Single Sleek Ultrawide Frame (40, 20, 860, 360)
+    create_rounded_rect(d, (40, 20, 860, 360), 14, fill=(20, 23, 31, 255), outline=(46, 54, 72, 255), width=3)
+    # Inner Bezel Screen Cutout (54, 32, 846, 346)
+    create_rounded_rect(d, (54, 32, 846, 346), 6, fill=(10, 12, 17, 255))
+    # Bottom chin power LED (subtle cyan glow)
+    d.ellipse([447, 350, 453, 356], fill=(0, 229, 255, 230))
     
     im.save(os.path.join(sprites_dir, "spr_monitor_frame.png"))
     print("Created spr_monitor_frame.png")
 
-# 3. Monitor Screen Content (IDE Code Lines + Game View)
+# 3. Clean Gamedev Monitor Screen (IDE Code Editor + Engine Telemetry)
 def make_monitor_screen():
     im = Image.new("RGBA", (800, 320), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    # Clean Dark IDE Screen (no distracting colored bars behind code text)
-    d.rectangle([0, 0, 480, 320], fill=(13, 16, 23, 255))
-    # Subtle top IDE tab bar
-    d.rectangle([0, 0, 480, 24], fill=(22, 27, 38, 255))
+    
+    # ---------------- Left 62%: IDE Code Editor (0, 0, 495, 320) ----------------
+    d.rectangle([0, 0, 495, 320], fill=(10, 13, 19, 255))
+    # Top Tab Bar
+    d.rectangle([0, 0, 495, 28], fill=(18, 22, 30, 255))
     # Window controls (macOS / Linux style mini dots)
-    d.ellipse([10, 8, 18, 16], fill=(255, 95, 86, 255))
-    d.ellipse([24, 8, 32, 16], fill=(255, 189, 46, 255))
-    d.ellipse([38, 8, 46, 16], fill=(39, 201, 63, 255))
-    # Vertical divider between IDE and Game View
-    d.line([(485, 0), (485, 320)], fill=(35, 42, 60, 255), width=2)
-            
-    # Right Game Preview Screen (490, 0, 800, 320)
-    d.rectangle([490, 0, 800, 320], fill=(20, 24, 34, 255))
-    # Ground in preview
-    d.rectangle([490, 240, 800, 320], fill=(35, 45, 65, 255))
-    # Pixel Hero in preview
-    create_rounded_rect(d, (620, 180, 670, 240), 6, fill=(0, 229, 255, 255))
-    # Sword / Staff
-    d.rectangle([670, 170, 676, 230], fill=(255, 189, 46, 255))
-    # Coin in air
-    d.ellipse([700, 130, 725, 155], fill=(255, 215, 0, 255), outline=(200, 160, 0, 255), width=2)
-    # Neon Grid lines
-    for gx in range(510, 790, 40):
-        d.line([(gx, 240), (gx - 30, 320)], fill=(0, 229, 255, 40), width=1)
+    d.ellipse([12, 10, 18, 16], fill=(255, 95, 86, 255))
+    d.ellipse([24, 10, 30, 16], fill=(255, 189, 46, 255))
+    d.ellipse([36, 10, 42, 16], fill=(39, 201, 63, 255))
+    
+    # Active Editor Tab (GameManager.cs)
+    create_rounded_rect(d, (56, 4, 185, 28), 4, fill=(10, 13, 19, 255), outline=(32, 38, 52, 255), width=1)
+    d.ellipse([64, 12, 70, 18], fill=(0, 180, 216, 255)) # C# icon dot
+    
+    # Line Numbers Gutter
+    d.rectangle([0, 28, 38, 320], fill=(13, 16, 23, 255))
+    d.line([(38, 28), (38, 320)], fill=(25, 30, 42, 255), width=1)
+    # Subtle line number markers
+    for idx, ly in enumerate(range(38, 305, 22)):
+        d.rectangle([20, ly+6, 28, ly+8], fill=(42, 50, 68, 200))
         
+    # Divider between IDE and Right Engine Viewport
+    d.line([(495, 0), (495, 320)], fill=(35, 42, 58, 255), width=2)
+            
+    # ---------------- Right 38%: Game Engine Viewport (496, 0, 800, 320) ----------------
+    d.rectangle([496, 0, 800, 320], fill=(12, 15, 22, 255))
+    # Top Viewport Header Bar
+    d.rectangle([496, 0, 800, 28], fill=(18, 22, 30, 255))
+    # Engine status indicator (green dot = 60 FPS active)
+    d.ellipse([508, 11, 516, 19], fill=(0, 255, 136, 255))
+    
+    # Isometric Tech Grid Lines
+    grid_col = (0, 180, 255, 28)
+    for x in range(510, 790, 35):
+        d.line([(x, 150), (x - 60, 280)], fill=grid_col, width=1)
+        d.line([(x, 150), (x + 60, 280)], fill=grid_col, width=1)
+        
+    # Wireframe 3D Gem / Diamond (representing active game asset in scene)
+    cx, cy = 645, 155
+    d.polygon([(cx, cy - 35), (cx + 35, cy), (cx, cy + 35), (cx - 35, cy)], outline=(0, 229, 255, 180), fill=(0, 180, 255, 35))
+    d.line([(cx, cy - 35), (cx, cy + 35)], fill=(0, 229, 255, 160), width=1)
+    d.line([(cx - 35, cy), (cx + 35, cy)], fill=(0, 229, 255, 160), width=1)
+    
+    # Bottom telemetry bar
+    d.rectangle([496, 294, 800, 320], fill=(15, 18, 26, 255))
+    d.line([(496, 294), (800, 294)], fill=(28, 34, 48, 255), width=1)
+    
     im.save(os.path.join(sprites_dir, "spr_monitor_screen.png"))
     print("Created spr_monitor_screen.png")
 
