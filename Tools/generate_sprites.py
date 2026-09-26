@@ -1,4 +1,5 @@
 import os
+import math
 from PIL import Image, ImageDraw, ImageFont
 
 sprites_dir = r"C:\HelloTap\Assets\Sprites"
@@ -263,6 +264,29 @@ def make_button_sprites():
     im.save(os.path.join(sprites_dir, "spr_btn_gold.png"))
     print("Created button sprites")
 
+# 11. Soft Steam Cloud Particle (48 x 48)
+def make_steam_particle():
+    im = Image.new("RGBA", (48, 48), (0, 0, 0, 0))
+    for y in range(48):
+        for x in range(48):
+            dx = x - 23.5
+            dy = y - 23.5
+            dist = math.sqrt(dx*dx + dy*dy) / 22.0
+            if dist <= 1.0:
+                a = int(((1.0 - dist) ** 1.6) * 220)
+                im.putpixel((x, y), (240, 245, 255, a))
+    im.save(os.path.join(sprites_dir, "spr_steam_puff.png"))
+    print("Created spr_steam_puff.png")
+
+# 12. Glowing Fizzy Bubble Particle (24 x 24)
+def make_bubble_particle():
+    im = Image.new("RGBA", (24, 24), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.ellipse([2, 2, 21, 21], fill=(0, 220, 255, 60), outline=(0, 255, 220, 230), width=2)
+    d.ellipse([6, 5, 10, 9], fill=(255, 255, 255, 240))
+    im.save(os.path.join(sprites_dir, "spr_bubble_spark.png"))
+    print("Created spr_bubble_spark.png")
+
 make_desk()
 make_monitor_frame()
 make_monitor_screen()
@@ -273,4 +297,6 @@ make_energy_can()
 make_cat()
 make_card_bg()
 make_button_sprites()
+make_steam_particle()
+make_bubble_particle()
 print("All sprites successfully generated!")

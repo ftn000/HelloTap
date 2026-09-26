@@ -56,12 +56,14 @@ public class AudioManager : MonoBehaviour
             sfxSource = gameObject.AddComponent<AudioSource>();
             sfxSource.playOnAwake = false;
         }
+        sfxSource.volume = 0.70f;
 
         if (typingSource == null)
         {
             typingSource = gameObject.AddComponent<AudioSource>();
             typingSource.playOnAwake = false;
         }
+        typingSource.volume = 1.0f;
 
         isMuted = PlayerPrefs.GetInt(MutePrefKey, 0) == 1;
         EnsureClips();
@@ -170,12 +172,7 @@ public class AudioManager : MonoBehaviour
         if (isMuted || isFocusLost) return;
         AudioListener.pause = false;
 
-        if (isCrit && critSound != null)
-        {
-            sfxSource.PlayOneShot(critSound, 0.9f);
-            return;
-        }
-
+        // 1. Всегда воспроизводим отчетливый стук механического переключателя
         if (typingSounds != null && typingSounds.Length > 0)
         {
             int index = Random.Range(0, typingSounds.Length);
@@ -185,6 +182,12 @@ public class AudioManager : MonoBehaviour
                 typingSource.pitch = Random.Range(minTypingPitch, maxTypingPitch);
                 typingSource.PlayOneShot(clip, 1.0f);
             }
+        }
+
+        // 2. При крите мягко накладываем приятный кристаллический акцент поверх клика клавиатуры
+        if (isCrit && critSound != null && sfxSource != null)
+        {
+            sfxSource.PlayOneShot(critSound, 0.45f);
         }
     }
 

@@ -30,40 +30,40 @@ def make_mech_switch_click(switch_type="blue", duration=0.075):
     samples = []
     
     if switch_type == "blue": # Cherry MX Blue (Crisp tactile click + solid bottom out)
-        click_freq = 4200.0
-        click_decay = 240.0
-        click_amp = 1.0
-        thud_freq = 240.0
-        thud_decay = 65.0
-        spring_ping_freq = 6800.0
-        spring_ping_amp = 0.16
+        click_freq = 4100.0
+        click_decay = 220.0
+        click_amp = 1.20
+        thud_freq = 230.0
+        thud_decay = 60.0
+        spring_ping_freq = 6600.0
+        spring_ping_amp = 0.18
         bottom_out_delay = 0.003
     elif switch_type == "brown": # Cherry MX Brown (Tactile bump + deep clack)
-        click_freq = 2900.0
-        click_decay = 180.0
-        click_amp = 0.82
-        thud_freq = 210.0
-        thud_decay = 55.0
-        spring_ping_freq = 5200.0
-        spring_ping_amp = 0.09
+        click_freq = 2800.0
+        click_decay = 170.0
+        click_amp = 1.05
+        thud_freq = 200.0
+        thud_decay = 50.0
+        spring_ping_freq = 5000.0
+        spring_ping_amp = 0.11
         bottom_out_delay = 0.004
     elif switch_type == "spacebar": # Heavy Spacebar stabilizer thud + bar clack
-        click_freq = 2200.0
-        click_decay = 160.0
-        click_amp = 0.72
-        thud_freq = 160.0
-        thud_decay = 40.0
-        spring_ping_freq = 4100.0
-        spring_ping_amp = 0.13
+        click_freq = 2100.0
+        click_decay = 150.0
+        click_amp = 0.95
+        thud_freq = 150.0
+        thud_decay = 38.0
+        spring_ping_freq = 4000.0
+        spring_ping_amp = 0.14
         bottom_out_delay = 0.002
     else: # Snappy Blue secondary clack
-        click_freq = 3800.0
-        click_decay = 220.0
-        click_amp = 0.92
-        thud_freq = 260.0
-        thud_decay = 70.0
-        spring_ping_freq = 6200.0
-        spring_ping_amp = 0.12
+        click_freq = 3700.0
+        click_decay = 210.0
+        click_amp = 1.12
+        thud_freq = 250.0
+        thud_decay = 65.0
+        spring_ping_freq = 6000.0
+        spring_ping_amp = 0.14
         bottom_out_delay = 0.003
 
     for i in range(total_samples):
@@ -85,7 +85,7 @@ def make_mech_switch_click(switch_type="blue", duration=0.075):
             env_thud = math.exp(-t_thud * thud_decay)
             thud = (math.sin(2.0 * math.pi * thud_freq * t_thud) + 
                     0.35 * math.sin(4.0 * math.pi * thud_freq * t_thud) + 
-                    0.25 * (random.random() * 2.0 - 1.0)) * env_thud * 0.68
+                    0.25 * (random.random() * 2.0 - 1.0)) * env_thud * 0.85
                     
         s = click + spring + thud
         samples.append(s)
@@ -93,23 +93,23 @@ def make_mech_switch_click(switch_type="blue", duration=0.075):
     return samples
 
 def make_crit_click():
-    duration = 0.24
+    duration = 0.20
     total_samples = int(SAMPLE_RATE * duration)
     samples = []
     for i in range(total_samples):
         t = i / SAMPLE_RATE
         # Crisp mechanical switch click transient
-        env_click = math.exp(-t * 180.0)
-        click = (math.sin(2.0 * math.pi * 4400.0 * t) + 0.5 * (random.random() * 2.0 - 1.0)) * env_click * 0.85
+        env_click = math.exp(-t * 190.0)
+        click = (math.sin(2.0 * math.pi * 4200.0 * t) + 0.45 * (random.random() * 2.0 - 1.0)) * env_click * 1.0
         
-        # Bright crystalline crit harmonic chime
-        env_bell = math.exp(-t * 16.0)
-        bell = (0.55 * math.sin(2.0 * math.pi * 1760.0 * t) + 
-                0.35 * math.sin(2.0 * math.pi * 3520.0 * t) + 
-                0.20 * math.sin(2.0 * math.pi * 5280.0 * t)) * env_bell
+        # Soft musical crystal sparkle (delicate, not harsh)
+        env_bell = math.exp(-t * 24.0)
+        bell = (0.24 * math.sin(2.0 * math.pi * 1760.0 * t) + 
+                0.14 * math.sin(2.0 * math.pi * 3520.0 * t) + 
+                0.07 * math.sin(2.0 * math.pi * 5280.0 * t)) * env_bell
         
-        # Low punch
-        thud = math.sin(2.0 * math.pi * 180.0 * t) * math.exp(-t * 50.0) * 0.4
+        # Low mechanical thud punch
+        thud = math.sin(2.0 * math.pi * 190.0 * t) * math.exp(-t * 55.0) * 0.5
         
         s = click + bell + thud
         samples.append(s)

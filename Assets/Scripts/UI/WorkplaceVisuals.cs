@@ -39,6 +39,10 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Transform energyCanTransform;
     [SerializeField] private Transform catTransform;
 
+    [Header("Партиклы пара и пузырьков")]
+    [SerializeField] private RectTransform[] coffeeSteamWisps;
+    [SerializeField] private RectTransform[] energyFizzBubbles;
+
     [Header("Прогресс-бар проекта и Шкала В Потоке")]
     [SerializeField] private Image projectProgressFill;
     [SerializeField] private TMP_Text projectProgressText;
@@ -61,6 +65,17 @@ public class WorkplaceVisuals : MonoBehaviour
     private int bugHp = 0;
     private const int MaxBugHp = 5;
     private const float BugLifetime = 8.5f;
+
+    // Партиклы пара и пузырьков
+    private Vector2[] steamBasePos;
+    private Graphic[] steamGraphics;
+    private Vector2[] fizzBasePos;
+    private Graphic[] fizzGraphics;
+    private float coffeeJostleBoost = 0f;
+    private float energyJostleBoost = 0f;
+
+    // Анимация кота
+    private Coroutine catWiggleCoroutine;
 
     // Отслеживание открытых предметов для анимации появления
     private bool wasMouseUnlocked = false;
@@ -144,6 +159,34 @@ public class WorkplaceVisuals : MonoBehaviour
         {
             monitorScreenGlow = transform.Find("DeskMat/MonitorFrame/MonitorScreen/MonitorScreenGlow")?.GetComponent<Graphic>();
         }
+
+        if (coffeeSteamWisps == null || coffeeSteamWisps.Length == 0)
+        {
+            Transform steamGroup = transform.Find("DeskMat/CoffeeMug/CoffeeSteamGroup");
+            if (steamGroup != null)
+            {
+                var list = new List<RectTransform>();
+                for (int i = 0; i < steamGroup.childCount; i++)
+                {
+                    if (steamGroup.GetChild(i) is RectTransform rt) list.Add(rt);
+                }
+                coffeeSteamWisps = list.ToArray();
+            }
+        }
+
+        if (energyFizzBubbles == null || energyFizzBubbles.Length == 0)
+        {
+            Transform fizzGroup = transform.Find("DeskMat/EnergyCan/EnergyFizzGroup");
+            if (fizzGroup != null)
+            {
+                var list = new List<RectTransform>();
+                for (int i = 0; i < fizzGroup.childCount; i++)
+                {
+                    if (fizzGroup.GetChild(i) is RectTransform rt) list.Add(rt);
+                }
+                energyFizzBubbles = list.ToArray();
+            }
+        }
     }
 
     private void OnEnable()
@@ -154,6 +197,8 @@ public class WorkplaceVisuals : MonoBehaviour
     private void Start()
     {
         SubscribeEvents();
+        InitSteamAndFizz();
+        InitCatInteraction();
         RefreshDeskUnlockables(false);
         RefreshProgressAndComboUI();
     }
@@ -194,17 +239,19 @@ public class WorkplaceVisuals : MonoBehaviour
             UpdateTerminalDisplay();
         }
 
-        // 2. Дыхание кота (если открыт)
-        if (catTransform != null && catTransform.gameObject.activeSelf)
-        {
-            float breath = 1f + Mathf.Sin(Time.time * 2.5f) * 0.025f;
-            catTransform.localScale = new Vector3(breath, 2f - breath, 1f);
-        }
+        // 2. Анимация кота (дыхание и покачивание хвостом)
+        UpdateCatIdle(dt);
 
-        // 3. Обновление шкалы комбо "В Потоке"
+        // 3. Анимация поднимающегося пара над кружкой кофе
+        UpdateCoffeeSteam(dt);
+
+        // 4. Анимация шипучих пузырьков энергетика
+        UpdateEnergyFizz(dt);
+
+        // 5. Обновление шкалы комбо "В Потоке"
         UpdateComboVisuals();
 
-        // 4. Таймер спавна и жизни Бага на мониторе
+        // 6. Таймер спавна и жизни Бага на мониторе
         UpdateBugHunt(dt);
     }
 
@@ -227,10 +274,10 @@ public class WorkplaceVisuals : MonoBehaviour
         if (GameManager.Instance == null) return;
 
         bool hasMouse = GameManager.Instance.GetUpgradeLevel("hw_mouse") > 0;
-        bool hasCat = GameManager.Instance.GetUpgradeLevel("staff_cat") > 0;
-        bool hasCoffee = GameManager.Instance.GetUpgradeLevel("staff_script") > 0 || GameManager.Instance.TotalCodeWritten >= 30;
+        bool hasCat = true; // Кот-маскот всегда мило спит на столе
+        bool hasCoffee = true; // Кружка с паром всегда на столе
         bool hasMonitor2 = GameManager.Instance.GetUpgradeLevel("hw_monitor2") > 0;
-        bool hasEnergy = GameManager.Instance.IsBoostActive || GameManager.Instance.TotalMoneyEarned > 0;
+        bool hasEnergy = true; // Энергетик с пузырьками на столе
 
         if (mouseTransform != null)
         {
@@ -525,7 +572,16 @@ public class WorkplaceVisuals : MonoBehaviour
         if (coffeeMugTransform != null && coffeeMugTransform.gameObject.activeSelf)
         {
             coffeeMugTransform.localRotation = Quaternion.Euler(0, 0, Random.Range(-3f, 3f));
+            coffeeJostleBoost = 1.0f;
         }
+
+        if (energyCanTransform != null && energyCanTransform.gameObject.activeSelf)
+        {
+            energyJostleBoost = 1.0f;
+        }
+
+        bool isCombo = GameManager.Instance != null && GameManager.Instance.GetComboMultiplier() > 1.15;
+        TriggerCatTapReaction(isCombo);
 
         UpdateComboVisuals();
         RefreshProgressAndComboUI();
@@ -627,6 +683,199 @@ public class WorkplaceVisuals : MonoBehaviour
         keyboardTransform.localScale = new Vector3(0.98f, 0.96f, 1f);
         yield return new WaitForSecondsRealtime(0.06f);
         keyboardTransform.localScale = baseScale;
+    }
+
+    #endregion
+
+    #region Анимация Кота (Cat Reactions & Idle)
+
+    private void InitCatInteraction()
+    {
+        if (catTransform != null)
+        {
+            Button catBtn = catTransform.GetComponent<Button>();
+            if (catBtn != null)
+            {
+                catBtn.onClick.RemoveAllListeners();
+                catBtn.onClick.AddListener(OnCatClickedDirectly);
+            }
+        }
+    }
+
+    private void UpdateCatIdle(float dt)
+    {
+        if (catTransform == null || !catTransform.gameObject.activeSelf) return;
+
+        // Если кот не занят реакцией на тап, он плавно дышит и изредка шевелит хвостиком
+        if (catWiggleCoroutine == null)
+        {
+            float breath = 1f + Mathf.Sin(Time.time * 2.2f) * 0.025f;
+            float idleTail = Mathf.Sin(Time.time * 1.5f) * 1.8f;
+            catTransform.localScale = new Vector3(breath, 2f - breath, 1f);
+            catTransform.localRotation = Quaternion.Euler(0, 0, idleTail);
+        }
+    }
+
+    public void TriggerCatTapReaction(bool isCombo)
+    {
+        if (catTransform == null || !catTransform.gameObject.activeSelf) return;
+        if (catWiggleCoroutine != null) StopCoroutine(catWiggleCoroutine);
+        catWiggleCoroutine = StartCoroutine(CatWiggleRoutine(isCombo));
+    }
+
+    private IEnumerator CatWiggleRoutine(bool isCombo)
+    {
+        float duration = isCombo ? 0.32f : 0.20f;
+        float freq = isCombo ? 26f : 16f;
+        float maxAngle = isCombo ? 6.0f : 3.2f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            float decay = 1f - t;
+
+            // Подергивание ушком и хвостом (вращение туда-обратно)
+            float angle = Mathf.Sin(elapsed * freq) * maxAngle * decay;
+            catTransform.localRotation = Quaternion.Euler(0, 0, angle);
+
+            // Мурчащий отскок (squash-stretch)
+            float bounce = Mathf.Sin(elapsed * freq * 0.5f) * (isCombo ? 0.09f : 0.05f) * decay;
+            catTransform.localScale = new Vector3(1f + bounce, 1f - bounce * 0.7f, 1f);
+
+            yield return null;
+        }
+
+        catTransform.localRotation = Quaternion.identity;
+        catTransform.localScale = Vector3.one;
+        catWiggleCoroutine = null;
+    }
+
+    public void OnCatClickedDirectly()
+    {
+        TriggerCatTapReaction(true);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayTyping(false);
+        if (ClickJuice.Instance != null && catTransform != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup("Муррр~ 💕", catTransform.position, new Color(1f, 0.45f, 0.75f, 1f), false);
+        }
+    }
+
+    #endregion
+
+    #region Партиклы пара кофе и пузырьков энергетика
+
+    private void InitSteamAndFizz()
+    {
+        if (coffeeSteamWisps != null && coffeeSteamWisps.Length > 0)
+        {
+            steamBasePos = new Vector2[coffeeSteamWisps.Length];
+            steamGraphics = new Graphic[coffeeSteamWisps.Length];
+            for (int i = 0; i < coffeeSteamWisps.Length; i++)
+            {
+                if (coffeeSteamWisps[i] != null)
+                {
+                    steamBasePos[i] = coffeeSteamWisps[i].anchoredPosition;
+                    steamGraphics[i] = coffeeSteamWisps[i].GetComponent<Graphic>();
+                }
+            }
+        }
+
+        if (energyFizzBubbles != null && energyFizzBubbles.Length > 0)
+        {
+            fizzBasePos = new Vector2[energyFizzBubbles.Length];
+            fizzGraphics = new Graphic[energyFizzBubbles.Length];
+            for (int i = 0; i < energyFizzBubbles.Length; i++)
+            {
+                if (energyFizzBubbles[i] != null)
+                {
+                    fizzBasePos[i] = energyFizzBubbles[i].anchoredPosition;
+                    fizzGraphics[i] = energyFizzBubbles[i].GetComponent<Graphic>();
+                }
+            }
+        }
+    }
+
+    private void UpdateCoffeeSteam(float dt)
+    {
+        if (coffeeMugTransform == null || !coffeeMugTransform.gameObject.activeSelf) return;
+        if (coffeeSteamWisps == null || coffeeSteamWisps.Length == 0) return;
+
+        if (coffeeJostleBoost > 0f)
+        {
+            coffeeJostleBoost = Mathf.Max(0f, coffeeJostleBoost - dt * 2.5f);
+        }
+
+        float time = Time.time * 0.85f;
+        for (int i = 0; i < coffeeSteamWisps.Length; i++)
+        {
+            var rt = coffeeSteamWisps[i];
+            if (rt == null) continue;
+
+            float phase = (time + i * 0.33f) % 1.0f;
+            Vector2 baseP = steamBasePos != null && i < steamBasePos.Length ? steamBasePos[i] : Vector2.zero;
+
+            // Плавный подъем вверх с легким покачиванием пара
+            float riseY = phase * (55f + coffeeJostleBoost * 20f);
+            float swayX = Mathf.Sin((time * 3f) + i * 1.5f) * (6f + i * 2f);
+            rt.anchoredPosition = new Vector2(baseP.x + swayX, baseP.y + riseY);
+
+            // Клубы пара слегка расширяются при подъеме
+            float scale = Mathf.Lerp(0.55f, 1.25f, phase);
+            rt.localScale = new Vector3(scale, scale, 1f);
+
+            // Прозрачность: рождается у ободка, максимум в середине, тает наверху
+            if (steamGraphics != null && i < steamGraphics.Length && steamGraphics[i] != null)
+            {
+                float alpha = Mathf.Sin(phase * Mathf.PI) * (0.42f + coffeeJostleBoost * 0.35f);
+                Color c = steamGraphics[i].color;
+                steamGraphics[i].color = new Color(c.r, c.g, c.b, Mathf.Clamp01(alpha));
+            }
+        }
+    }
+
+    private void UpdateEnergyFizz(float dt)
+    {
+        if (energyCanTransform == null || !energyCanTransform.gameObject.activeSelf) return;
+        if (energyFizzBubbles == null || energyFizzBubbles.Length == 0) return;
+
+        if (energyJostleBoost > 0f)
+        {
+            energyJostleBoost = Mathf.Max(0f, energyJostleBoost - dt * 3f);
+        }
+
+        bool isBoostActive = GameManager.Instance != null && GameManager.Instance.IsBoostActive;
+        float speed = isBoostActive ? 1.8f : (0.95f + energyJostleBoost * 1.2f);
+        float time = Time.time * speed;
+
+        for (int i = 0; i < energyFizzBubbles.Length; i++)
+        {
+            var rt = energyFizzBubbles[i];
+            if (rt == null) continue;
+
+            float phase = (time + i * 0.28f) % 1.0f;
+            Vector2 baseP = fizzBasePos != null && i < fizzBasePos.Length ? fizzBasePos[i] : Vector2.zero;
+
+            // Вылет пузырьков из горлышка банки с мелкой вибрацией
+            float riseY = phase * (38f + energyJostleBoost * 18f);
+            float jitterX = Mathf.Cos((time * 8f) + i * 2.1f) * 4.5f;
+            rt.anchoredPosition = new Vector2(baseP.x + jitterX, baseP.y + riseY);
+
+            // Микро-хлопок в конце подъема
+            float popScale = phase > 0.85f ? Mathf.Lerp(1f, 1.4f, (phase - 0.85f) / 0.15f) : 1f;
+            rt.localScale = new Vector3(popScale, popScale, 1f);
+
+            if (fizzGraphics != null && i < fizzGraphics.Length && fizzGraphics[i] != null)
+            {
+                // Неоновое свечение пузырька
+                float alpha = phase > 0.88f 
+                    ? Mathf.Lerp(0.85f, 0f, (phase - 0.88f) / 0.12f)
+                    : Mathf.Sin(phase * Mathf.PI) * 0.85f;
+                Color c = fizzGraphics[i].color;
+                fizzGraphics[i].color = new Color(c.r, c.g, c.b, Mathf.Clamp01(alpha));
+            }
+        }
     }
 
     #endregion

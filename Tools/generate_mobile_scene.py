@@ -44,6 +44,8 @@ GUID_SPR_CARD_BG = "7b300000000000000000000000000009"
 GUID_SPR_BTN_CYAN = "7b300000000000000000000000000010"
 GUID_SPR_BTN_ORANGE = "7b300000000000000000000000000011"
 GUID_SPR_BTN_GOLD = "7b300000000000000000000000000012"
+GUID_SPR_STEAM = "7b30000000000000000000000000000d"
+GUID_SPR_BUBBLE = "7b30000000000000000000000000000e"
 
 # Audio SFX Clips
 GUID_SFX_KEY1 = "9a200000000000000000000000000001"
@@ -691,7 +693,7 @@ add("  serializedVersion: 4")
 add("  OutputAudioMixerGroup: {fileID: 0}")
 add("  m_audioClip: {fileID: 0}")
 add("  m_PlayOnAwake: 0")
-add("  m_Volume: 1")
+add("  m_Volume: 0.70")
 add("  m_Pitch: 1")
 add("  Loop: 0")
 add("  Mute: 0")
@@ -722,7 +724,7 @@ add("  serializedVersion: 4")
 add("  OutputAudioMixerGroup: {fileID: 0}")
 add("  m_audioClip: {fileID: 0}")
 add("  m_PlayOnAwake: 0")
-add("  m_Volume: 0.85")
+add("  m_Volume: 1")
 add("  m_Pitch: 1")
 add("  Loop: 0")
 add("  Mute: 0")
@@ -1036,22 +1038,61 @@ add_cr(3012203, 3012200)
 add_tmp(3012202, 3012200, "ТЕМП ПЕЧАТИ: x1.0 (тапай быстрее для x3.0)", fsize=14, fstyle=1, color=(0.75, 0.82, 0.92, 1), align=514, autosize=1, fmin=10, fmax=15)
 
 # Cat Mascot (curled up sleeping peacefully under the keyboard on desk mat)
-add_go(3070000, "CatMascot", [3070001, 3070003, 3070002])
+add_go(3070000, "CatMascot", [3070001, 3070003, 3070002, 3070004])
 add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -1210), size=(180, 125), pivot=(0.5, 0.5))
 add_cr(3070003, 3070000)
-add_image(3070002, 3070000, GUID_SPR_CAT, raycast=0)
+add_image(3070002, 3070000, GUID_SPR_CAT, raycast=1)
+add_button(3070004, 3070000, 3070002)
 
 # Energy Can (placed on the desk mat above mouse)
 add_go(3060000, "EnergyCan", [3060001, 3060003, 3060002])
-add_rect(3060001, 3060000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(455, -780), size=(80, 140), pivot=(0.5, 0.5))
+add_rect(3060001, 3060000, 3010001, [3061001], amin=(0.5, 1), amax=(0.5, 1), pos=(455, -780), size=(80, 140), pivot=(0.5, 0.5))
 add_cr(3060003, 3060000)
 add_image(3060002, 3060000, GUID_SPR_ENERGY, raycast=0)
 
+# EnergyFizzGroup (Fizzy neon carbonation bubbles)
+add_go(3061000, "EnergyFizzGroup", [3061001])
+add_rect(3061001, 3061000, 3060001, [3061101, 3061201, 3061301], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 60), size=(60, 60), pivot=(0.5, 0.5))
+
+add_go(3061100, "Bubble_0", [3061101, 3061103, 3061102])
+add_rect(3061101, 3061100, 3061001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-7, 0), size=(13, 13), pivot=(0.5, 0.5))
+add_cr(3061103, 3061100)
+add_image(3061102, 3061100, GUID_SPR_BUBBLE, color=(0, 1, 0.85, 0.75), raycast=0)
+
+add_go(3061200, "Bubble_1", [3061201, 3061203, 3061202])
+add_rect(3061201, 3061200, 3061001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(1, 8), size=(16, 16), pivot=(0.5, 0.5))
+add_cr(3061203, 3061200)
+add_image(3061202, 3061200, GUID_SPR_BUBBLE, color=(0, 0.9, 1, 0.80), raycast=0)
+
+add_go(3061300, "Bubble_2", [3061301, 3061303, 3061302])
+add_rect(3061301, 3061300, 3061001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(9, 4), size=(11, 11), pivot=(0.5, 0.5))
+add_cr(3061303, 3061300)
+add_image(3061302, 3061300, GUID_SPR_BUBBLE, color=(0, 1, 0.7, 0.70), raycast=0)
+
 # Coffee Mug (shifted right onto desk mat)
 add_go(3050000, "CoffeeMug", [3050001, 3050003, 3050002])
-add_rect(3050001, 3050000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-380, -960), size=(120, 140), pivot=(0.5, 0.5))
+add_rect(3050001, 3050000, 3010001, [3051001], amin=(0.5, 1), amax=(0.5, 1), pos=(-380, -960), size=(120, 140), pivot=(0.5, 0.5))
 add_cr(3050003, 3050000)
 add_image(3050002, 3050000, GUID_SPR_COFFEE, raycast=0)
+
+# CoffeeSteamGroup (Soft warm steam wisps rising from cup)
+add_go(3051000, "CoffeeSteamGroup", [3051001])
+add_rect(3051001, 3051000, 3050001, [3051101, 3051201, 3051301], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 48), size=(80, 80), pivot=(0.5, 0.5))
+
+add_go(3051100, "SteamWisp_0", [3051101, 3051103, 3051102])
+add_rect(3051101, 3051100, 3051001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-12, 0), size=(26, 26), pivot=(0.5, 0.5))
+add_cr(3051103, 3051100)
+add_image(3051102, 3051100, GUID_SPR_STEAM, color=(1, 1, 1, 0.35), raycast=0)
+
+add_go(3051200, "SteamWisp_1", [3051201, 3051203, 3051202])
+add_rect(3051201, 3051200, 3051001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(3, 6), size=(32, 32), pivot=(0.5, 0.5))
+add_cr(3051203, 3051200)
+add_image(3051202, 3051200, GUID_SPR_STEAM, color=(1, 1, 1, 0.40), raycast=0)
+
+add_go(3051300, "SteamWisp_2", [3051301, 3051303, 3051302])
+add_rect(3051301, 3051300, 3051001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(15, 2), size=(24, 24), pivot=(0.5, 0.5))
+add_cr(3051303, 3051300)
+add_image(3051302, 3051300, GUID_SPR_STEAM, color=(1, 1, 1, 0.30), raycast=0)
 
 # Gaming Mouse (positioned cleanly to the right of keyboard)
 add_go(3040000, "GamingMouse", [3040001, 3040003, 3040002])
@@ -1168,6 +1209,14 @@ add("  mouseTransform: {fileID: 3040001}")
 add("  coffeeMugTransform: {fileID: 3050001}")
 add("  energyCanTransform: {fileID: 3060001}")
 add("  catTransform: {fileID: 3070001}")
+add("  coffeeSteamWisps:")
+add("  - {fileID: 3051101}")
+add("  - {fileID: 3051201}")
+add("  - {fileID: 3051301}")
+add("  energyFizzBubbles:")
+add("  - {fileID: 3061101}")
+add("  - {fileID: 3061201}")
+add("  - {fileID: 3061301}")
 add("  projectProgressFill: {fileID: 3011102}")
 add("  projectProgressText: {fileID: 3011202}")
 add("  quickReleaseButton: {fileID: 3011303}")
