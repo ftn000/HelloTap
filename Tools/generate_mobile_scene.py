@@ -219,8 +219,14 @@ def add_tmp(fid, go_id, text, fsize=24, fstyle=0, color=(1,1,1,1), align=514, au
     add(f"  m_fontSizeMin: {fmin}")
     add(f"  m_fontSizeMax: {fmax}")
     add(f"  m_fontStyle: {fstyle}")
-    add(f"  m_HorizontalAlignment: {align % 256}")
-    add(f"  m_VerticalAlignment: {align // 256}")
+    horiz = align & 0xFF
+    vert = align & 0xFF00
+    if horiz == 0:
+        horiz = 2
+    if vert == 0:
+        vert = 512
+    add(f"  m_HorizontalAlignment: {horiz}")
+    add(f"  m_VerticalAlignment: {vert}")
     add("  m_textAlignment: 65535")
     add("  m_characterSpacing: 0")
     add("  m_wordSpacing: 0")
@@ -841,7 +847,7 @@ add("  m_UiScaleMode: 1")
 add("  m_ReferencePixelsPerUnit: 100")
 add("  m_ScaleFactor: 1")
 add("  m_ReferenceResolution: {x: 1080, y: 1920}")
-add("  m_ScreenMatchMode: 1")
+add("  m_ScreenMatchMode: 0")
 add("  m_MatchWidthOrHeight: 0")
 add("--- !u!114 &1442568836")
 add("MonoBehaviour:")
@@ -902,7 +908,7 @@ add_button(2060003, 2060000, 2060002)
 add_go(2061000, "ResetBtnText", [2061001, 2061003, 2061002])
 add_rect(2061001, 2061000, 2060001, [], amin=(0,0), amax=(1,1))
 add_cr(2061003, 2061000)
-add_tmp(2061002, 2061000, "СБРОС", fsize=16, fstyle=1, color=(1,1,1,1), align=514)
+add_tmp(2061002, 2061000, "СБРОС", fsize=16, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=12, fmax=18)
 
 # AudioMuteButton
 add_go(2050000, "AudioMuteButton", [2050001, 2050004, 2050002, 2050003, 2050005])
@@ -913,7 +919,7 @@ add_button(2050003, 2050000, 2050002)
 add_go(2051000, "MuteIcon", [2051001, 2051003, 2051002])
 add_rect(2051001, 2051000, 2050001, [], amin=(0,0), amax=(1,1))
 add_cr(2051003, 2051000)
-add_tmp(2051002, 2051000, "ЗВУК: ВКЛ", fsize=15, fstyle=1, color=(0.2, 0.95, 0.65, 1), align=514)
+add_tmp(2051002, 2051000, "ЗВУК: ВКЛ", fsize=15, fstyle=1, color=(0.2, 0.95, 0.65, 1), align=514, autosize=1, fmin=11, fmax=16)
 # AudioToggleButton
 add(f"--- !u!114 &2050005")
 add("MonoBehaviour:")
@@ -937,13 +943,13 @@ add_cr(2040004, 2040000)
 add_image(2040002, 2040000, GUID_SPR_BTN_GOLD, img_type=1)
 add_button(2040003, 2040000, 2040002)
 add_go(2041000, "BoostBtnText", [2041001, 2041003, 2041002])
-add_rect(2041001, 2041000, 2040001, [], amin=(0,0), amax=(1,1), pos=(0, 7), size=(0, 24))
+add_rect(2041001, 2041000, 2040001, [], amin=(0, 0.45), amax=(1, 1), pos=(0, 0), size=(0, 0))
 add_cr(2041003, 2041000)
-add_tmp(2041002, 2041000, "ЭНЕРГЕТИК x2", fsize=16, fstyle=1, color=(1,1,1,1), align=514)
+add_tmp(2041002, 2041000, "ЭНЕРГЕТИК x2", fsize=16, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=12, fmax=16)
 add_go(2042000, "BoostTimerText", [2042001, 2042003, 2042002])
-add_rect(2042001, 2042000, 2040001, [], amin=(0,0), amax=(1,1), pos=(0, -12), size=(0, 20))
+add_rect(2042001, 2042000, 2040001, [], amin=(0, 0), amax=(1, 0.45), pos=(0, 0), size=(0, 0))
 add_cr(2042003, 2042000)
-add_tmp(2042002, 2042000, "ГОТОВО К ПУСКУ", fsize=12, fstyle=1, color=(1, 0.9, 0.4, 1), align=514)
+add_tmp(2042002, 2042000, "ГОТОВО К ПУСКУ", fsize=12, fstyle=1, color=(1, 0.9, 0.4, 1), align=514, autosize=1, fmin=10, fmax=13)
 
 # Row 2: Code Counter Text & Stats
 add_go(2020000, "CodeBlock", [2020001])
@@ -1009,7 +1015,7 @@ add_tmp(3021212, 3021210, "<color=#4EC9B0>[DEV DOCS & METRICS]</color>\\nGPU: In
 
 # ComboBar (Between monitor and keyboard)
 add_go(3012000, "ComboBar", [3012001, 3012003, 3012002])
-add_rect(3012001, 3012000, 3010001, [3012101, 3012201], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -628), size=(820, 36), pivot=(0.5, 1))
+add_rect(3012001, 3012000, 3010001, [3012101, 3012201], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -615), size=(820, 36), pivot=(0.5, 1))
 add_cr(3012003, 3012000)
 add_image(3012002, 3012000, GUID_SPR_CARD_BG, color=(0.06, 0.08, 0.12, 0.9), img_type=1)
 
@@ -1025,31 +1031,31 @@ add_tmp(3012202, 3012200, "ТЕМП ПЕЧАТИ: x1.0 (тапай быстре�
 
 # Cat Mascot (sitting peacefully by monitor)
 add_go(3070000, "CatMascot", [3070001, 3070003, 3070002])
-add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-385, -310), size=(180, 130), pivot=(0.5, 0.5))
+add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-385, -340), size=(180, 130), pivot=(0.5, 0.5))
 add_cr(3070003, 3070000)
 add_image(3070002, 3070000, GUID_SPR_CAT, raycast=0)
 
 # Energy Can (on desk)
 add_go(3060000, "EnergyCan", [3060001, 3060003, 3060002])
-add_rect(3060001, 3060000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(395, -310), size=(100, 170), pivot=(0.5, 0.5))
+add_rect(3060001, 3060000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(395, -340), size=(100, 170), pivot=(0.5, 0.5))
 add_cr(3060003, 3060000)
 add_image(3060002, 3060000, GUID_SPR_ENERGY, raycast=0)
 
 # Coffee Mug
 add_go(3050000, "CoffeeMug", [3050001, 3050003, 3050002])
-add_rect(3050001, 3050000, 3010001, [], amin=(0.5, 0), amax=(0.5, 0), pos=(-390, 140), size=(130, 150), pivot=(0.5, 0.5))
+add_rect(3050001, 3050000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-390, -810), size=(130, 150), pivot=(0.5, 0.5))
 add_cr(3050003, 3050000)
 add_image(3050002, 3050000, GUID_SPR_COFFEE, raycast=0)
 
 # Gaming Mouse
 add_go(3040000, "GamingMouse", [3040001, 3040003, 3040002])
-add_rect(3040001, 3040000, 3010001, [], amin=(0.5, 0), amax=(0.5, 0), pos=(390, 140), size=(110, 180), pivot=(0.5, 0.5))
+add_rect(3040001, 3040000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(390, -810), size=(110, 180), pivot=(0.5, 0.5))
 add_cr(3040003, 3040000)
 add_image(3040002, 3040000, GUID_SPR_MOUSE, raycast=0)
 
 # KeyboardGroup (Lower half of workstation - Main tap zone)
 add_go(3030000, "KeyboardGroup", [3030001])
-add_rect(3030001, 3030000, 3010001, [3031001, 3032001], amin=(0.5, 0), amax=(0.5, 0), pos=(0, 25), size=(780, 260), pivot=(0.5, 0))
+add_rect(3030001, 3030000, 3010001, [3031001, 3032001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -685), size=(760, 250), pivot=(0.5, 1))
 
 add_go(3031000, "KeyboardImage", [3031001, 3031003, 3031002])
 add_rect(3031001, 3031000, 3030001, [], amin=(0,0), amax=(1,1))
