@@ -190,6 +190,40 @@ def make_boost_sound():
         samples.append(fizz + whoosh)
     return samples
 
+def make_cat_purr():
+    duration = 0.45
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        if t < 0.05:
+            env = t / 0.05
+        elif t > duration - 0.12:
+            env = (duration - t) / 0.12
+        else:
+            env = 1.0
+        
+        # 24Hz purr rumble flutter
+        flutter = 0.5 + 0.5 * math.sin(2.0 * math.pi * 24.0 * t)
+        
+        # Pitch contour: slight friendly chirp rise from 135Hz to 210Hz then settling to 155Hz
+        if t < 0.22:
+            freq = 135.0 + (t / 0.22) * 75.0
+        else:
+            freq = 210.0 - ((t - 0.22) / (duration - 0.22)) * 55.0
+            
+        carrier = (math.sin(2.0 * math.pi * freq * t) + 
+                   0.45 * math.sin(4.0 * math.pi * freq * t) + 
+                   0.25 * math.sin(6.0 * math.pi * freq * t))
+                   
+        # Soft breath/fur noise
+        breath = (random.random() * 2.0 - 1.0) * 0.12
+        
+        val = (carrier * flutter + breath) * env * 0.75
+        samples.append(val)
+    return samples
+
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
@@ -201,4 +235,5 @@ save_wav(os.path.join(out_dir, "click_crit.wav"), make_crit_click())
 save_wav(os.path.join(out_dir, "upgrade_buy.wav"), make_upgrade_chime())
 save_wav(os.path.join(out_dir, "project_release.wav"), make_cash_release())
 save_wav(os.path.join(out_dir, "boost_activate.wav"), make_boost_sound())
+save_wav(os.path.join(out_dir, "cat_purr.wav"), make_cat_purr())
 print("All sound effects generated successfully!")

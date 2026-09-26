@@ -28,6 +28,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip upgradeSound;
     [SerializeField] private AudioClip releaseSound;
     [SerializeField] private AudioClip boostSound;
+    [SerializeField] private AudioClip catPurrSound;
 
     [Header("Источники звука")]
     [SerializeField] private AudioSource sfxSource;
@@ -90,6 +91,31 @@ public class AudioManager : MonoBehaviour
                 }
             }
         }
+
+        if (catPurrSound == null)
+        {
+            catPurrSound = CreateProceduralPurrClip();
+        }
+    }
+
+    private AudioClip CreateProceduralPurrClip()
+    {
+        int sampleRate = 44100;
+        int sampleCount = (int)(sampleRate * 0.45f);
+        float[] data = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float env = t < 0.05f ? t / 0.05f : (t > 0.33f ? (0.45f - t) / 0.12f : 1f);
+            float flutter = 0.5f + 0.5f * Mathf.Sin(2f * Mathf.PI * 24f * t);
+            float freq = t < 0.22f ? 135f + (t / 0.22f) * 75f : 210f - ((t - 0.22f) / 0.23f) * 55f;
+            float carrier = Mathf.Sin(2f * Mathf.PI * freq * t) + 0.45f * Mathf.Sin(4f * Mathf.PI * freq * t);
+            float breath = (Random.value * 2f - 1f) * 0.12f;
+            data[i] = Mathf.Clamp((carrier * flutter + breath) * env * 0.75f, -1f, 1f);
+        }
+        AudioClip clip = AudioClip.Create("Procedural_Purr", sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
     }
 
     private AudioClip CreateProceduralSwitchClip(string clipName, float clickFreq, float thudFreq)
@@ -219,6 +245,16 @@ public class AudioManager : MonoBehaviour
         else if (critSound != null)
         {
             sfxSource.PlayOneShot(critSound, 0.8f);
+        }
+    }
+
+    public void PlayCatPurr()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (catPurrSound != null)
+        {
+            sfxSource.pitch = Random.Range(0.96f, 1.05f);
+            sfxSource.PlayOneShot(catPurrSound, 0.75f);
         }
     }
 

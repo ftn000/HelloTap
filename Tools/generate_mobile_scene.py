@@ -46,6 +46,7 @@ GUID_SPR_BTN_ORANGE = "7b300000000000000000000000000011"
 GUID_SPR_BTN_GOLD = "7b300000000000000000000000000012"
 GUID_SPR_STEAM = "7b30000000000000000000000000000d"
 GUID_SPR_BUBBLE = "7b30000000000000000000000000000e"
+GUID_SPR_MOUSE_GLOW = "7b30000000000000000000000000000f"
 
 # Audio SFX Clips
 GUID_SFX_KEY1 = "9a200000000000000000000000000001"
@@ -56,6 +57,7 @@ GUID_SFX_CRIT = "9a200000000000000000000000000005"
 GUID_SFX_UPG = "9a200000000000000000000000000006"
 GUID_SFX_REL = "9a200000000000000000000000000007"
 GUID_SFX_BOOST = "9a200000000000000000000000000008"
+GUID_SFX_PURR = "9a200000000000000000000000000009"
 
 out = []
 def add(s=""):
@@ -259,6 +261,20 @@ def add_tmp(fid, go_id, text, fsize=24, fstyle=0, color=(1,1,1,1), align=514, au
     add("  m_margin: {x: 0, y: 0, z: 0, w: 0}")
     add("  m_isUsingLegacyAnimationComponent: 0")
     add("  m_isVolumetricText: 0")
+
+def add_rect_mask_2d(fid, go_id):
+    add(f"--- !u!114 &{fid}")
+    add("MonoBehaviour:")
+    add("  m_ObjectHideFlags: 0")
+    add("  m_CorrespondingSourceObject: {fileID: 0}")
+    add("  m_PrefabInstance: {fileID: 0}")
+    add("  m_PrefabAsset: {fileID: 0}")
+    add(f"  m_GameObject: {{fileID: {go_id}}}")
+    add("  m_Enabled: 1")
+    add("  m_EditorHideFlags: 0")
+    add("  m_Script: {fileID: 11500000, guid: " + GUID_RECT_MASK_2D + ", type: 3}")
+    add("  m_Name: ")
+    add("  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D")
 
 # Header Settings
 add("%YAML 1.1")
@@ -764,6 +780,7 @@ add("  critSound: {fileID: 8300000, guid: " + GUID_SFX_CRIT + ", type: 3}")
 add("  upgradeSound: {fileID: 8300000, guid: " + GUID_SFX_UPG + ", type: 3}")
 add("  releaseSound: {fileID: 8300000, guid: " + GUID_SFX_REL + ", type: 3}")
 add("  boostSound: {fileID: 8300000, guid: " + GUID_SFX_BOOST + ", type: 3}")
+add("  catPurrSound: {fileID: 8300000, guid: " + GUID_SFX_PURR + ", type: 3}")
 add("  sfxSource: {fileID: 1002003}")
 add("  typingSource: {fileID: 1002004}")
 add("  minTypingPitch: 0.94")
@@ -994,15 +1011,20 @@ add_image(3020002, 3020000, GUID_SPR_MON_FRAME, raycast=0)
 
 # MonitorScreen (Exact 756x306 fit inside MonitorFrame cutout, perfectly centered)
 add_go(3021000, "MonitorScreen", [3021001, 3021003, 3021002])
-add_rect(3021001, 3021000, 3020001, [3021101, 3021201, 3021301, 3021401], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 27), size=(756, 306), pivot=(0.5, 0.5))
+add_rect(3021001, 3021000, 3020001, [3021051, 3021201, 3021301, 3021401], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 27), size=(756, 306), pivot=(0.5, 0.5))
 add_cr(3021003, 3021000)
 add_image(3021002, 3021000, GUID_SPR_MON_SCREEN, raycast=0)
 
-# TerminalCodeText (Live C# code on screen - fitted cleanly in IDE editor area below tab bar)
+# CodeViewport (Masked viewport for smooth scrolling terminal code)
+add_go(3021050, "CodeViewport", [3021051, 3021052])
+add_rect(3021051, 3021050, 3021001, [3021101], amin=(0, 0), amax=(0.64, 1), pos=(42, -34), size=(-48, -44), pivot=(0, 1))
+add_rect_mask_2d(3021052, 3021050)
+
+# TerminalCodeText (Live C# code on screen inside viewport)
 add_go(3021100, "TerminalCodeText", [3021101, 3021103, 3021102])
-add_rect(3021101, 3021100, 3021001, [], amin=(0, 0), amax=(0.64, 1), pos=(42, -34), size=(-48, -44), pivot=(0, 1))
+add_rect(3021101, 3021100, 3021051, [], amin=(0, 1), amax=(1, 1), pos=(0, 0), size=(0, 500), pivot=(0, 1))
 add_cr(3021103, 3021100)
-add_tmp(3021102, 3021100, "// HelloTap Dev v1.4.0\\nusing UnityEngine;\\n> <color=#00FF88>_</color>", fsize=13, fstyle=0, color=(0, 1, 0.55, 1), align=257, autosize=1, fmin=10, fmax=14)
+add_tmp(3021102, 3021100, "// HelloTap Dev v1.4.0\\nusing UnityEngine;\\n> <color=#00FF88>_</color>", fsize=13, fstyle=0, color=(0, 1, 0.55, 1), align=257, autosize=0)
 
 # SecondMonitorPanel (Docs & Metrics)
 add_go(3021200, "SecondMonitorPanel", [3021201, 3021203, 3021202], active=0)
@@ -1096,9 +1118,15 @@ add_image(3051302, 3051300, GUID_SPR_STEAM, color=(1, 1, 1, 0.30), raycast=0)
 
 # Gaming Mouse (positioned cleanly to the right of keyboard)
 add_go(3040000, "GamingMouse", [3040001, 3040003, 3040002])
-add_rect(3040001, 3040000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(465, -960), size=(100, 160), pivot=(0.5, 0.5))
+add_rect(3040001, 3040000, 3010001, [3041001], amin=(0.5, 1), amax=(0.5, 1), pos=(465, -960), size=(100, 180), pivot=(0.5, 0.5))
 add_cr(3040003, 3040000)
 add_image(3040002, 3040000, GUID_SPR_MOUSE, raycast=0)
+
+# GamingMouseGlow (RGB rainbow wave strip and braided cord pulse)
+add_go(3041000, "GamingMouseGlow", [3041001, 3041003, 3041002])
+add_rect(3041001, 3041000, 3040001, [], amin=(0,0), amax=(1,1))
+add_cr(3041003, 3041000)
+add_image(3041002, 3041000, GUID_SPR_MOUSE_GLOW, color=(0, 0.9, 1, 0.5), raycast=0)
 
 # KeyboardGroup (Lower half of workstation - Main tap zone, shifted right by +35px)
 add_go(3030000, "KeyboardGroup", [3030001])
@@ -1206,6 +1234,7 @@ add("  secondMonitorPanel: {fileID: 3021200}")
 add("  keyboardTransform: {fileID: 3030001}")
 add("  keyboardGlowImage: {fileID: 3032002}")
 add("  mouseTransform: {fileID: 3040001}")
+add("  mouseGlowGraphic: {fileID: 3041002}")
 add("  coffeeMugTransform: {fileID: 3050001}")
 add("  energyCanTransform: {fileID: 3060001}")
 add("  catTransform: {fileID: 3070001}")

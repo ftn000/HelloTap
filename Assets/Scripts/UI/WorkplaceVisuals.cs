@@ -35,6 +35,7 @@ public class WorkplaceVisuals : MonoBehaviour
 
     [Header("Предметы на столе (Визуальная прогрессия)")]
     [SerializeField] private Transform mouseTransform;
+    [SerializeField] private Graphic mouseGlowGraphic;
     [SerializeField] private Transform coffeeMugTransform;
     [SerializeField] private Transform energyCanTransform;
     [SerializeField] private Transform catTransform;
@@ -58,6 +59,13 @@ public class WorkplaceVisuals : MonoBehaviour
     private float cursorTimer = 0f;
     private bool cursorVisible = true;
     private Coroutine glowCoroutine;
+
+    // Плавный скролл терминала
+    private float currentScrollY = 0f;
+    private float targetScrollY = 0f;
+    private RectTransform terminalRt;
+    private const float TerminalLineHeight = 17.5f;
+    private const float ViewportVisibleHeight = 230f;
 
     // Состояние охоты на баги
     private float bugSpawnTimer = 18f;
@@ -132,6 +140,15 @@ public class WorkplaceVisuals : MonoBehaviour
             Transform found = transform.Find("DeskMat/GamingMouse");
             if (found != null) mouseTransform = found;
         }
+        if (mouseTransform == null)
+        {
+            Transform found = transform.Find("DeskMat/GamingMouse");
+            if (found != null) mouseTransform = found;
+        }
+        if (mouseGlowGraphic == null)
+        {
+            mouseGlowGraphic = transform.Find("DeskMat/GamingMouse/MouseGlow")?.GetComponent<Graphic>();
+        }
         if (coffeeMugTransform == null)
         {
             Transform found = transform.Find("DeskMat/CoffeeMug");
@@ -197,6 +214,10 @@ public class WorkplaceVisuals : MonoBehaviour
     private void Start()
     {
         SubscribeEvents();
+        if (monitorCodeText != null)
+        {
+            terminalRt = monitorCodeText.rectTransform;
+        }
         InitSteamAndFizz();
         InitCatInteraction();
         RefreshDeskUnlockables(false);
@@ -248,10 +269,16 @@ public class WorkplaceVisuals : MonoBehaviour
         // 4. Анимация шипучих пузырьков энергетика
         UpdateEnergyFizz(dt);
 
-        // 5. Обновление шкалы комбо "В Потоке"
+        // 5. Плавный скролл истории кода
+        UpdateTerminalScroll(dt);
+
+        // 6. RGB подсветка и спектральная волна мыши
+        UpdateMouseRgb(dt);
+
+        // 7. Обновление шкалы комбо "В Потоке"
         UpdateComboVisuals();
 
-        // 6. Таймер спавна и жизни Бага на мониторе
+        // 8. Таймер спавна и жизни Бага на мониторе
         UpdateBugHunt(dt);
     }
 
@@ -550,10 +577,16 @@ public class WorkplaceVisuals : MonoBehaviour
         string nextLine = CodeSnippets[Random.Range(0, CodeSnippets.Length)];
         terminalHistory.Add(nextLine);
 
-        while (terminalHistory.Count > maxVisibleLines)
+        // Храним до 28 строк для непрерывного плавного вертикального скролла
+        if (terminalHistory.Count > 28)
         {
             terminalHistory.RemoveAt(0);
+            currentScrollY = Mathf.Max(0f, currentScrollY - TerminalLineHeight);
+            targetScrollY = Mathf.Max(0f, targetScrollY - TerminalLineHeight);
         }
+
+        float totalHeight = (terminalHistory.Count + 1) * TerminalLineHeight;
+        targetScrollY = Mathf.Max(0f, totalHeight - ViewportVisibleHeight);
         UpdateTerminalDisplay();
 
         if (keyboardGlowImage != null)
@@ -565,6 +598,11 @@ public class WorkplaceVisuals : MonoBehaviour
         if (keyboardTransform != null)
         {
             StartCoroutine(KeyboardTapRoutine());
+        }
+
+        if (mouseTransform != null && mouseTransform.gameObject.activeSelf)
+        {
+            StartCoroutine(MouseClickPunchRoutine());
         }
 
         FlashKey(isCrit);
@@ -755,7 +793,7 @@ public class WorkplaceVisuals : MonoBehaviour
     public void OnCatClickedDirectly()
     {
         TriggerCatTapReaction(true);
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayTyping(false);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCatPurr();
         if (ClickJuice.Instance != null && catTransform != null)
         {
             ClickJuice.Instance.SpawnCustomPopup("Муррр~ 💕", catTransform.position, new Color(1f, 0.45f, 0.75f, 1f), false);
@@ -876,6 +914,44 @@ public class WorkplaceVisuals : MonoBehaviour
                 fizzGraphics[i].color = new Color(c.r, c.g, c.b, Mathf.Clamp01(alpha));
             }
         }
+    }
+
+    #endregion
+
+    #region Плавный скролл терминала и RGB Мышь
+
+    private void UpdateTerminalScroll(float dt)
+    {
+        if (terminalRt == null) return;
+        currentScrollY = Mathf.Lerp(currentScrollY, targetScrollY, dt * 14f);
+        terminalRt.anchoredPosition = new Vector2(terminalRt.anchoredPosition.x, currentScrollY);
+    }
+
+    private void UpdateMouseRgb(float dt)
+    {
+        if (mouseTransform == null || !mouseTransform.gameObject.activeSelf) return;
+        if (mouseGlowGraphic == null) return;
+
+        double combo = GameManager.Instance != null ? GameManager.Instance.GetComboMultiplier() : 1.0;
+        bool isCombo = combo > 1.15;
+
+        // Скорость спектрального перелива RGB возрастает в комбо
+        float waveSpeed = isCombo ? 1.8f : 0.4f;
+        float hue = Mathf.Repeat(Time.time * waveSpeed, 1f);
+        Color rgbColor = Color.HSVToRGB(hue, isCombo ? 0.95f : 0.75f, 1f);
+
+        // Пульсация яркости подсветки
+        float pulse = (Mathf.Sin(Time.time * (isCombo ? 7f : 2.5f)) + 1f) * 0.5f;
+        rgbColor.a = isCombo ? (0.65f + pulse * 0.35f) : (0.35f + pulse * 0.25f);
+        mouseGlowGraphic.color = rgbColor;
+    }
+
+    private IEnumerator MouseClickPunchRoutine()
+    {
+        Vector3 baseScale = Vector3.one;
+        mouseTransform.localScale = new Vector3(0.97f, 0.94f, 1f);
+        yield return new WaitForSecondsRealtime(0.05f);
+        mouseTransform.localScale = baseScale;
     }
 
     #endregion

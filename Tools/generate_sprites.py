@@ -157,22 +157,38 @@ def make_keyboard():
     im.save(os.path.join(sprites_dir, "spr_keyboard.png"))
     print("Created spr_keyboard.png")
 
-# 5. Gaming Mouse (100 x 160)
+# 5. Gaming Mouse with Braided Cord (100 x 180)
 def make_mouse():
-    im = Image.new("RGBA", (100, 160), (0, 0, 0, 0))
+    im = Image.new("RGBA", (100, 180), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    # Body
-    create_rounded_rect(d, (10, 15, 90, 145), 28, fill=(28, 30, 38, 255), outline=(55, 60, 75, 255), width=2)
-    # RGB Side strips
-    d.arc([14, 25, 86, 135], start=45, end=135, fill=(0, 229, 255, 255), width=3)
-    d.arc([14, 25, 86, 135], start=225, end=315, fill=(255, 0, 128, 255), width=3)
-    # Scroll wheel
-    create_rounded_rect(d, (44, 28, 56, 58), 4, fill=(0, 229, 255, 255), outline=(255, 255, 255, 200))
+    # Braided mouse cord going upward
+    d.line([(50, 25), (50, 0)], fill=(20, 22, 28, 255), width=4)
+    d.line([(50, 25), (50, 0)], fill=(45, 50, 65, 255), width=2)
+    # Cord strain relief boot
+    create_rounded_rect(d, (46, 20, 54, 28), 2, fill=(35, 38, 48, 255))
+    # Mouse Body
+    create_rounded_rect(d, (10, 25, 90, 165), 28, fill=(28, 30, 38, 255), outline=(55, 60, 75, 255), width=2)
     # Split seam
-    d.line([(50, 15), (50, 28)], fill=(55, 60, 75, 255), width=2)
-    d.line([(50, 58), (50, 95)], fill=(55, 60, 75, 255), width=2)
+    d.line([(50, 25), (50, 42)], fill=(55, 60, 75, 255), width=2)
+    d.line([(50, 72), (50, 110)], fill=(55, 60, 75, 255), width=2)
+    # Scroll wheel
+    create_rounded_rect(d, (44, 42, 56, 72), 4, fill=(30, 34, 44, 255), outline=(65, 75, 95, 255))
     im.save(os.path.join(sprites_dir, "spr_mouse.png"))
     print("Created spr_mouse.png")
+
+# 5b. Gaming Mouse RGB Glow Layer (100 x 180)
+def make_mouse_glow():
+    im = Image.new("RGBA", (100, 180), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # RGB side strips
+    d.arc([14, 38, 86, 155], start=45, end=135, fill=(255, 255, 255, 240), width=4)
+    d.arc([14, 38, 86, 155], start=225, end=315, fill=(255, 255, 255, 240), width=4)
+    # Illuminated scroll wheel
+    create_rounded_rect(d, (45, 43, 55, 71), 3, fill=(255, 255, 255, 220))
+    # Cord RGB pulse dot
+    d.ellipse([47, 6, 53, 12], fill=(255, 255, 255, 200))
+    im.save(os.path.join(sprites_dir, "spr_mouse_glow.png"))
+    print("Created spr_mouse_glow.png")
 
 # 6. Coffee Mug (120 x 140)
 def make_coffee_mug():
@@ -292,6 +308,7 @@ make_monitor_frame()
 make_monitor_screen()
 make_keyboard()
 make_mouse()
+make_mouse_glow()
 make_coffee_mug()
 make_energy_can()
 make_cat()
