@@ -145,10 +145,13 @@ def make_keyboard():
                 # Accent colors for WASD or special keys
                 kfill = (38, 42, 54, 255)
                 kout = (58, 64, 82, 255)
-                if r_idx == 1 and cur_x in range(95, 140): # W key
+                if r_idx == 0 and cur_x == 28: # ESC key (illuminated cyan)
+                    kfill = (0, 180, 216, 220)
+                    kout = (0, 229, 255, 255)
+                elif r_idx == 1 and cur_x in range(95, 140): # W key
                     kfill = (0, 180, 216, 200)
                     kout = (0, 229, 255, 255)
-                elif r_idx == 2 and cur_x in range(85, 185): # A, S, D
+                elif r_idx == 2 and cur_x in range(75, 185): # A, S, D keys
                     kfill = (0, 180, 216, 200)
                     kout = (0, 229, 255, 255)
                 elif r_idx == 2 and cur_x > 440: # Enter
