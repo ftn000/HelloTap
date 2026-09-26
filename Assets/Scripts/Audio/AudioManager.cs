@@ -183,7 +183,7 @@ public class AudioManager : MonoBehaviour
             if (clip != null)
             {
                 typingSource.pitch = Random.Range(minTypingPitch, maxTypingPitch);
-                typingSource.PlayOneShot(clip, 0.75f);
+                typingSource.PlayOneShot(clip, 1.0f);
             }
         }
     }

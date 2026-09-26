@@ -82,7 +82,6 @@ public class ClickJuice : MonoBehaviour
     private void HandleCodeClicked(double amount, bool isCrit, Vector2 screenPos)
     {
         PlayPunchEffect();
-        PlayTypingSound();
 
         Transform parent = floatingTextParent != null ? floatingTextParent : transform.parent;
         if (parent != null)

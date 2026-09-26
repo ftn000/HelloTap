@@ -400,7 +400,7 @@ public class WorkplaceVisuals : MonoBehaviour
             bugActiveTimer -= dt;
             if (bugAlertText != null)
             {
-                bugAlertText.text = $"[ ! ] БАГ НА ПРОДЕ! Тапни ({bugHp}) [{bugActiveTimer:F1}с]";
+                bugAlertText.text = $"⚡ ТАПАЙ БЫСТРО! БАГ ({bugHp} шт) [{bugActiveTimer:F1}с]";
             }
 
             if (bugActiveTimer <= 0f)
@@ -451,7 +451,7 @@ public class WorkplaceVisuals : MonoBehaviour
             if (AudioManager.Instance != null) AudioManager.Instance.PlayBugHit(false);
             if (ClickJuice.Instance != null)
             {
-                ClickJuice.Instance.SpawnCustomPopup($"ФИКС БАГА! Осталось: {bugHp}", pos, new Color(1f, 0.55f, 0.2f), false);
+                ClickJuice.Instance.SpawnCustomPopup($"ТАП! Еще {bugHp}", pos, new Color(1f, 0.45f, 0.25f), false);
             }
             StartCoroutine(PopInRoutine(bugAlertButton.transform));
         }
@@ -466,7 +466,7 @@ public class WorkplaceVisuals : MonoBehaviour
             if (ClickJuice.Instance != null)
             {
                 ClickJuice.Instance.SpawnCustomPopup(
-                    $"БАГ УСТРАНЕН! +{NumberFormatter.Format(bonusCode)} кода | +{NumberFormatter.Format(bonusMoney)} руб.",
+                    $"🎉 БАГ УСТРАНЕН! +{NumberFormatter.Format(bonusCode)} кода | +{NumberFormatter.Format(bonusMoney)} руб.",
                     pos,
                     new Color(0.2f, 1f, 0.55f),
                     true);
