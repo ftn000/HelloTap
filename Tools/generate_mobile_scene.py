@@ -78,6 +78,18 @@ GUID_SFX_BUG_SQUASH = "9a200000000000000000000000000013"
 GUID_SFX_CRATE_COLLECT = "9a200000000000000000000000000014"
 GUID_SFX_BUILD_COMPLETE = "9a200000000000000000000000000015"
 GUID_PROJECT_BUILD_MINIGAME = "8a100000000000000000000000000004"
+GUID_LOFI_PLAYER_UI = "8a100000000000000000000000000005"
+GUID_SESSION_ANALYTICS_UI = "8a100000000000000000000000000006"
+
+# Keyboard Variant Sprites & LoFi Player
+GUID_SPR_KEYBOARD_RETRO = "7b300000000000000000000000000020"
+GUID_SPR_KEYBOARD_NEON = "7b300000000000000000000000000021"
+GUID_SPR_LOFI_PLAYER = "7b300000000000000000000000000022"
+
+# Audio SFX & Music Loops
+GUID_SFX_CASSETTE_CLICK = "9a200000000000000000000000000016"
+GUID_SFX_LOFI_TRACK = "9a200000000000000000000000000017"
+GUID_SFX_SYNTHWAVE_TRACK = "9a200000000000000000000000000018"
 
 out = []
 def add(s=""):
@@ -807,6 +819,7 @@ add("  lampSwitchSound: {fileID: 8300000, guid: " + GUID_SFX_LAMP_SWITCH + ", ty
 add("  bugSquashSound: {fileID: 8300000, guid: " + GUID_SFX_BUG_SQUASH + ", type: 3}")
 add("  crateCollectSound: {fileID: 8300000, guid: " + GUID_SFX_CRATE_COLLECT + ", type: 3}")
 add("  buildCompleteSound: {fileID: 8300000, guid: " + GUID_SFX_BUILD_COMPLETE + ", type: 3}")
+add("  cassetteClickSound: {fileID: 8300000, guid: " + GUID_SFX_CASSETTE_CLICK + ", type: 3}")
 add("  sfxSource: {fileID: 1002003}")
 add("  typingSource: {fileID: 1002004}")
 add("  minTypingPitch: 0.94")
@@ -918,7 +931,7 @@ add_image(1400002, 1400000, None, color=(0.03, 0.035, 0.05, 1.0), raycast=0)
 
 # MobileFrame (Full Responsive Stretch Canvas Container)
 add_go(1500000, "MobileFrame", [1500001, 1500003, 1500002])
-add_rect(1500001, 1500000, 1442568835, [3000001, 3090001, 2010001, 2080001, 4000001, 5000001, 1501001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(1500001, 1500000, 1442568835, [3000001, 3090001, 2010001, 2080001, 4000001, 5000001, 6000001, 1501001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(1500003, 1500000)
 add_image(1500002, 1500000, None, color=(0.055, 0.065, 0.09, 1.0), raycast=0)
 
@@ -946,35 +959,35 @@ add_rect(2010001, 2010000, 1500001, [2011001, 2020001, 2030001], amin=(0,1), ama
 add_cr(2010003, 2010000)
 add_image(2010002, 2010000, None, color=(0.07, 0.086, 0.12, 0.95), raycast=0)
 
-# Row 1: Top mini-controls (Reset, Mute, TimeOfDay, Boost)
+# Row 1: Top mini-controls (Reset, Mute, TimeOfDay, Analytics, Boost)
 add_go(2011000, "TopControlsRow", [2011001])
-add_rect(2011001, 2011000, 2010001, [2060001, 2050001, 2070001, 2040001], amin=(0, 1), amax=(1, 1), pos=(0, -40), size=(-40, 60), pivot=(0.5, 0.5))
+add_rect(2011001, 2011000, 2010001, [2060001, 2050001, 2070001, 2090001, 2040001], amin=(0, 1), amax=(1, 1), pos=(0, -40), size=(-40, 60), pivot=(0.5, 0.5))
 
 # ResetButton (Lab requirement)
 add_go(2060000, "ResetButton", [2060001, 2060004, 2060002, 2060003])
-add_rect(2060001, 2060000, 2011001, [2061001], amin=(0, 0.5), amax=(0, 0.5), pos=(65, 0), size=(130, 56), pivot=(0.5, 0.5))
+add_rect(2060001, 2060000, 2011001, [2061001], amin=(0, 0.5), amax=(0, 0.5), pos=(60, 0), size=(110, 56), pivot=(0.5, 0.5))
 add_cr(2060004, 2060000)
 add_image(2060002, 2060000, GUID_SPR_BTN_ORANGE, img_type=1)
 add_button(2060003, 2060000, 2060002)
 add_go(2061000, "ResetBtnText", [2061001, 2061003, 2061002])
 add_rect(2061001, 2061000, 2060001, [], amin=(0,0), amax=(1,1))
 add_cr(2061003, 2061000)
-add_tmp(2061002, 2061000, "СБРОС", fsize=16, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=12, fmax=18)
+add_tmp(2061002, 2061000, "СБРОС", fsize=15, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=11, fmax=17)
 
 # AudioMuteButton
 add_go(2050000, "AudioMuteButton", [2050001, 2050004, 2050002, 2050003, 2050005])
-add_rect(2050001, 2050000, 2011001, [2051001], amin=(0, 0.5), amax=(0, 0.5), pos=(215, 0), size=(140, 56), pivot=(0.5, 0.5))
+add_rect(2050001, 2050000, 2011001, [2051001], amin=(0, 0.5), amax=(0, 0.5), pos=(180, 0), size=(120, 56), pivot=(0.5, 0.5))
 add_cr(2050004, 2050000)
 add_image(2050002, 2050000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(2050003, 2050000, 2050002)
 add_go(2051000, "MuteIcon", [2051001, 2051003, 2051002])
 add_rect(2051001, 2051000, 2050001, [], amin=(0,0), amax=(1,1))
 add_cr(2051003, 2051000)
-add_tmp(2051002, 2051000, "ЗВУК: ВКЛ", fsize=15, fstyle=1, color=(0.2, 0.95, 0.65, 1), align=514, autosize=1, fmin=11, fmax=16)
+add_tmp(2051002, 2051000, "ЗВУК: ВКЛ", fsize=14, fstyle=1, color=(0.2, 0.95, 0.65, 1), align=514, autosize=1, fmin=11, fmax=16)
 
 # TimeOfDayToggleBtn
 add_go(2070000, "TimeOfDayToggleBtn", [2070001, 2070004, 2070002, 2070003])
-add_rect(2070001, 2070000, 2011001, [2071001], amin=(0, 0.5), amax=(0, 0.5), pos=(365, 0), size=(130, 56), pivot=(0.5, 0.5))
+add_rect(2070001, 2070000, 2011001, [2071001], amin=(0, 0.5), amax=(0, 0.5), pos=(310, 0), size=(125, 56), pivot=(0.5, 0.5))
 add_cr(2070004, 2070000)
 add_image(2070002, 2070000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(2070003, 2070000, 2070002)
@@ -982,6 +995,17 @@ add_go(2071000, "TimeOfDayTxt", [2071001, 2071003, 2071002])
 add_rect(2071001, 2071000, 2070001, [], amin=(0,0), amax=(1,1))
 add_cr(2071003, 2071000)
 add_tmp(2071002, 2071000, "☀️ ДЕНЬ", fsize=14, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=10, fmax=15)
+
+# AnalyticsButton (Session Productivity Dashboard Modal Trigger)
+add_go(2090000, "AnalyticsButton", [2090001, 2090004, 2090002, 2090003])
+add_rect(2090001, 2090000, 2011001, [2091001], amin=(0, 0.5), amax=(0, 0.5), pos=(445, 0), size=(130, 56), pivot=(0.5, 0.5))
+add_cr(2090004, 2090000)
+add_image(2090002, 2090000, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(2090003, 2090000, 2090002)
+add_go(2091000, "AnalyticsBtnTxt", [2091001, 2091003, 2091002])
+add_rect(2091001, 2091000, 2090001, [], amin=(0,0), amax=(1,1))
+add_cr(2091003, 2091000)
+add_tmp(2091002, 2091000, "📊 СТАТЫ", fsize=14, fstyle=1, color=(1, 0.95, 0.5, 1), align=514, autosize=1, fmin=10, fmax=15)
 # AudioToggleButton
 add(f"--- !u!114 &2050005")
 add("MonoBehaviour:")
@@ -1042,7 +1066,7 @@ add_rect(3000001, 3000000, 1500001, [3010001, 3080001, 3011001], amin=(0, 0), am
 
 # DeskMat (Background desk surface)
 add_go(3010000, "DeskMat", [3010001, 3010003, 3010002])
-add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001, 3015001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3010003, 3010000)
 add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
 
@@ -1058,6 +1082,131 @@ add_go(3014000, "LampLightCone", [3014001, 3014003, 3014002])
 add_rect(3014001, 3014000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-210, -460), size=(580, 480), pivot=(0.5, 0.5))
 add_cr(3014003, 3014000)
 add_image(3014002, 3014000, GUID_SPR_LAMP_CONE, raycast=0)
+
+# LoFiPlayerWidget (Cassette music deck on desk mat to the right of monitor)
+add_go(3015000, "LoFiPlayerWidget", [3015001, 3015003, 3015002, 3015004, 3015005])
+add_rect(3015001, 3015000, 3010001, [3015101, 3015201, 3015301, 3015401], amin=(0.5, 1), amax=(0.5, 1), pos=(445, -340), size=(136, 170), pivot=(0.5, 0.5))
+add_cr(3015003, 3015000)
+add_image(3015002, 3015000, GUID_SPR_LOFI_PLAYER, raycast=1)
+
+# AudioSource for LoFi player
+add(f"--- !u!82 &3015005")
+add("AudioSource:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 3015000}")
+add("  m_Enabled: 1")
+add("  serializedVersion: 4")
+add("  OutputAudioMixerGroup: {fileID: 0}")
+add("  m_audioClip: {fileID: 8300000, guid: " + GUID_SFX_LOFI_TRACK + ", type: 3}")
+add("  m_PlayOnAwake: 0")
+add("  m_Volume: 0.45")
+add("  m_Pitch: 1")
+add("  Loop: 1")
+add("  Mute: 0")
+add("  Spatialize: 0")
+add("  SpatializePostEffects: 0")
+add("  Priority: 128")
+add("  DopplerLevel: 1")
+add("  MinDistance: 1")
+add("  MaxDistance: 500")
+add("  Pan2D: 0")
+add("  rolloffMode: 0")
+add("  BypassEffects: 0")
+add("  BypassListenerEffects: 0")
+add("  BypassReverbZones: 0")
+add("  rolloffCustomCurve:")
+add("    serializedVersion: 2")
+add("    m_Curve: []")
+add("    m_PreInfinity: 2")
+add("    m_PostInfinity: 2")
+add("    m_RotationOrder: 4")
+add("  panLevelCustomCurve:")
+add("    serializedVersion: 2")
+add("    m_Curve: []")
+add("    m_PreInfinity: 2")
+add("    m_PostInfinity: 2")
+add("    m_RotationOrder: 4")
+add("  spreadCustomCurve:")
+add("    serializedVersion: 2")
+add("    m_Curve: []")
+add("    m_PreInfinity: 2")
+add("    m_PostInfinity: 2")
+add("    m_RotationOrder: 4")
+add("  reverbZoneMixCustomCurve:")
+add("    serializedVersion: 2")
+add("    m_Curve: []")
+add("    m_PreInfinity: 2")
+add("    m_PostInfinity: 2")
+add("    m_RotationOrder: 4")
+
+# LoFiPlayerUI component
+add(f"--- !u!114 &3015004")
+add("MonoBehaviour:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 3015000}")
+add("  m_Enabled: 1")
+add("  m_EditorHideFlags: 0")
+add("  m_Script: {fileID: 11500000, guid: " + GUID_LOFI_PLAYER_UI + ", type: 3}")
+add("  m_Name: ")
+add("  m_EditorClassIdentifier: Assembly-CSharp::LoFiPlayerUI")
+add("  musicSource: {fileID: 3015005}")
+add("  lofiTrack: {fileID: 8300000, guid: " + GUID_SFX_LOFI_TRACK + ", type: 3}")
+add("  synthwaveTrack: {fileID: 8300000, guid: " + GUID_SFX_SYNTHWAVE_TRACK + ", type: 3}")
+add("  playPauseButton: {fileID: 3015303}")
+add("  nextTrackButton: {fileID: 3015403}")
+add("  trackTitleText: {fileID: 3015102}")
+add("  playPauseIconText: {fileID: 3015312}")
+add("  eqBars:")
+add("  - {fileID: 3015211}")
+add("  - {fileID: 3015221}")
+add("  - {fileID: 3015231}")
+add("  - {fileID: 3015241}")
+
+# TrackTitle
+add_go(3015100, "LoFiTrackTitle", [3015101, 3015103, 3015102])
+add_rect(3015101, 3015100, 3015001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -22), size=(126, 20), pivot=(0.5, 0.5))
+add_cr(3015103, 3015100)
+add_tmp(3015102, 3015100, "☕ Lo-Fi Chill", fsize=10, fstyle=1, color=(0.2, 0.95, 0.7, 1), align=514, autosize=1, fmin=8, fmax=11)
+
+# EqContainer
+add_go(3015200, "LoFiEqContainer", [3015201])
+add_rect(3015201, 3015200, 3015001, [3015211, 3015221, 3015231, 3015241], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 6), size=(88, 30), pivot=(0.5, 0.5))
+
+# 4 EQ Bars
+for idx, (bx, bar_id) in enumerate([(-30, 3015210), (-10, 3015220), (10, 3015230), (30, 3015240)]):
+    add_go(bar_id, f"EqBar_{idx}", [bar_id+1, bar_id+3, bar_id+2])
+    add_rect(bar_id+1, bar_id, 3015201, [], amin=(0.5, 0), amax=(0.5, 0), pos=(bx, 0), size=(12, 14), pivot=(0.5, 0))
+    add_cr(bar_id+3, bar_id)
+    bar_col = (0.2, 0.95, 0.7, 0.85) if idx % 2 == 0 else (0.1, 0.85, 1.0, 0.85)
+    add_image(bar_id+2, bar_id, None, color=bar_col, raycast=0)
+
+# PlayPauseBtn
+add_go(3015300, "PlayPauseBtn", [3015301, 3015304, 3015302, 3015303])
+add_rect(3015301, 3015300, 3015001, [3015311], amin=(0.5, 0), amax=(0.5, 0), pos=(-28, 26), size=(44, 30), pivot=(0.5, 0.5))
+add_cr(3015304, 3015300)
+add_image(3015302, 3015300, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(3015303, 3015300, 3015302)
+add_go(3015310, "PlayPauseTxt", [3015311, 3015313, 3015312])
+add_rect(3015311, 3015310, 3015301, [], amin=(0,0), amax=(1,1))
+add_cr(3015313, 3015310)
+add_tmp(3015312, 3015310, "▶", fsize=14, fstyle=1, color=(1,1,1,1), align=514)
+
+# NextTrackBtn
+add_go(3015400, "NextTrackBtn", [3015401, 3015404, 3015402, 3015403])
+add_rect(3015401, 3015400, 3015001, [3015411], amin=(0.5, 0), amax=(0.5, 0), pos=(28, 26), size=(44, 30), pivot=(0.5, 0.5))
+add_cr(3015404, 3015400)
+add_image(3015402, 3015400, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(3015403, 3015400, 3015402)
+add_go(3015410, "NextTrackTxt", [3015411, 3015413, 3015412])
+add_rect(3015411, 3015410, 3015401, [], amin=(0,0), amax=(1,1))
+add_cr(3015413, 3015410)
+add_tmp(3015412, 3015410, "⏭", fsize=14, fstyle=1, color=(1,1,1,1), align=514)
 
 # MonitorFrame (Upper half of workstation - 840x420 with 756x306 bezel cutout)
 add_go(3020000, "MonitorFrame", [3020001, 3020003, 3020002])
@@ -1253,7 +1402,7 @@ add_image(3041002, 3041000, GUID_SPR_MOUSE_GLOW, color=(0, 0.9, 1, 0.5), raycast
 
 # KeyboardGroup (Lower half of workstation - Main tap zone, shifted right by +35px)
 add_go(3030000, "KeyboardGroup", [3030001])
-add_rect(3030001, 3030000, 3010001, [3031001, 3032001, 3033001, 3034001, 3035001, 3036001, 3037001, 3038001], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -835), size=(760, 250), pivot=(0.5, 1))
+add_rect(3030001, 3030000, 3010001, [3031001, 3032001, 3033001, 3034001, 3035001, 3036001, 3037001, 3038001, 3039101, 3039201], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -835), size=(760, 250), pivot=(0.5, 1))
 
 add_go(3031000, "KeyboardImage", [3031001, 3031003, 3031002])
 add_rect(3031001, 3031000, 3030001, [], amin=(0,0), amax=(1,1))
@@ -1295,6 +1444,27 @@ add_go(3038000, "KeyGlow_Space", [3038001, 3038003, 3038002])
 add_rect(3038001, 3038000, 3030001, [], amin=(0, 1), amax=(0, 1), pos=(371, -200), size=(330, 32), pivot=(0.5, 0.5))
 add_cr(3038003, 3038000)
 add_image(3038002, 3038000, GUID_SPR_CARD_BG, color=(0, 0.95, 1, 0), img_type=1, raycast=0)
+
+# Keyboard Customization Badges (Style & Switch Profiles on top bezel)
+add_go(3039100, "KeyboardStyleBtn", [3039101, 3039104, 3039102, 3039103])
+add_rect(3039101, 3039100, 3030001, [3039111], amin=(0, 1), amax=(0, 1), pos=(510, -22), size=(150, 28), pivot=(0.5, 0.5))
+add_cr(3039104, 3039100)
+add_image(3039102, 3039100, GUID_SPR_CARD_BG, color=(0.10, 0.14, 0.20, 0.95), img_type=1)
+add_button(3039103, 3039100, 3039102)
+add_go(3039110, "KeyboardStyleTxt", [3039111, 3039113, 3039112])
+add_rect(3039111, 3039110, 3039101, [], amin=(0,0), amax=(1,1))
+add_cr(3039113, 3039110)
+add_tmp(3039112, 3039110, "🎨 CYBERPUNK", fsize=12, fstyle=1, color=(0.3, 0.9, 1, 1), align=514, autosize=1, fmin=9, fmax=13)
+
+add_go(3039200, "KeyboardSwitchBtn", [3039201, 3039204, 3039202, 3039203])
+add_rect(3039201, 3039200, 3030001, [3039211], amin=(0, 1), amax=(0, 1), pos=(670, -22), size=(150, 28), pivot=(0.5, 0.5))
+add_cr(3039204, 3039200)
+add_image(3039202, 3039200, GUID_SPR_CARD_BG, color=(0.10, 0.14, 0.20, 0.95), img_type=1)
+add_button(3039203, 3039200, 3039202)
+add_go(3039210, "KeyboardSwitchTxt", [3039211, 3039213, 3039212])
+add_rect(3039211, 3039210, 3039201, [], amin=(0,0), amax=(1,1))
+add_cr(3039213, 3039210)
+add_tmp(3039212, 3039210, "🔊 CHERRY BLUE", fsize=12, fstyle=1, color=(1, 0.85, 0.3, 1), align=514, autosize=1, fmin=9, fmax=13)
 
 # Full-Screen Tap Button (Spans the workplace zone!)
 add_go(3080000, "TapButton", [3080001, 3080004, 3080002, 3080003])
@@ -1356,6 +1526,14 @@ add("  secondMonitorText: {fileID: 3021212}")
 add("  secondMonitorPanel: {fileID: 3021200}")
 add("  keyboardTransform: {fileID: 3030001}")
 add("  keyboardGlowImage: {fileID: 3032002}")
+add("  keyboardBaseImage: {fileID: 3031002}")
+add("  sprKeyboardDefault: {fileID: 21300000, guid: " + GUID_SPR_KEYBOARD + ", type: 3}")
+add("  sprKeyboardRetro: {fileID: 21300000, guid: " + GUID_SPR_KEYBOARD_RETRO + ", type: 3}")
+add("  sprKeyboardNeon: {fileID: 21300000, guid: " + GUID_SPR_KEYBOARD_NEON + ", type: 3}")
+add("  keyboardStyleButton: {fileID: 3039103}")
+add("  keyboardStyleText: {fileID: 3039112}")
+add("  keyboardSwitchButton: {fileID: 3039203}")
+add("  keyboardSwitchText: {fileID: 3039212}")
 add("  mouseTransform: {fileID: 3040001}")
 add("  mouseGlowGraphic: {fileID: 3041002}")
 add("  mouseButton: {fileID: 3040004}")
@@ -1924,6 +2102,137 @@ add_go(5027100, "Txt", [5027101, 5027103, 5027102])
 add_rect(5027101, 5027100, 5027001, [], amin=(0,0), amax=(1,1))
 add_cr(5027103, 5027100)
 add_tmp(5027102, 5027100, "⚡ ЗАБРАТЬ x2", fsize=22, fstyle=1, color=(1,1,1,1), align=514)
+
+# ==============================================================
+# 5.3 SESSION ANALYTICS MODAL (Productivity Dashboard & CPM Chart)
+# ==============================================================
+add_go(6000000, "SessionAnalyticsModalRoot", [6000001, 6000004], active=0)
+add_rect(6000001, 6000000, 1500001, [6001001, 6002001], amin=(0,0), amax=(1,1))
+
+# Dim Backdrop
+add_go(6001000, "AnalyticsBackdrop", [6001001, 6001004, 6001002, 6001003])
+add_rect(6001001, 6001000, 6000001, [], amin=(0,0), amax=(1,1))
+add_cr(6001004, 6001000)
+add_image(6001002, 6001000, None, color=(0.02, 0.03, 0.05, 0.85), raycast=1)
+add_button(6001003, 6001000, 6001002)
+
+# Modal Card Container
+add_go(6002000, "AnalyticsCard", [6002001, 6002004, 6002002])
+add_rect(6002001, 6002000, 6000001, [6003001, 6004001, 6005001, 6006001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(940, 1160), pivot=(0.5, 0.5))
+add_cr(6002004, 6002000)
+add_image(6002002, 6002000, GUID_SPR_CARD_BG, color=(0.09, 0.11, 0.16, 0.98), img_type=1)
+
+# Modal Header (Title + Close X Button)
+add_go(6003000, "AnalyticsHeader", [6003001])
+add_rect(6003001, 6003000, 6002001, [6003101, 6003201], amin=(0, 1), amax=(1, 1), pos=(0, -45), size=(0, 70), pivot=(0.5, 1))
+
+add_go(6003100, "AnalyticsHeaderTitle", [6003101, 6003103, 6003102])
+add_rect(6003101, 6003100, 6003001, [], amin=(0, 0), amax=(1, 1), pos=(-30, 0), size=(0, 0))
+add_cr(6003103, 6003100)
+add_tmp(6003102, 6003100, "📊 АНАЛИТИКА ПРОДУКТИВНОСТИ", fsize=26, fstyle=1, color=(1, 0.85, 0.3, 1), align=514, autosize=1, fmin=18, fmax=28)
+
+add_go(6003200, "AnalyticsCloseXBtn", [6003201, 6003204, 6003202, 6003203])
+add_rect(6003201, 6003200, 6003001, [6003211], amin=(1, 0.5), amax=(1, 0.5), pos=(-45, 0), size=(56, 56), pivot=(0.5, 0.5))
+add_cr(6003204, 6003200)
+add_image(6003202, 6003200, GUID_SPR_BTN_ORANGE, img_type=1)
+add_button(6003203, 6003200, 6003202)
+add_go(6003210, "CloseTxt", [6003211, 6003213, 6003212])
+add_rect(6003211, 6003210, 6003201, [], amin=(0,0), amax=(1,1))
+add_cr(6003213, 6003210)
+add_tmp(6003212, 6003210, "✕", fsize=24, fstyle=1, color=(1,1,1,1), align=514)
+
+# Metrics Grid (6 Metric Rows)
+add_go(6004000, "MetricsGrid", [6004001, 6004003, 6004002])
+add_rect(6004001, 6004000, 6002001, [6004101, 6004201, 6004301, 6004401, 6004501, 6004601], amin=(0, 1), amax=(1, 1), pos=(0, -115), size=(-70, 470), pivot=(0.5, 1))
+add_cr(6004003, 6004000)
+add_image(6004002, 6004000, GUID_SPR_CARD_BG, color=(0.06, 0.08, 0.12, 0.85), img_type=1)
+
+metric_defs = [
+    (6004100, "TimeInFlow", -40, "⏱ ВРЕМЯ В ПОТОКЕ: 00:00:00", (0.3, 0.95, 0.7, 1)),
+    (6004200, "SessionCode", -115, "💻 КОДА ЗА СЕССИЮ: 0 строк", (1, 1, 1, 1)),
+    (6004300, "SessionMoney", -190, "💰 ЗАРАБОТАНО: 0 руб.", (1, 0.82, 0.35, 1)),
+    (6004400, "CurrentCpm", -265, "⚡ ТЕКУЩИЙ CPM: 0 кликов/мин", (0.2, 0.9, 1, 1)),
+    (6004500, "PeakCpm", -340, "🔥 ПИКОВЫЙ CPM: 0 кликов/мин", (1, 0.55, 0.25, 1)),
+    (6004600, "BugsAndProjects", -415, "🐛 БАГОВ: 0 | 🚀 РЕЛИЗОВ: 0", (0.9, 0.75, 1, 1))
+]
+
+for m_id, m_name, m_y, m_default_text, m_color in metric_defs:
+    add_go(m_id, m_name, [m_id+1, m_id+3, m_id+2])
+    add_rect(m_id+1, m_id, 6004001, [], amin=(0, 1), amax=(1, 1), pos=(0, m_y), size=(-40, 60), pivot=(0.5, 0.5))
+    add_cr(m_id+3, m_id)
+    add_tmp(m_id+2, m_id, m_default_text, fsize=20, fstyle=1, color=m_color, align=513, autosize=1, fmin=14, fmax=22)
+
+# Chart Container (8-minute Bar Chart)
+add_go(6005000, "ChartContainer", [6005001, 6005003, 6005002])
+add_rect(6005001, 6005000, 6002001, [6005011, 6005101, 6005201, 6005301, 6005401, 6005501, 6005601, 6005701, 6005801, 6005151, 6005251, 6005351, 6005451, 6005551, 6005651, 6005751, 6005851], amin=(0, 0), amax=(1, 0), pos=(0, 240), size=(-70, 310), pivot=(0.5, 0.5))
+add_cr(6005003, 6005000)
+add_image(6005002, 6005000, GUID_SPR_CARD_BG, color=(0.06, 0.08, 0.12, 0.85), img_type=1)
+
+add_go(6005010, "ChartTitle", [6005011, 6005013, 6005012])
+add_rect(6005011, 6005010, 6005001, [], amin=(0, 1), amax=(1, 1), pos=(0, -26), size=(-40, 36), pivot=(0.5, 0.5))
+add_cr(6005013, 6005010)
+add_tmp(6005012, 6005010, "📈 АКТИВНОСТЬ (СТРОК/МИН ЗА 8 МИНУТ)", fsize=17, fstyle=1, color=(0.4, 0.85, 1, 1), align=514)
+
+chart_labels = ["-7м", "-6м", "-5м", "-4м", "-3м", "-2м", "-1м", "сейчас"]
+for i in range(8):
+    bx = -350 + i * 100
+    bar_id = 6005100 + i * 100
+    lbl_id = 6005150 + i * 100
+
+    # Bar
+    add_go(bar_id, f"ChartBar_{i}", [bar_id+1, bar_id+3, bar_id+2])
+    add_rect(bar_id+1, bar_id, 6005001, [], amin=(0.5, 0), amax=(0.5, 0), pos=(bx, 50), size=(68, 20), pivot=(0.5, 0))
+    add_cr(bar_id+3, bar_id)
+    bar_tint = (0.2, 0.95, 0.65, 0.9) if i == 7 else (0.15, 0.65, 0.95, 0.8)
+    add_image(bar_id+2, bar_id, GUID_SPR_CARD_BG, color=bar_tint, img_type=1)
+
+    # Label
+    add_go(lbl_id, f"ChartLabel_{i}", [lbl_id+1, lbl_id+3, lbl_id+2])
+    add_rect(lbl_id+1, lbl_id, 6005001, [], amin=(0.5, 0), amax=(0.5, 0), pos=(bx, 24), size=(80, 30), pivot=(0.5, 0.5))
+    add_cr(lbl_id+3, lbl_id)
+    add_tmp(lbl_id+2, lbl_id, chart_labels[i], fsize=13, fstyle=0, color=(0.6, 0.75, 0.88, 1), align=514)
+
+# Bottom Close Button
+add_go(6006000, "AnalyticsConfirmCloseBtn", [6006001, 6006004, 6006002, 6006003])
+add_rect(6006001, 6006000, 6002001, [6006101], amin=(0.5, 0), amax=(0.5, 0), pos=(0, 65), size=(560, 76), pivot=(0.5, 0.5))
+add_cr(6006004, 6006000)
+add_image(6006002, 6006000, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(6006003, 6006000, 6006002)
+add_go(6006100, "BtnTxt", [6006101, 6006103, 6006102])
+add_rect(6006101, 6006100, 6006001, [], amin=(0,0), amax=(1,1))
+add_cr(6006103, 6006100)
+add_tmp(6006102, 6006100, "ОТЛИЧНО, В РАБОТУ! 🚀", fsize=22, fstyle=1, color=(1,1,1,1), align=514)
+
+# SessionAnalyticsUI component
+add(f"--- !u!114 &6000004")
+add("MonoBehaviour:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 6000000}")
+add("  m_Enabled: 1")
+add("  m_EditorHideFlags: 0")
+add("  m_Script: {fileID: 11500000, guid: " + GUID_SESSION_ANALYTICS_UI + ", type: 3}")
+add("  m_Name: ")
+add("  m_EditorClassIdentifier: Assembly-CSharp::SessionAnalyticsUI")
+add("  openAnalyticsBtn: {fileID: 2090003}")
+add("  closeAnalyticsBtn: {fileID: 6006003}")
+add("  closeXBtn: {fileID: 6003203}")
+add("  backdropBtn: {fileID: 6001003}")
+add("  modalRoot: {fileID: 6000000}")
+add("  timeInFlowText: {fileID: 6004102}")
+add("  sessionCodeText: {fileID: 6004202}")
+add("  sessionMoneyText: {fileID: 6004302}")
+add("  currentCpmText: {fileID: 6004402}")
+add("  peakCpmText: {fileID: 6004502}")
+add("  bugsAndProjectsText: {fileID: 6004602}")
+add("  chartBars:")
+for i in range(8):
+    add(f"  - {{fileID: {6005100 + i * 100 + 1}}}")
+add("  chartBarLabels:")
+for i in range(8):
+    add(f"  - {{fileID: {6005150 + i * 100 + 2}}}")
 
 # ==============================================================
 # 6. COUNTERSCRIPT (TapCounter)

@@ -360,6 +360,142 @@ def make_build_complete():
         samples.append(bell * 0.9)
     return samples
 
+def make_cassette_click():
+    duration = 0.075
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        env = math.exp(-t * 190.0)
+        click = math.sin(2.0 * math.pi * 2400.0 * t) * env * 0.9
+        thud = math.sin(2.0 * math.pi * 280.0 * t) * math.exp(-t * 90.0) * 0.7
+        samples.append(click + thud)
+    return samples
+
+def make_lofi_track():
+    duration = 4.0 # 1 seamless loop
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+    
+    # 4 jazz chords (Fmaj7, Em7, Dm7, Cmaj7) - 1.0s each
+    chord_freqs = [
+        [174.61, 220.00, 261.63, 329.63], # Fmaj7
+        [164.81, 196.00, 246.94, 293.66], # Em7
+        [146.83, 174.61, 220.00, 261.63], # Dm7
+        [130.81, 164.81, 196.00, 246.94], # Cmaj7
+    ]
+    
+    # 1. Rhodes electric piano chords
+    for c_idx, freqs in enumerate(chord_freqs):
+        start_t = c_idx * 1.0
+        start_idx = int(start_t * SAMPLE_RATE)
+        end_idx = int((start_t + 1.0) * SAMPLE_RATE)
+        for i in range(start_idx, min(end_idx, total_samples)):
+            lt = (i - start_idx) / SAMPLE_RATE
+            env = math.exp(-lt * 2.8) * 0.22
+            vib = math.sin(2.0 * math.pi * 4.5 * lt) * 0.02
+            val = 0.0
+            for f in freqs:
+                f_vib = f * (1.0 + vib)
+                val += math.sin(2.0 * math.pi * f_vib * lt) * 0.25
+                val += math.sin(2.0 * math.pi * (f_vib * 2.0) * lt) * 0.08
+            samples[i] += val * env
+
+    # 2. Lo-fi drums (Kick at 0.0s, 2.0s; Snare at 1.0s, 3.0s; Hi-hats every 0.25s)
+    # Kicks
+    for kt in [0.0, 2.0]:
+        k_start = int(kt * SAMPLE_RATE)
+        k_len = int(0.20 * SAMPLE_RATE)
+        for i in range(k_len):
+            idx = (k_start + i) % total_samples
+            t = i / SAMPLE_RATE
+            f = max(45.0, 160.0 * math.exp(-t * 30.0))
+            env = math.exp(-t * 18.0)
+            samples[idx] += math.sin(2.0 * math.pi * f * t) * env * 0.35
+
+    # Snares / Rimshots
+    for st in [1.0, 3.0]:
+        s_start = int(st * SAMPLE_RATE)
+        s_len = int(0.18 * SAMPLE_RATE)
+        for i in range(s_len):
+            idx = (s_start + i) % total_samples
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 22.0)
+            noise = (random.random() * 2.0 - 1.0) * 0.18 * env
+            tone = math.sin(2.0 * math.pi * 220.0 * t) * 0.12 * math.exp(-t * 35.0)
+            samples[idx] += noise + tone
+
+    # Vinyl crackle background
+    for i in range(total_samples):
+        if random.random() < 0.003:
+            samples[i] += (random.random() * 2.0 - 1.0) * 0.06
+        samples[i] += (random.random() * 2.0 - 1.0) * 0.008
+
+    return samples
+
+def make_synthwave_track():
+    duration = 4.0 # 120 BPM: 2 bars of 4/4
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+
+    # 120 BPM: 1 beat = 0.5s. 16th note = 0.125s.
+    # 1. 16th note rolling analog synth bass
+    bass_notes = [55.0, 55.0, 55.0, 55.0, 43.65, 43.65, 43.65, 43.65, 48.99, 48.99, 48.99, 48.99, 41.20, 41.20, 41.20, 41.20] # A1, F1, G1, E1
+    for step in range(32): # 32 16th notes in 4.0s
+        note_idx = (step // 2) % len(bass_notes)
+        freq = bass_notes[note_idx]
+        b_start = int(step * 0.125 * SAMPLE_RATE)
+        b_len = int(0.12 * SAMPLE_RATE)
+        for i in range(b_len):
+            idx = (b_start + i) % total_samples
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 20.0) * 0.24
+            # Saw approximation
+            saw = (math.sin(2.0 * math.pi * freq * t) + 
+                   0.5 * math.sin(2.0 * math.pi * freq * 2.0 * t) + 
+                   0.25 * math.sin(2.0 * math.pi * freq * 3.0 * t))
+            samples[idx] += saw * env
+
+    # 2. Four on the floor kick drum (every 0.5s)
+    for b in range(8):
+        kt = b * 0.5
+        k_start = int(kt * SAMPLE_RATE)
+        k_len = int(0.18 * SAMPLE_RATE)
+        for i in range(k_len):
+            idx = (k_start + i) % total_samples
+            t = i / SAMPLE_RATE
+            f = max(40.0, 180.0 * math.exp(-t * 35.0))
+            env = math.exp(-t * 20.0)
+            samples[idx] += math.sin(2.0 * math.pi * f * t) * env * 0.38
+
+    # 3. Gated 80s Snare on beats 2, 4, 6, 8 (t = 0.5, 1.5, 2.5, 3.5)
+    for b in [1, 3, 5, 7]:
+        st = b * 0.5
+        s_start = int(st * SAMPLE_RATE)
+        s_len = int(0.24 * SAMPLE_RATE)
+        for i in range(s_len):
+            idx = (s_start + i) % total_samples
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 14.0)
+            noise = (random.random() * 2.0 - 1.0) * 0.22 * env
+            tone = math.sin(2.0 * math.pi * 260.0 * t) * 0.15 * math.exp(-t * 25.0)
+            samples[idx] += noise + tone
+
+    # 4. Glittering neon arpeggio (Am, F, C, G)
+    arp_notes = [440.0, 523.25, 659.25, 880.0, 349.23, 440.0, 523.25, 698.46, 523.25, 659.25, 783.99, 1046.5, 392.0, 493.88, 587.33, 783.99]
+    for step in range(32):
+        freq = arp_notes[step % len(arp_notes)]
+        a_start = int(step * 0.125 * SAMPLE_RATE)
+        a_len = int(0.11 * SAMPLE_RATE)
+        for i in range(a_len):
+            idx = (a_start + i) % total_samples
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 24.0) * 0.12
+            sine = math.sin(2.0 * math.pi * freq * t) + 0.3 * math.sin(2.0 * math.pi * freq * 2.0 * t)
+            samples[idx] += sine * env
+
+    return samples
+
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
@@ -378,4 +514,7 @@ save_wav(os.path.join(out_dir, "lamp_switch.wav"), make_lamp_switch())
 save_wav(os.path.join(out_dir, "bug_squash.wav"), make_bug_squash())
 save_wav(os.path.join(out_dir, "crate_collect.wav"), make_crate_collect())
 save_wav(os.path.join(out_dir, "build_complete.wav"), make_build_complete())
+save_wav(os.path.join(out_dir, "cassette_click.wav"), make_cassette_click())
+save_wav(os.path.join(out_dir, "lofi_chill_loop.wav"), make_lofi_track())
+save_wav(os.path.join(out_dir, "synthwave_night_loop.wav"), make_synthwave_track())
 print("All sound effects generated successfully!")

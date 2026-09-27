@@ -24,6 +24,14 @@ public class WorkplaceVisuals : MonoBehaviour
     [Header("Клавиатура")]
     [SerializeField] private Transform keyboardTransform;
     [SerializeField] private Graphic keyboardGlowImage;
+    [SerializeField] private Image keyboardBaseImage;
+    [SerializeField] private Sprite sprKeyboardDefault;
+    [SerializeField] private Sprite sprKeyboardRetro;
+    [SerializeField] private Sprite sprKeyboardNeon;
+    [SerializeField] private Button keyboardStyleButton;
+    [SerializeField] private TMP_Text keyboardStyleText;
+    [SerializeField] private Button keyboardSwitchButton;
+    [SerializeField] private TMP_Text keyboardSwitchText;
     [SerializeField] private Color keyGlowNormal = new Color(0, 0.89f, 1f, 0f);
     [SerializeField] private Color keyGlowActive = new Color(0, 1f, 0.55f, 0.35f);
     [SerializeField] private Graphic keyGlowW;
@@ -237,6 +245,27 @@ public class WorkplaceVisuals : MonoBehaviour
                 energyFizzBubbles = list.ToArray();
             }
         }
+
+        if (keyboardBaseImage == null && keyboardTransform != null)
+        {
+            keyboardBaseImage = keyboardTransform.Find("KeyboardImage")?.GetComponent<Image>();
+        }
+        if (keyboardStyleButton == null && keyboardTransform != null)
+        {
+            keyboardStyleButton = keyboardTransform.Find("KeyboardCustomBar/StyleBtn")?.GetComponent<Button>();
+        }
+        if (keyboardStyleText == null && keyboardStyleButton != null)
+        {
+            keyboardStyleText = keyboardStyleButton.GetComponentInChildren<TMP_Text>();
+        }
+        if (keyboardSwitchButton == null && keyboardTransform != null)
+        {
+            keyboardSwitchButton = keyboardTransform.Find("KeyboardCustomBar/SwitchBtn")?.GetComponent<Button>();
+        }
+        if (keyboardSwitchText == null && keyboardSwitchButton != null)
+        {
+            keyboardSwitchText = keyboardSwitchButton.GetComponentInChildren<TMP_Text>();
+        }
     }
 
     private void OnEnable()
@@ -254,6 +283,7 @@ public class WorkplaceVisuals : MonoBehaviour
         InitSteamAndFizz();
         InitCatInteraction();
         InitCatCustomization();
+        InitKeyboardCustomization();
         InitLighting();
         InitDrinksInteraction();
         InitMouseInteraction();
@@ -1736,6 +1766,126 @@ public class WorkplaceVisuals : MonoBehaviour
         if (ClickJuice.Instance != null && hotkeyBadgeObj != null)
         {
             ClickJuice.Instance.SpawnCustomPopup("💾 Проект сохранён!", hotkeyBadgeObj.transform.position + Vector3.up * 30f, new Color(0.3f, 0.95f, 0.7f, 1f), false);
+        }
+    }
+
+    #endregion
+
+    #region Кастомизация клавиатуры и звуковых свитчей
+
+    private int currentKeyboardStyle = 0;
+    private int currentSwitchType = 0;
+
+    private static readonly string[] KeyboardStyleNames = new string[]
+    {
+        "CYBERPUNK",
+        "RETRO IBM",
+        "TOKYO NEON"
+    };
+
+    private static readonly string[] SwitchTypeNames = new string[]
+    {
+        "CHERRY BLUE",
+        "CHERRY BROWN",
+        "SPEED RED",
+        "THOCK SPACE"
+    };
+
+    private void InitKeyboardCustomization()
+    {
+        currentKeyboardStyle = PlayerPrefs.GetInt("SelectedKeyboardStyle", 0);
+        currentSwitchType = PlayerPrefs.GetInt("SelectedSwitchType", 0);
+
+        if (keyboardStyleButton != null)
+        {
+            keyboardStyleButton.onClick.RemoveAllListeners();
+            keyboardStyleButton.onClick.AddListener(CycleKeyboardStyle);
+        }
+
+        if (keyboardSwitchButton != null)
+        {
+            keyboardSwitchButton.onClick.RemoveAllListeners();
+            keyboardSwitchButton.onClick.AddListener(CycleSwitchType);
+        }
+
+        ApplyKeyboardStyle(currentKeyboardStyle, false);
+        UpdateKeyboardCustomizationLabels();
+    }
+
+    public void CycleKeyboardStyle()
+    {
+        currentKeyboardStyle = (currentKeyboardStyle + 1) % 3;
+        PlayerPrefs.SetInt("SelectedKeyboardStyle", currentKeyboardStyle);
+        PlayerPrefs.Save();
+        ApplyKeyboardStyle(currentKeyboardStyle, true);
+        UpdateKeyboardCustomizationLabels();
+
+        HapticFeedback.Vibrate(25);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCassetteClick();
+        if (ClickJuice.Instance != null && keyboardStyleButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"КЛАВИАТУРА: {KeyboardStyleNames[currentKeyboardStyle]}", keyboardStyleButton.transform.position, new Color(0.3f, 0.9f, 1f), true);
+        }
+    }
+
+    public void CycleSwitchType()
+    {
+        currentSwitchType = (currentSwitchType + 1) % 4;
+        PlayerPrefs.SetInt("SelectedSwitchType", currentSwitchType);
+        PlayerPrefs.Save();
+        UpdateKeyboardCustomizationLabels();
+
+        HapticFeedback.Vibrate(30);
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayTypingWithSwitch(currentSwitchType, false);
+        }
+        if (ClickJuice.Instance != null && keyboardSwitchButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"СВИТЧИ: {SwitchTypeNames[currentSwitchType]}", keyboardSwitchButton.transform.position, new Color(1f, 0.85f, 0.3f), true);
+        }
+    }
+
+    private void ApplyKeyboardStyle(int style, bool animate)
+    {
+        if (keyboardBaseImage == null) return;
+        Sprite targetSprite = sprKeyboardDefault;
+        Color glowColor = new Color(0f, 0.89f, 1f, 0f);
+
+        switch (style)
+        {
+            case 0: // Cyberpunk
+                targetSprite = sprKeyboardDefault != null ? sprKeyboardDefault : keyboardBaseImage.sprite;
+                glowColor = new Color(0f, 0.89f, 1f, 0f);
+                break;
+            case 1: // Retro IBM
+                if (sprKeyboardRetro != null) targetSprite = sprKeyboardRetro;
+                glowColor = new Color(1f, 0.7f, 0.2f, 0f);
+                break;
+            case 2: // Tokyo Neon
+                if (sprKeyboardNeon != null) targetSprite = sprKeyboardNeon;
+                glowColor = new Color(1f, 0.2f, 0.8f, 0f);
+                break;
+        }
+
+        if (targetSprite != null) keyboardBaseImage.sprite = targetSprite;
+        keyGlowNormal = glowColor;
+
+        if (animate && keyboardTransform != null)
+        {
+            StartCoroutine(PopInRoutine(keyboardTransform));
+        }
+    }
+
+    private void UpdateKeyboardCustomizationLabels()
+    {
+        if (keyboardStyleText != null)
+        {
+            keyboardStyleText.text = $"🎨 {KeyboardStyleNames[currentKeyboardStyle]}";
+        }
+        if (keyboardSwitchText != null)
+        {
+            keyboardSwitchText.text = $"🔊 {SwitchTypeNames[currentSwitchType]}";
         }
     }
 

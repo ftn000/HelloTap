@@ -35,6 +35,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip bugSquashSound;
     [SerializeField] private AudioClip crateCollectSound;
     [SerializeField] private AudioClip buildCompleteSound;
+    [SerializeField] private AudioClip cassetteClickSound;
 
     [Header("Источники звука")]
     [SerializeField] private AudioSource sfxSource;
@@ -131,6 +132,11 @@ public class AudioManager : MonoBehaviour
         if (buildCompleteSound == null)
         {
             buildCompleteSound = CreateProceduralBuildCompleteClip();
+        }
+
+        if (cassetteClickSound == null)
+        {
+            cassetteClickSound = CreateProceduralCassetteClickClip();
         }
     }
 
@@ -305,23 +311,8 @@ public class AudioManager : MonoBehaviour
         if (isMuted || isFocusLost) return;
         AudioListener.pause = false;
 
-        // 1. Всегда воспроизводим отчетливый стук механического переключателя
-        if (typingSounds != null && typingSounds.Length > 0)
-        {
-            int index = Random.Range(0, typingSounds.Length);
-            AudioClip clip = typingSounds[index];
-            if (clip != null)
-            {
-                typingSource.pitch = Random.Range(minTypingPitch, maxTypingPitch);
-                typingSource.PlayOneShot(clip, 1.0f);
-            }
-        }
-
-        // 2. При крите мягко накладываем приятный кристаллический акцент поверх клика клавиатуры
-        if (isCrit && critSound != null && sfxSource != null)
-        {
-            sfxSource.PlayOneShot(critSound, 0.45f);
-        }
+        int switchType = PlayerPrefs.GetInt("SelectedSwitchType", 0);
+        PlayTypingWithSwitch(switchType, isCrit);
     }
 
     public void PlayUpgrade()
@@ -498,6 +489,57 @@ public class AudioManager : MonoBehaviour
         {
             sfxSource.pitch = 1.0f;
             sfxSource.PlayOneShot(buildCompleteSound, 1.0f);
+        }
+    }
+
+    private AudioClip CreateProceduralCassetteClickClip()
+    {
+        int sampleRate = 44100;
+        int sampleCount = (int)(sampleRate * 0.075f);
+        float[] data = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float env = Mathf.Exp(-t * 190f);
+            float click = Mathf.Sin(2f * Mathf.PI * 2400f * t) * env * 0.9f;
+            float thud = Mathf.Sin(2f * Mathf.PI * 280f * t) * Mathf.Exp(-t * 90f) * 0.7f;
+            data[i] = Mathf.Clamp(click + thud, -1f, 1f);
+        }
+        AudioClip clip = AudioClip.Create("Procedural_CassetteClick", sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    public void PlayCassetteClick()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (cassetteClickSound != null)
+        {
+            sfxSource.pitch = Random.Range(0.96f, 1.04f);
+            sfxSource.PlayOneShot(cassetteClickSound, 0.85f);
+        }
+    }
+
+    public void PlayTypingWithSwitch(int switchType, bool isCrit = false)
+    {
+        if (isMuted || isFocusLost) return;
+        AudioListener.pause = false;
+
+        if (typingSounds != null && typingSounds.Length > 0)
+        {
+            int index = Mathf.Clamp(switchType, 0, typingSounds.Length - 1);
+            AudioClip clip = typingSounds[index];
+            if (clip != null)
+            {
+                typingSource.pitch = Random.Range(minTypingPitch, maxTypingPitch);
+                typingSource.PlayOneShot(clip, 1.0f);
+            }
+        }
+
+        if (isCrit && critSound != null && sfxSource != null)
+        {
+            sfxSource.pitch = Random.Range(1.02f, 1.15f);
+            sfxSource.PlayOneShot(critSound, 0.40f);
         }
     }
 

@@ -576,6 +576,132 @@ def make_minigame_sprites():
     im.save(os.path.join(sprites_dir, "spr_minigame_crate.png"))
     print("Created spr_minigame_crate.png")
 
+# 17. Vintage Retro Mechanical Keyboard (540 x 200)
+def make_keyboard_retro():
+    im = Image.new("RGBA", (540, 200), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Retro Beige Chassis
+    create_rounded_rect(d, (10, 10, 530, 190), 14, fill=(218, 212, 196, 255), outline=(175, 168, 150, 255), width=3)
+    create_rounded_rect(d, (20, 20, 520, 180), 8, fill=(188, 182, 166, 255))
+    row_y = [28, 58, 88, 118, 148]
+    key_h = 24
+    for r_idx, y in enumerate(row_y):
+        if r_idx == 4:
+            create_rounded_rect(d, (28, y, 62, y+key_h), 4, fill=(150, 144, 130, 255), outline=(125, 120, 108, 255))
+            create_rounded_rect(d, (68, y, 102, y+key_h), 4, fill=(150, 144, 130, 255), outline=(125, 120, 108, 255))
+            create_rounded_rect(d, (148, y, 380, y+key_h), 4, fill=(238, 234, 222, 255), outline=(195, 190, 178, 255))
+            create_rounded_rect(d, (386, y, 420, y+key_h), 4, fill=(150, 144, 130, 255), outline=(125, 120, 108, 255))
+            create_rounded_rect(d, (426, y, 460, y+key_h), 4, fill=(150, 144, 130, 255), outline=(125, 120, 108, 255))
+            create_rounded_rect(d, (466, y, 512, y+key_h), 4, fill=(180, 50, 45, 255), outline=(145, 35, 30, 255))
+        else:
+            cur_x = 28
+            while cur_x < 510:
+                kw = 30
+                if r_idx == 0 and cur_x > 460: kw = 48
+                elif r_idx == 1 and cur_x == 28: kw = 42
+                elif r_idx == 2 and cur_x == 28: kw = 48
+                elif r_idx == 2 and cur_x > 450: kw = 58
+                elif r_idx == 3 and cur_x == 28: kw = 64
+                elif r_idx == 3 and cur_x > 430: kw = 78
+                if cur_x + kw > 514: kw = 514 - cur_x
+                if kw < 10: break
+
+                kfill = (238, 234, 222, 255)
+                kout = (195, 190, 178, 255)
+                if r_idx == 0 and cur_x == 28:
+                    kfill = (205, 55, 45, 255) # Red vintage ESC
+                    kout = (165, 40, 30, 255)
+                elif (r_idx == 1 and cur_x in range(95, 140)) or (r_idx == 2 and cur_x in range(75, 185)):
+                    kfill = (248, 245, 235, 255) # Light ivory WASD
+                    kout = (185, 180, 168, 255)
+                elif (r_idx in (1, 2, 3) and cur_x == 28) or (r_idx in (0, 1, 2, 3) and cur_x > 430):
+                    kfill = (150, 144, 130, 255) # Vintage gray modifiers
+                    kout = (125, 120, 108, 255)
+
+                create_rounded_rect(d, (cur_x, y, cur_x+kw, y+key_h), 4, fill=kfill, outline=kout)
+                cur_x += kw + 5
+    im.save(os.path.join(sprites_dir, "spr_keyboard_retro.png"))
+    print("Created spr_keyboard_retro.png")
+
+# 18. Tokyo Night Cyberpunk Neon Keyboard (540 x 200)
+def make_keyboard_neon():
+    im = Image.new("RGBA", (540, 200), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Deep Neon Chassis
+    create_rounded_rect(d, (10, 10, 530, 190), 14, fill=(28, 16, 44, 255), outline=(190, 40, 220, 255), width=3)
+    create_rounded_rect(d, (20, 20, 520, 180), 8, fill=(18, 10, 30, 255))
+    row_y = [28, 58, 88, 118, 148]
+    key_h = 24
+    for r_idx, y in enumerate(row_y):
+        if r_idx == 4:
+            create_rounded_rect(d, (28, y, 62, y+key_h), 4, fill=(0, 200, 230, 220), outline=(0, 240, 255, 255))
+            create_rounded_rect(d, (68, y, 102, y+key_h), 4, fill=(45, 24, 70, 255), outline=(75, 45, 110, 255))
+            # Spacebar Neon Magenta
+            create_rounded_rect(d, (148, y, 380, y+key_h), 4, fill=(255, 30, 130, 230), outline=(255, 80, 170, 255))
+            create_rounded_rect(d, (386, y, 420, y+key_h), 4, fill=(45, 24, 70, 255), outline=(75, 45, 110, 255))
+            create_rounded_rect(d, (426, y, 460, y+key_h), 4, fill=(0, 200, 230, 220), outline=(0, 240, 255, 255))
+            create_rounded_rect(d, (466, y, 512, y+key_h), 4, fill=(255, 190, 30, 230), outline=(255, 220, 80, 255))
+        else:
+            cur_x = 28
+            while cur_x < 510:
+                kw = 30
+                if r_idx == 0 and cur_x > 460: kw = 48
+                elif r_idx == 1 and cur_x == 28: kw = 42
+                elif r_idx == 2 and cur_x == 28: kw = 48
+                elif r_idx == 2 and cur_x > 450: kw = 58
+                elif r_idx == 3 and cur_x == 28: kw = 64
+                elif r_idx == 3 and cur_x > 430: kw = 78
+                if cur_x + kw > 514: kw = 514 - cur_x
+                if kw < 10: break
+
+                kfill = (45, 25, 70, 255)
+                kout = (85, 50, 120, 255)
+                if r_idx == 0 and cur_x == 28:
+                    kfill = (255, 30, 130, 240) # Bright neon pink ESC
+                    kout = (255, 90, 180, 255)
+                elif (r_idx == 1 and cur_x in range(95, 140)) or (r_idx == 2 and cur_x in range(75, 185)):
+                    kfill = (255, 45, 140, 220) # Neon Pink WASD
+                    kout = (255, 100, 190, 255)
+                elif r_idx == 2 and cur_x > 440:
+                    kfill = (0, 230, 255, 240) # Cyan Enter
+                    kout = (120, 255, 255, 255)
+
+                create_rounded_rect(d, (cur_x, y, cur_x+kw, y+key_h), 4, fill=kfill, outline=kout)
+                cur_x += kw + 5
+    im.save(os.path.join(sprites_dir, "spr_keyboard_neon.png"))
+    print("Created spr_keyboard_neon.png")
+
+# 19. Desktop Lo-Fi Chillhop Player (160 x 95)
+def make_lofi_player():
+    im = Image.new("RGBA", (160, 95), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Chassis
+    create_rounded_rect(d, (4, 4, 156, 91), 8, fill=(22, 25, 34, 255), outline=(50, 58, 76, 255), width=2)
+    # LED Screen window
+    create_rounded_rect(d, (12, 10, 148, 52), 6, fill=(10, 14, 20, 255), outline=(0, 229, 255, 150), width=1)
+    # Mini cassette reels or visualizer bars
+    d.ellipse([26, 20, 48, 42], fill=(20, 26, 36, 255), outline=(0, 229, 255, 220), width=2)
+    d.ellipse([34, 28, 40, 34], fill=(0, 229, 255, 255))
+    d.ellipse([112, 20, 134, 42], fill=(20, 26, 36, 255), outline=(0, 229, 255, 220), width=2)
+    d.ellipse([120, 28, 126, 34], fill=(0, 229, 255, 255))
+    # Sound wave line between reels
+    d.line([(52, 31), (108, 31)], fill=(0, 229, 255, 180), width=2)
+    # Mini EQ bars in center
+    eq_x = [62, 70, 78, 86, 94]
+    eq_h = [12, 18, 14, 20, 10]
+    for x, h in zip(eq_x, eq_h):
+        d.line([(x, 40), (x, 40 - h)], fill=(0, 255, 136, 220), width=3)
+    # Control buttons row
+    create_rounded_rect(d, (20, 60, 52, 82), 4, fill=(35, 42, 58, 255), outline=(60, 72, 98, 255), width=1)
+    d.polygon([(32, 66), (42, 71), (32, 76)], fill=(0, 255, 136, 255)) # Play icon
+    create_rounded_rect(d, (64, 60, 96, 82), 4, fill=(35, 42, 58, 255), outline=(60, 72, 98, 255), width=1)
+    d.polygon([(74, 66), (82, 71), (74, 76)], fill=(0, 229, 255, 255)) # Next icon
+    d.polygon([(82, 66), (90, 71), (82, 76)], fill=(0, 229, 255, 255))
+    create_rounded_rect(d, (108, 60, 140, 82), 4, fill=(35, 42, 58, 255), outline=(60, 72, 98, 255), width=1)
+    d.ellipse([120, 67, 128, 75], fill=(255, 90, 140, 255)) # Mute/Mode led
+    im.save(os.path.join(sprites_dir, "spr_lofi_player.png"))
+    print("Created spr_lofi_player.png")
+
 make_desk()
 make_monitor_frame()
 make_monitor_screen()
@@ -597,4 +723,7 @@ make_lamp_cone()
 make_cat_stretch()
 make_cat_accessories()
 make_minigame_sprites()
+make_keyboard_retro()
+make_keyboard_neon()
+make_lofi_player()
 print("All sprites successfully generated!")
