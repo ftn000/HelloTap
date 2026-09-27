@@ -81,6 +81,16 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Button roomThemeButton;
     [SerializeField] private TMP_Text roomThemeText;
 
+    [Header("Скины коврика рабочей зоны")]
+    [SerializeField] private Image deskMatImage;
+    [SerializeField] private Sprite sprDeskMatDefault;
+    [SerializeField] private Sprite sprDeskMatFelt;
+    [SerializeField] private Sprite sprDeskMatCyber;
+    [SerializeField] private Sprite sprDeskMatBlueprint;
+    [SerializeField] private Sprite sprDeskMatRGB;
+    [SerializeField] private Button deskMatSkinButton;
+    [SerializeField] private TMP_Text deskMatSkinText;
+
     [Header("Интерактивные напитки и мышь")]
     [SerializeField] private Button mouseButton;
     [SerializeField] private Button coffeeButton;
@@ -316,6 +326,7 @@ public class WorkplaceVisuals : MonoBehaviour
         InitMouseSwitchCustomization();
         InitRoomThemeCustomization();
         InitPetCompanionCustomization();
+        InitDeskMatCustomization();
         InitLighting();
         InitDrinksInteraction();
         InitMouseInteraction();
@@ -2122,6 +2133,70 @@ public class WorkplaceVisuals : MonoBehaviour
         if (animate && catTransform != null)
         {
             StartCoroutine(PopInRoutine(catTransform));
+        }
+    }
+
+    #endregion
+
+    #region Кастомизация коврика (Desk Mat Skins)
+
+    private int currentDeskMatSkin = 0; // 0=Default, 1=Felt, 2=Cyber, 3=Blueprint, 4=RGB
+    private static readonly string[] DeskMatSkinNames = new string[]
+    {
+        "БАЗОВЫЙ",
+        "ВОЙЛОК",
+        "КИБЕР",
+        "ЧЕРТЁЖ",
+        "RGB GLOW"
+    };
+
+    private void InitDeskMatCustomization()
+    {
+        currentDeskMatSkin = PlayerPrefs.GetInt("SelectedDeskMatSkin", 0);
+        ApplyDeskMatSkin(currentDeskMatSkin, false);
+
+        if (deskMatSkinButton != null)
+        {
+            deskMatSkinButton.onClick.RemoveAllListeners();
+            deskMatSkinButton.onClick.AddListener(CycleDeskMatSkin);
+        }
+    }
+
+    public void CycleDeskMatSkin()
+    {
+        currentDeskMatSkin = (currentDeskMatSkin + 1) % 5;
+        PlayerPrefs.SetInt("SelectedDeskMatSkin", currentDeskMatSkin);
+        PlayerPrefs.Save();
+        ApplyDeskMatSkin(currentDeskMatSkin, true);
+
+        HapticFeedback.Vibrate(25);
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayUpgrade();
+        }
+
+        if (ClickJuice.Instance != null && deskMatSkinButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"🟪 КОВРИК: {DeskMatSkinNames[currentDeskMatSkin]}", deskMatSkinButton.transform.position, new Color(0.4f, 0.9f, 1f), true);
+        }
+    }
+
+    private void ApplyDeskMatSkin(int skinIdx, bool animate)
+    {
+        if (deskMatImage != null)
+        {
+            Sprite targetSprite = sprDeskMatDefault;
+            if (skinIdx == 1 && sprDeskMatFelt != null) targetSprite = sprDeskMatFelt;
+            else if (skinIdx == 2 && sprDeskMatCyber != null) targetSprite = sprDeskMatCyber;
+            else if (skinIdx == 3 && sprDeskMatBlueprint != null) targetSprite = sprDeskMatBlueprint;
+            else if (skinIdx == 4 && sprDeskMatRGB != null) targetSprite = sprDeskMatRGB;
+
+            if (targetSprite != null) deskMatImage.sprite = targetSprite;
+        }
+
+        if (deskMatSkinText != null)
+        {
+            deskMatSkinText.text = $"🟪 {DeskMatSkinNames[currentDeskMatSkin]}";
         }
     }
 

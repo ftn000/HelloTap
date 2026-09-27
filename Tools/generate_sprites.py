@@ -1073,6 +1073,134 @@ def make_streak_sprites():
     im_crown.save(os.path.join(sprites_dir, "spr_crown_badge.png"))
     print("Created spr_crown_badge.png")
 
+# 24. Lucky Wheel Sprites (Wheel Base 512x512 + Pointer 64x80)
+def make_wheel_sprites():
+    # spr_wheel_base.png
+    im_wheel = Image.new("RGBA", (512, 512), (0, 0, 0, 0))
+    dw = ImageDraw.Draw(im_wheel)
+    
+    # Outer gold rim shadow & glow
+    dw.ellipse([8, 8, 504, 504], fill=(255, 190, 20, 80))
+    dw.ellipse([12, 12, 500, 500], fill=(20, 24, 34, 255), outline=(255, 215, 0, 255), width=8)
+    
+    # 8 vibrant sector colors
+    sector_colors = [
+        (46, 204, 113, 255),   # 0: +5,000 руб. (Emerald Green)
+        (52, 152, 219, 255),   # 1: +2,000 строк (Sky Blue)
+        (241, 196, 15, 255),   # 2: ⚡ Буст x2 30с (Electric Gold)
+        (26, 188, 156, 255),   # 3: +25,000 руб. (Bright Teal)
+        (155, 89, 182, 255),   # 4: +10,000 строк (Purple)
+        (230, 126, 34, 255),   # 5: 🎁 ДЖЕКПОТ 100K (Flame Orange)
+        (231, 76, 60, 255),    # 6: ⚡ МЕГА-БУСТ x3 (Ruby Red)
+        (44, 62, 80, 255),     # 7: 🐛 Баг-клинер (Midnight Slate)
+    ]
+    
+    cx, cy, r = 256, 256, 236
+    for idx, col in enumerate(sector_colors):
+        start_deg = idx * 45.0 - 22.5
+        end_deg = start_deg + 45.0
+        dw.pieslice([cx - r, cy - r, cx + r, cy + r], start=start_deg, end=end_deg, fill=col, outline=(255, 240, 150, 220), width=2)
+        
+        # Sector inner icon badge / pill
+        mid_rad = math.radians(start_deg + 22.5)
+        ix = cx + int(145 * math.cos(mid_rad))
+        iy = cy + int(145 * math.sin(mid_rad))
+        dw.ellipse([ix - 16, iy - 16, ix + 16, iy + 16], fill=(16, 20, 30, 220), outline=(255, 255, 255, 200), width=2)
+        # Accent center dot
+        dw.ellipse([ix - 6, iy - 6, ix + 6, iy + 6], fill=col)
+
+    # 16 Gold perimeter pegs
+    for peg in range(16):
+        peg_rad = math.radians(peg * 22.5)
+        px = cx + int(240 * math.cos(peg_rad))
+        py = cy + int(240 * math.sin(peg_rad))
+        dw.ellipse([px - 5, py - 5, px + 5, py + 5], fill=(255, 240, 120, 255), outline=(180, 130, 10, 255), width=2)
+
+    # Center Hub (Double ring + Golden Star)
+    dw.ellipse([cx - 48, cy - 48, cx + 48, cy + 48], fill=(24, 28, 40, 255), outline=(255, 215, 0, 255), width=5)
+    dw.ellipse([cx - 32, cy - 32, cx + 32, cy + 32], fill=(16, 18, 26, 255), outline=(0, 229, 255, 200), width=2)
+    # Center golden dot
+    dw.ellipse([cx - 12, cy - 12, cx + 12, cy + 12], fill=(255, 215, 0, 255))
+    
+    im_wheel.save(os.path.join(sprites_dir, "spr_wheel_base.png"))
+    print("Created spr_wheel_base.png")
+
+    # spr_wheel_pointer.png (64x80)
+    im_ptr = Image.new("RGBA", (64, 80), (0, 0, 0, 0))
+    dp = ImageDraw.Draw(im_ptr)
+    
+    # Outer drop shadow
+    dp.polygon([(14, 8), (50, 8), (32, 74)], fill=(0, 0, 0, 120))
+    # Golden Downward Arrow
+    dp.polygon([(12, 6), (52, 6), (32, 70)], fill=(255, 195, 20, 255), outline=(255, 245, 140, 255))
+    # Inner bevel
+    dp.polygon([(20, 12), (44, 12), (32, 56)], fill=(240, 160, 10, 255))
+    # Cyan Ruby Gem in pointer base
+    dp.polygon([(32, 14), (42, 26), (32, 38), (22, 26)], fill=(0, 229, 255, 255), outline=(255, 255, 255, 230), width=1)
+    
+    im_ptr.save(os.path.join(sprites_dir, "spr_wheel_pointer.png"))
+    print("Created spr_wheel_pointer.png")
+
+# 25. Desk Mat Skins (1200x700: Cozy Felt, Cyber Grid, Retro Blueprint, RGB Edge Glow)
+def make_desk_mat_skins():
+    # 1. Felt Wool Mat
+    im_felt = Image.new("RGBA", (1200, 700), (0, 0, 0, 0))
+    df = ImageDraw.Draw(im_felt)
+    create_rounded_rect(df, (20, 20, 1180, 680), 24, fill=(22, 24, 28, 255), outline=(36, 40, 48, 255), width=3)
+    create_rounded_rect(df, (80, 120, 1120, 640), 16, fill=(40, 44, 52, 255), outline=(70, 76, 90, 255), width=2)
+    # Stitched seam line
+    create_rounded_rect(df, (90, 130, 1110, 630), 12, fill=None, outline=(150, 160, 180, 140), width=2)
+    # Leather tag
+    create_rounded_rect(df, (980, 140, 1090, 175), 4, fill=(90, 55, 35, 255), outline=(130, 85, 55, 255), width=1)
+    im_felt.save(os.path.join(sprites_dir, "spr_desk_mat_felt.png"))
+    print("Created spr_desk_mat_felt.png")
+
+    # 2. Cyber Grid Mat
+    im_cyb = Image.new("RGBA", (1200, 700), (0, 0, 0, 0))
+    dcy = ImageDraw.Draw(im_cyb)
+    create_rounded_rect(dcy, (20, 20, 1180, 680), 24, fill=(12, 14, 20, 255), outline=(24, 30, 44, 255), width=3)
+    create_rounded_rect(dcy, (80, 120, 1120, 640), 16, fill=(10, 16, 28, 255), outline=(0, 240, 255, 220), width=2)
+    # Grid lines inside mat
+    for gx in range(120, 1100, 50):
+        dcy.line([(gx, 122), (gx, 638)], fill=(0, 200, 255, 30), width=1)
+    for gy in range(150, 620, 40):
+        dcy.line([(82, gy), (1118, gy)], fill=(0, 200, 255, 30), width=1)
+    # Cyber corner brackets
+    dcy.line([(95, 135), (145, 135)], fill=(0, 240, 255, 240), width=3)
+    dcy.line([(95, 135), (95, 185)], fill=(0, 240, 255, 240), width=3)
+    dcy.line([(1105, 625), (1055, 625)], fill=(0, 240, 255, 240), width=3)
+    dcy.line([(1105, 625), (1105, 575)], fill=(0, 240, 255, 240), width=3)
+    im_cyb.save(os.path.join(sprites_dir, "spr_desk_mat_cyber.png"))
+    print("Created spr_desk_mat_cyber.png")
+
+    # 3. Retro Blueprint Mat
+    im_bp = Image.new("RGBA", (1200, 700), (0, 0, 0, 0))
+    dbp = ImageDraw.Draw(im_bp)
+    create_rounded_rect(dbp, (20, 20, 1180, 680), 24, fill=(14, 20, 32, 255), outline=(28, 42, 68, 255), width=3)
+    create_rounded_rect(dbp, (80, 120, 1120, 640), 16, fill=(18, 44, 88, 255), outline=(120, 190, 255, 220), width=2)
+    # Fine blueprint grid
+    for bx in range(100, 1110, 25):
+        dbp.line([(bx, 122), (bx, 638)], fill=(160, 210, 255, 35), width=1)
+    for by in range(135, 630, 25):
+        dbp.line([(82, by), (1118, by)], fill=(160, 210, 255, 35), width=1)
+    # Technical blueprint watermark header
+    dbp.rectangle([100, 140, 240, 165], fill=(12, 30, 65, 220), outline=(120, 190, 255, 180), width=1)
+    im_bp.save(os.path.join(sprites_dir, "spr_desk_mat_blueprint.png"))
+    print("Created spr_desk_mat_blueprint.png")
+
+    # 4. Premium RGB Edge Glow Mat
+    im_rgb = Image.new("RGBA", (1200, 700), (0, 0, 0, 0))
+    drgb = ImageDraw.Draw(im_rgb)
+    create_rounded_rect(drgb, (20, 20, 1180, 680), 24, fill=(14, 15, 18, 255), outline=(32, 34, 42, 255), width=3)
+    create_rounded_rect(drgb, (80, 120, 1120, 640), 16, fill=(12, 13, 16, 255))
+    # Rainbow perimeter glow
+    drgb.line([(96, 122), (1104, 122)], fill=(0, 235, 255, 230), width=4)   # Cyan top
+    drgb.line([(1118, 136), (1118, 624)], fill=(255, 0, 180, 230), width=4) # Magenta right
+    drgb.line([(1104, 638), (96, 638)], fill=(255, 190, 0, 230), width=4)   # Gold bottom
+    drgb.line([(82, 624), (82, 136)], fill=(0, 255, 140, 230), width=4)     # Lime left
+    im_rgb.save(os.path.join(sprites_dir, "spr_desk_mat_rgb.png"))
+    print("Created spr_desk_mat_rgb.png")
+
 make_desk()
 make_monitor_frame()
 make_monitor_screen()
@@ -1102,4 +1230,6 @@ make_quest_icon()
 make_corgi_pet()
 make_robo_pet()
 make_streak_sprites()
+make_wheel_sprites()
+make_desk_mat_skins()
 print("All sprites successfully generated!")

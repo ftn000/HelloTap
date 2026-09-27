@@ -35,6 +35,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip dogBarkSound;
     [SerializeField] private AudioClip roboBeepSound;
     [SerializeField] private AudioClip streakClaimSound;
+    [SerializeField] private AudioClip wheelTickSound;
+    [SerializeField] private AudioClip wheelWinSound;
     [SerializeField] private AudioClip lampSwitchSound;
     [SerializeField] private AudioClip bugSquashSound;
     [SerializeField] private AudioClip crateCollectSound;
@@ -452,6 +454,26 @@ public class AudioManager : MonoBehaviour
         {
             sfxSource.pitch = 1.0f;
             sfxSource.PlayOneShot(streakClaimSound, 0.95f);
+        }
+    }
+
+    public void PlayWheelTick()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (wheelTickSound != null)
+        {
+            sfxSource.pitch = Random.Range(0.96f, 1.05f);
+            sfxSource.PlayOneShot(wheelTickSound, 0.70f);
+        }
+    }
+
+    public void PlayWheelWin()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (wheelWinSound != null)
+        {
+            sfxSource.pitch = 1.0f;
+            sfxSource.PlayOneShot(wheelWinSound, 0.95f);
         }
     }
 

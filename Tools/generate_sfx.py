@@ -703,6 +703,36 @@ def make_quest_complete(duration=0.85):
 
     return samples
 
+def make_wheel_tick(duration=0.04):
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        # Crisp click needle hit: 3400 Hz decay + wood spoke thud at 480 Hz
+        click = math.sin(2.0 * math.pi * 3400.0 * t) * math.exp(-t * 280.0) * 0.95
+        thud = math.sin(2.0 * math.pi * 480.0 * t) * math.exp(-t * 110.0) * 0.65
+        noise = (random.random() * 2.0 - 1.0) * math.exp(-t * 320.0) * 0.35
+        samples.append(click + thud + noise)
+    return samples
+
+def make_wheel_win(duration=1.2):
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+    # Grand 5-note fanfare arpeggio: C5, E5, G5, C6, G6
+    notes = [(0.0, 523.25), (0.12, 659.25), (0.24, 783.99), (0.36, 1046.50), (0.50, 1567.98)]
+    for n_start, freq in notes:
+        s_idx = int(n_start * SAMPLE_RATE)
+        n_len = min(int((duration - n_start) * SAMPLE_RATE), total_samples - s_idx)
+        for i in range(n_len):
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 4.2) * 0.35
+            sig = (math.sin(2.0 * math.pi * freq * t) +
+                   0.50 * math.sin(2.0 * math.pi * freq * 2.0 * t) +
+                   0.25 * math.sin(2.0 * math.pi * freq * 3.0 * t) +
+                   0.12 * math.sin(2.0 * math.pi * freq * 4.0 * t))
+            samples[s_idx + i] += sig * env
+    return samples
+
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
@@ -733,4 +763,6 @@ save_wav(os.path.join(out_dir, "synthwave_night_loop.wav"), make_synthwave_track
 save_wav(os.path.join(out_dir, "rain_ambience_loop.wav"), make_rain_ambience())
 save_wav(os.path.join(out_dir, "night_ambience_loop.wav"), make_night_ambience())
 save_wav(os.path.join(out_dir, "quest_complete.wav"), make_quest_complete())
+save_wav(os.path.join(out_dir, "wheel_tick.wav"), make_wheel_tick())
+save_wav(os.path.join(out_dir, "wheel_win.wav"), make_wheel_win())
 print("All sound effects generated successfully!")

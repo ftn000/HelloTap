@@ -392,6 +392,20 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Списание денег (на покупку спинов колеса, предметов и т.д.)
+    /// </summary>
+    public bool SpendMoney(double amount)
+    {
+        if (amount <= 0) return true;
+        if (money < amount) return false;
+
+        money -= amount;
+        OnCurrenciesChanged?.Invoke();
+        SaveGame();
+        return true;
+    }
+
+    /// <summary>
     /// Награда за обезвреживание бага на мониторе
     /// </summary>
     public void ClaimBugFixReward(Vector2 screenPos, out double bonusCode, out double bonusMoney)

@@ -82,6 +82,8 @@ GUID_LOFI_PLAYER_UI = "8a100000000000000000000000000005"
 GUID_SESSION_ANALYTICS_UI = "8a100000000000000000000000000006"
 GUID_DAILY_QUESTS_UI = "8a100000000000000000000000000007"
 GUID_DAILY_STREAK_UI = "8a100000000000000000000000000008"
+GUID_LUCKY_WHEEL_UI = "8a100000000000000000000000000009"
+GUID_SAVE_EXPORT_UI = "8a10000000000000000000000000000a"
 
 # Keyboard Variant Sprites, LoFi Player, Wallpapers, Quest Icon, Pets & Streak
 GUID_SPR_KEYBOARD_RETRO = "7b300000000000000000000000000020"
@@ -97,6 +99,12 @@ GUID_SPR_ROBO_SLEEP = "7b300000000000000000000000000029"
 GUID_SPR_ROBO_AWAKE = "7b30000000000000000000000000002a"
 GUID_SPR_STREAK_FLAME = "7b30000000000000000000000000002b"
 GUID_SPR_CROWN_BADGE = "7b30000000000000000000000000002c"
+GUID_SPR_WHEEL_BASE = "7b30000000000000000000000000002d"
+GUID_SPR_WHEEL_POINTER = "7b30000000000000000000000000002e"
+GUID_SPR_MAT_FELT = "7b30000000000000000000000000002f"
+GUID_SPR_MAT_CYBER = "7b300000000000000000000000000030"
+GUID_SPR_MAT_BLUEPRINT = "7b300000000000000000000000000031"
+GUID_SPR_MAT_RGB = "7b300000000000000000000000000032"
 
 # Audio SFX & Music Loops
 GUID_SFX_CASSETTE_CLICK = "9a200000000000000000000000000016"
@@ -111,6 +119,8 @@ GUID_SFX_MOUSE_SILENT = "9a200000000000000000000000000024"
 GUID_SFX_CORGI_BARK = "9a200000000000000000000000000025"
 GUID_SFX_ROBO_BEEP = "9a200000000000000000000000000026"
 GUID_SFX_STREAK_CLAIM = "9a200000000000000000000000000027"
+GUID_SFX_WHEEL_TICK = "9a200000000000000000000000000028"
+GUID_SFX_WHEEL_WIN = "9a200000000000000000000000000029"
 
 out = []
 def add(s=""):
@@ -843,6 +853,8 @@ add("  - {fileID: 8300000, guid: " + GUID_SFX_MOUSE_SILENT + ", type: 3}")
 add("  dogBarkSound: {fileID: 8300000, guid: " + GUID_SFX_CORGI_BARK + ", type: 3}")
 add("  roboBeepSound: {fileID: 8300000, guid: " + GUID_SFX_ROBO_BEEP + ", type: 3}")
 add("  streakClaimSound: {fileID: 8300000, guid: " + GUID_SFX_STREAK_CLAIM + ", type: 3}")
+add("  wheelTickSound: {fileID: 8300000, guid: " + GUID_SFX_WHEEL_TICK + ", type: 3}")
+add("  wheelWinSound: {fileID: 8300000, guid: " + GUID_SFX_WHEEL_WIN + ", type: 3}")
 add("  lampSwitchSound: {fileID: 8300000, guid: " + GUID_SFX_LAMP_SWITCH + ", type: 3}")
 add("  bugSquashSound: {fileID: 8300000, guid: " + GUID_SFX_BUG_SQUASH + ", type: 3}")
 add("  crateCollectSound: {fileID: 8300000, guid: " + GUID_SFX_CRATE_COLLECT + ", type: 3}")
@@ -959,7 +971,7 @@ add_image(1400002, 1400000, None, color=(0.03, 0.035, 0.05, 1.0), raycast=0)
 
 # MobileFrame (Full Responsive Stretch Canvas Container)
 add_go(1500000, "MobileFrame", [1500001, 1500003, 1500002])
-add_rect(1500001, 1500000, 1442568835, [1502001, 3000001, 3090001, 2010001, 2080001, 1501001, 4000001, 5000001, 6000001, 7000001, 8000001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(1500001, 1500000, 1442568835, [1502001, 3000001, 3090001, 2010001, 2080001, 1501001, 4000001, 5000001, 6000001, 7000001, 8000001, 8100001, 8200001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(1500003, 1500000)
 add_image(1500002, 1500000, None, color=(0.055, 0.065, 0.09, 1.0), raycast=0)
 
@@ -993,64 +1005,64 @@ add_rect(2010001, 2010000, 1500001, [2011001, 2020001, 2030001], amin=(0,1), ama
 add_cr(2010003, 2010000)
 add_image(2010002, 2010000, None, color=(0.07, 0.086, 0.12, 0.95), raycast=0)
 
-# Row 1: Top mini-controls (Reset, Mute, TimeOfDay, Analytics, Quests, Streak, Boost)
+# Row 1: Top mini-controls (Reset, Mute, TimeOfDay, Analytics, Quests, Streak, Wheel, Save, Boost)
 add_go(2011000, "TopControlsRow", [2011001])
-add_rect(2011001, 2011000, 2010001, [2060001, 2050001, 2070001, 2090001, 2100001, 2110001, 2040001], amin=(0, 1), amax=(1, 1), pos=(0, -40), size=(-40, 60), pivot=(0.5, 0.5))
+add_rect(2011001, 2011000, 2010001, [2060001, 2050001, 2070001, 2090001, 2100001, 2110001, 2120001, 2130001, 2040001], amin=(0, 1), amax=(1, 1), pos=(0, -40), size=(-40, 60), pivot=(0.5, 0.5))
 
 # ResetButton (Lab requirement)
 add_go(2060000, "ResetButton", [2060001, 2060004, 2060002, 2060003])
-add_rect(2060001, 2060000, 2011001, [2061001], amin=(0, 0.5), amax=(0, 0.5), pos=(45, 0), size=(85, 56), pivot=(0.5, 0.5))
+add_rect(2060001, 2060000, 2011001, [2061001], amin=(0, 0.5), amax=(0, 0.5), pos=(40, 0), size=(76, 56), pivot=(0.5, 0.5))
 add_cr(2060004, 2060000)
 add_image(2060002, 2060000, GUID_SPR_BTN_ORANGE, img_type=1)
 add_button(2060003, 2060000, 2060002)
 add_go(2061000, "ResetBtnText", [2061001, 2061003, 2061002])
 add_rect(2061001, 2061000, 2060001, [], amin=(0,0), amax=(1,1))
 add_cr(2061003, 2061000)
-add_tmp(2061002, 2061000, "СБРОС", fsize=14, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=10, fmax=16)
+add_tmp(2061002, 2061000, "СБРОС", fsize=13, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=9, fmax=15)
 
 # AudioMuteButton
 add_go(2050000, "AudioMuteButton", [2050001, 2050004, 2050002, 2050003, 2050005])
-add_rect(2050001, 2050000, 2011001, [2051001], amin=(0, 0.5), amax=(0, 0.5), pos=(140, 0), size=(95, 56), pivot=(0.5, 0.5))
+add_rect(2050001, 2050000, 2011001, [2051001], amin=(0, 0.5), amax=(0, 0.5), pos=(124, 0), size=(82, 56), pivot=(0.5, 0.5))
 add_cr(2050004, 2050000)
 add_image(2050002, 2050000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(2050003, 2050000, 2050002)
 add_go(2051000, "MuteIcon", [2051001, 2051003, 2051002])
 add_rect(2051001, 2051000, 2050001, [], amin=(0,0), amax=(1,1))
 add_cr(2051003, 2051000)
-add_tmp(2051002, 2051000, "ЗВУК", fsize=14, fstyle=1, color=(0.2, 0.95, 0.65, 1), align=514, autosize=1, fmin=10, fmax=16)
+add_tmp(2051002, 2051000, "ЗВУК", fsize=13, fstyle=1, color=(0.2, 0.95, 0.65, 1), align=514, autosize=1, fmin=9, fmax=15)
 
 # TimeOfDayToggleBtn
 add_go(2070000, "TimeOfDayToggleBtn", [2070001, 2070004, 2070002, 2070003])
-add_rect(2070001, 2070000, 2011001, [2071001], amin=(0, 0.5), amax=(0, 0.5), pos=(245, 0), size=(105, 56), pivot=(0.5, 0.5))
+add_rect(2070001, 2070000, 2011001, [2071001], amin=(0, 0.5), amax=(0, 0.5), pos=(218, 0), size=(96, 56), pivot=(0.5, 0.5))
 add_cr(2070004, 2070000)
 add_image(2070002, 2070000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(2070003, 2070000, 2070002)
 add_go(2071000, "TimeOfDayTxt", [2071001, 2071003, 2071002])
 add_rect(2071001, 2071000, 2070001, [], amin=(0,0), amax=(1,1))
 add_cr(2071003, 2071000)
-add_tmp(2071002, 2071000, "☀️ ДЕНЬ", fsize=13, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=9, fmax=15)
+add_tmp(2071002, 2071000, "☀️ ДЕНЬ", fsize=12, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=9, fmax=14)
 
 # AnalyticsButton (Session Productivity Dashboard Modal Trigger)
 add_go(2090000, "AnalyticsButton", [2090001, 2090004, 2090002, 2090003])
-add_rect(2090001, 2090000, 2011001, [2091001], amin=(0, 0.5), amax=(0, 0.5), pos=(360, 0), size=(115, 56), pivot=(0.5, 0.5))
+add_rect(2090001, 2090000, 2011001, [2091001], amin=(0, 0.5), amax=(0, 0.5), pos=(324, 0), size=(104, 56), pivot=(0.5, 0.5))
 add_cr(2090004, 2090000)
 add_image(2090002, 2090000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(2090003, 2090000, 2090002)
 add_go(2091000, "AnalyticsBtnTxt", [2091001, 2091003, 2091002])
 add_rect(2091001, 2091000, 2090001, [], amin=(0,0), amax=(1,1))
 add_cr(2091003, 2091000)
-add_tmp(2091002, 2091000, "📊 СТАТЫ", fsize=13, fstyle=1, color=(1, 0.95, 0.5, 1), align=514, autosize=1, fmin=9, fmax=15)
+add_tmp(2091002, 2091000, "📊 СТАТЫ", fsize=12, fstyle=1, color=(1, 0.95, 0.5, 1), align=514, autosize=1, fmin=9, fmax=14)
 
 # QuestsButton (Daily Dev Challenges Modal Trigger)
 add_go(2100000, "QuestsButton", [2100001, 2100004, 2100002, 2100003])
-add_rect(2100001, 2100000, 2011001, [2101001, 2102001], amin=(0, 0.5), amax=(0, 0.5), pos=(480, 0), size=(115, 56), pivot=(0.5, 0.5))
+add_rect(2100001, 2100000, 2011001, [2101001, 2102001], amin=(0, 0.5), amax=(0, 0.5), pos=(436, 0), size=(108, 56), pivot=(0.5, 0.5))
 add_cr(2100004, 2100000)
 add_image(2100002, 2100000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(2100003, 2100000, 2100002)
 add_go(2101000, "QuestsBtnTxt", [2101001, 2101003, 2101002])
 add_rect(2101001, 2101000, 2100001, [], amin=(0,0), amax=(1,1))
 add_cr(2101003, 2101000)
-add_tmp(2101002, 2101000, "🎯 КВЕСТЫ", fsize=13, fstyle=1, color=(0.4, 1, 0.8, 1), align=514, autosize=1, fmin=9, fmax=15)
+add_tmp(2101002, 2101000, "🎯 КВЕСТЫ", fsize=12, fstyle=1, color=(0.4, 1, 0.8, 1), align=514, autosize=1, fmin=9, fmax=14)
 
 # QuestBadgeDot (Notification indicator when a quest is ready to claim)
 add_go(2102000, "QuestBadgeDot", [2102001, 2102003, 2102002], active=0)
@@ -1060,7 +1072,7 @@ add_image(2102002, 2102000, GUID_SPR_BTN_ORANGE, img_type=1)
 
 # StreakButton (Daily login streak reward modal button)
 add_go(2110000, "StreakButton", [2110001, 2110004, 2110002, 2110003])
-add_rect(2110001, 2110000, 2011001, [2111001, 2112001], amin=(0, 0.5), amax=(0, 0.5), pos=(605, 0), size=(115, 56), pivot=(0.5, 0.5))
+add_rect(2110001, 2110000, 2011001, [2111001, 2112001], amin=(0, 0.5), amax=(0, 0.5), pos=(548, 0), size=(104, 56), pivot=(0.5, 0.5))
 add_cr(2110004, 2110000)
 add_image(2110002, 2110000, GUID_SPR_BTN_CYAN, img_type=1)
 add_button(2110003, 2110000, 2110002)
@@ -1068,13 +1080,43 @@ add_button(2110003, 2110000, 2110002)
 add_go(2111000, "StreakBtnTxt", [2111001, 2111003, 2111002])
 add_rect(2111001, 2111000, 2110001, [], amin=(0,0), amax=(1,1))
 add_cr(2111003, 2111000)
-add_tmp(2111002, 2111000, "🔥 1 ДН.", fsize=13, fstyle=1, color=(1, 0.85, 0.3, 1), align=514, autosize=1, fmin=9, fmax=15)
+add_tmp(2111002, 2111000, "🔥 1 ДН.", fsize=12, fstyle=1, color=(1, 0.85, 0.3, 1), align=514, autosize=1, fmin=9, fmax=14)
 
 # StreakBadgeDot (Notification indicator when today's streak reward is available)
 add_go(2112000, "StreakBadgeDot", [2112001, 2112003, 2112002], active=0)
 add_rect(2112001, 2112000, 2110001, [], amin=(1, 1), amax=(1, 1), pos=(-10, -10), size=(18, 18), pivot=(0.5, 0.5))
 add_cr(2112003, 2112000)
 add_image(2112002, 2112000, GUID_SPR_BTN_ORANGE, img_type=1)
+
+# WheelButton (Dev Lucky Wheel Modal Trigger)
+add_go(2120000, "WheelButton", [2120001, 2120004, 2120002, 2120003])
+add_rect(2120001, 2120000, 2011001, [2121001, 2122001], amin=(0, 0.5), amax=(0, 0.5), pos=(658, 0), size=(104, 56), pivot=(0.5, 0.5))
+add_cr(2120004, 2120000)
+add_image(2120002, 2120000, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(2120003, 2120000, 2120002)
+
+add_go(2121000, "WheelBtnTxt", [2121001, 2121003, 2121002])
+add_rect(2121001, 2121000, 2120001, [], amin=(0,0), amax=(1,1))
+add_cr(2121003, 2121000)
+add_tmp(2121002, 2121000, "🎡 СПИН", fsize=12, fstyle=1, color=(1, 0.9, 0.35, 1), align=514, autosize=1, fmin=9, fmax=14)
+
+# WheelBadgeDot (Notification indicator when a free spin is available)
+add_go(2122000, "WheelBadgeDot", [2122001, 2122003, 2122002], active=0)
+add_rect(2122001, 2122000, 2120001, [], amin=(1, 1), amax=(1, 1), pos=(-10, -10), size=(18, 18), pivot=(0.5, 0.5))
+add_cr(2122003, 2122000)
+add_image(2122002, 2122000, GUID_SPR_BTN_ORANGE, img_type=1)
+
+# SaveButton (Save Manager & Cloud Export Modal Trigger)
+add_go(2130000, "SaveButton", [2130001, 2130004, 2130002, 2130003])
+add_rect(2130001, 2130000, 2011001, [2131001], amin=(0, 0.5), amax=(0, 0.5), pos=(764, 0), size=(96, 56), pivot=(0.5, 0.5))
+add_cr(2130004, 2130000)
+add_image(2130002, 2130000, GUID_SPR_CARD_BG, color=(0.10, 0.14, 0.22, 0.95), img_type=1)
+add_button(2130003, 2130000, 2130002)
+
+add_go(2131000, "SaveBtnTxt", [2131001, 2131003, 2131002])
+add_rect(2131001, 2131000, 2130001, [], amin=(0,0), amax=(1,1))
+add_cr(2131003, 2131000)
+add_tmp(2131002, 2131000, "💾 СЕЙВ", fsize=12, fstyle=1, color=(0.4, 0.9, 1, 1), align=514, autosize=1, fmin=9, fmax=14)
 
 # AudioToggleButton
 add(f"--- !u!114 &2050005")
@@ -1094,18 +1136,18 @@ add("  button: {fileID: 2050003}")
 
 # EnergyBoostButton
 add_go(2040000, "EnergyBoostButton", [2040001, 2040004, 2040002, 2040003])
-add_rect(2040001, 2040000, 2011001, [2041001, 2042001], amin=(1, 0.5), amax=(1, 0.5), pos=(-150, 0), size=(280, 56), pivot=(0.5, 0.5))
+add_rect(2040001, 2040000, 2011001, [2041001, 2042001], amin=(1, 0.5), amax=(1, 0.5), pos=(-105, 0), size=(190, 56), pivot=(0.5, 0.5))
 add_cr(2040004, 2040000)
 add_image(2040002, 2040000, GUID_SPR_BTN_GOLD, img_type=1)
 add_button(2040003, 2040000, 2040002)
 add_go(2041000, "BoostBtnText", [2041001, 2041003, 2041002])
 add_rect(2041001, 2041000, 2040001, [], amin=(0, 0.45), amax=(1, 1), pos=(0, 0), size=(0, 0))
 add_cr(2041003, 2041000)
-add_tmp(2041002, 2041000, "ЭНЕРГЕТИК x2", fsize=16, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=12, fmax=16)
+add_tmp(2041002, 2041000, "ЭНЕРГЕТИК x2", fsize=14, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=11, fmax=15)
 add_go(2042000, "BoostTimerText", [2042001, 2042003, 2042002])
 add_rect(2042001, 2042000, 2040001, [], amin=(0, 0), amax=(1, 0.45), pos=(0, 0), size=(0, 0))
 add_cr(2042003, 2042000)
-add_tmp(2042002, 2042000, "ГОТОВО К ПУСКУ", fsize=12, fstyle=1, color=(1, 0.9, 0.4, 1), align=514, autosize=1, fmin=10, fmax=13)
+add_tmp(2042002, 2042000, "ГОТОВО К ПУСКУ", fsize=11, fstyle=1, color=(1, 0.9, 0.4, 1), align=514, autosize=1, fmin=9, fmax=12)
 
 # Row 2: Code Counter Text & Stats
 add_go(2020000, "CodeBlock", [2020001])
@@ -1136,9 +1178,20 @@ add_rect(3000001, 3000000, 1500001, [3010001, 3080001, 3011001], amin=(0, 0), am
 
 # DeskMat (Background desk surface)
 add_go(3010000, "DeskMat", [3010001, 3010003, 3010002])
-add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001, 3015001, 3016001, 3042001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001, 3015001, 3016001, 3042001, 3017001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3010003, 3010000)
 add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
+
+# DeskMatSkinBtn (Quick desk mousepad texture skin changer)
+add_go(3017000, "DeskMatSkinBtn", [3017001, 3017004, 3017002, 3017003])
+add_rect(3017001, 3017000, 3010001, [3017011], amin=(0.5, 1), amax=(0.5, 1), pos=(-430, -120), size=(130, 36), pivot=(0.5, 0.5))
+add_cr(3017004, 3017000)
+add_image(3017002, 3017000, GUID_SPR_CARD_BG, color=(0.10, 0.14, 0.22, 0.95), img_type=1)
+add_button(3017003, 3017000, 3017002)
+add_go(3017010, "DeskMatSkinTxt", [3017011, 3017013, 3017012])
+add_rect(3017011, 3017010, 3017001, [], amin=(0,0), amax=(1,1))
+add_cr(3017013, 3017010)
+add_tmp(3017012, 3017010, "🟪 БАЗОВЫЙ", fsize=10, fstyle=1, color=(0.6, 0.85, 1, 1), align=514, autosize=1, fmin=8, fmax=12)
 
 # RoomThemeBtn (Quick room background style changer on desk mat)
 add_go(3016000, "RoomThemeBtn", [3016001, 3016004, 3016002, 3016003])
@@ -1779,6 +1832,14 @@ add("  sprRoboAwake: {fileID: 21300000, guid: " + GUID_SPR_ROBO_AWAKE + ", type:
 add("  petSelectorButton: {fileID: 3074003}")
 add("  petSelectorText: {fileID: 3074012}")
 add("  stickerCrown: {fileID: 3022500}")
+add("  deskMatImage: {fileID: 3010002}")
+add("  sprDeskMatDefault: {fileID: 21300000, guid: " + GUID_SPR_DESK + ", type: 3}")
+add("  sprDeskMatFelt: {fileID: 21300000, guid: " + GUID_SPR_MAT_FELT + ", type: 3}")
+add("  sprDeskMatCyber: {fileID: 21300000, guid: " + GUID_SPR_MAT_CYBER + ", type: 3}")
+add("  sprDeskMatBlueprint: {fileID: 21300000, guid: " + GUID_SPR_MAT_BLUEPRINT + ", type: 3}")
+add("  sprDeskMatRGB: {fileID: 21300000, guid: " + GUID_SPR_MAT_RGB + ", type: 3}")
+add("  deskMatSkinButton: {fileID: 3017003}")
+add("  deskMatSkinText: {fileID: 3017012}")
 
 # ClickJuice component
 add(f"--- !u!114 &3000003")
@@ -2821,6 +2882,301 @@ add("  claimTodayBtn: {fileID: 8005003}")
 add("  claimTodayBtnText: {fileID: 8005012}")
 add("  crownStickerObj: {fileID: 3022500}")
 add("  streakClaimSound: {fileID: 8300000, guid: " + GUID_SFX_STREAK_CLAIM + ", type: 3}")
+
+# ==============================================================
+# 5.6 DEV LUCKY WHEEL MODAL (Spin for jackpots, boosts & rewards)
+# ==============================================================
+add_go(8100000, "LuckyWheelModalRoot", [8100001, 8100004], active=0)
+add_rect(8100001, 8100000, 1500001, [8101001, 8102001], amin=(0,0), amax=(1,1))
+
+# Dim Backdrop
+add_go(8101000, "WheelBackdrop", [8101001, 8101004, 8101002, 8101003])
+add_rect(8101001, 8101000, 8100001, [], amin=(0,0), amax=(1,1))
+add_cr(8101004, 8101000)
+add_image(8101002, 8101000, None, color=(0.02, 0.03, 0.05, 0.85), raycast=1)
+add_button(8101003, 8101000, 8101002)
+
+# Modal Card Container
+add_go(8102000, "WheelCard", [8102001, 8102004, 8102002])
+add_rect(8102001, 8102000, 8100001, [8103001, 8104001, 8105001, 8106001, 8107001, 8108001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(940, 1200), pivot=(0.5, 0.5))
+add_cr(8102004, 8102000)
+add_image(8102002, 8102000, GUID_SPR_CARD_BG, color=(0.09, 0.11, 0.16, 0.98), img_type=1)
+
+# Modal Header (Title + Close X Button + Subtitle)
+add_go(8103000, "WheelHeader", [8103001])
+add_rect(8103001, 8103000, 8102001, [8103101, 8103201, 8103301], amin=(0, 1), amax=(1, 1), pos=(0, -45), size=(0, 110), pivot=(0.5, 1))
+
+add_go(8103100, "WheelHeaderTitle", [8103101, 8103103, 8103102])
+add_rect(8103101, 8103100, 8103001, [], amin=(0, 1), amax=(1, 1), pos=(-30, -22), size=(0, 42), pivot=(0.5, 0.5))
+add_cr(8103103, 8103100)
+add_tmp(8103102, 8103100, "🎡 КОЛЕСО ФОРТУНЫ", fsize=26, fstyle=1, color=(1, 0.85, 0.3, 1), align=514, autosize=1, fmin=18, fmax=28)
+
+add_go(8103200, "WheelCloseXBtn", [8103201, 8103204, 8103202, 8103203])
+add_rect(8103201, 8103200, 8103001, [8103211], amin=(1, 1), amax=(1, 1), pos=(-45, -22), size=(56, 56), pivot=(0.5, 0.5))
+add_cr(8103204, 8103200)
+add_image(8103202, 8103200, GUID_SPR_BTN_ORANGE, img_type=1)
+add_button(8103203, 8103200, 8103202)
+add_go(8103210, "CloseTxt", [8103211, 8103213, 8103212])
+add_rect(8103211, 8103210, 8103201, [], amin=(0,0), amax=(1,1))
+add_cr(8103213, 8103210)
+add_tmp(8103212, 8103210, "✕", fsize=24, fstyle=1, color=(1,1,1,1), align=514)
+
+add_go(8103300, "WheelSubtitle", [8103301, 8103303, 8103302])
+add_rect(8103301, 8103300, 8103001, [], amin=(0, 1), amax=(1, 1), pos=(0, -68), size=(0, 28), pivot=(0.5, 0.5))
+add_cr(8103303, 8103300)
+add_tmp(8103302, 8103300, "Испытай удачу и сорви инди-джекпот!", fsize=13, fstyle=0, color=(0.7, 0.8, 0.9, 1), align=514, autosize=1, fmin=10, fmax=15)
+
+# WheelContainer (530x530 centered)
+add_go(8104000, "WheelContainer", [8104001])
+add_rect(8104001, 8104000, 8102001, [8104101, 8104201], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -425), size=(530, 530), pivot=(0.5, 0.5))
+
+# WheelDisc
+add_go(8104100, "WheelDisc", [8104101, 8104103, 8104102])
+add_rect(8104101, 8104100, 8104001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(512, 512), pivot=(0.5, 0.5))
+add_cr(8104103, 8104100)
+add_image(8104102, 8104100, GUID_SPR_WHEEL_BASE, raycast=0)
+
+# WheelPointer
+add_go(8104200, "WheelPointer", [8104201, 8104203, 8104202])
+add_rect(8104201, 8104200, 8104001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 240), size=(64, 80), pivot=(0.5, 0.5))
+add_cr(8104203, 8104200)
+add_image(8104202, 8104200, GUID_SPR_WHEEL_POINTER, raycast=0)
+
+# StatusDescText
+add_go(8105000, "StatusDescText", [8105001, 8105003, 8105002])
+add_rect(8105001, 8105000, 8102001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -735), size=(860, 40), pivot=(0.5, 0.5))
+add_cr(8105003, 8105000)
+add_tmp(8105002, 8105000, "Крути колесо каждый день и выигрывай бонусы!", fsize=16, fstyle=0, color=(1, 0.9, 0.4, 1), align=514, autosize=1, fmin=12, fmax=18)
+
+# FreeSpinBtn
+add_go(8106000, "FreeSpinBtn", [8106001, 8106004, 8106002, 8106003])
+add_rect(8106001, 8106000, 8102001, [8106011], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -815), size=(620, 76), pivot=(0.5, 0.5))
+add_cr(8106004, 8106000)
+add_image(8106002, 8106000, GUID_SPR_BTN_GOLD, img_type=1)
+add_button(8106003, 8106000, 8106002)
+add_go(8106010, "FreeSpinTxt", [8106011, 8106013, 8106012])
+add_rect(8106011, 8106010, 8106001, [], amin=(0,0), amax=(1,1))
+add_cr(8106013, 8106010)
+add_tmp(8106012, 8106010, "КРУТИТЬ БЕСПЛАТНО! 🎁", fsize=22, fstyle=1, color=(1,1,1,1), align=514)
+
+# PaidSpinBtn
+add_go(8107000, "PaidSpinBtn", [8107001, 8107004, 8107002, 8107003])
+add_rect(8107001, 8107000, 8102001, [8107011], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -905), size=(620, 68), pivot=(0.5, 0.5))
+add_cr(8107004, 8107000)
+add_image(8107002, 8107000, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(8107003, 8107000, 8107002)
+add_go(8107010, "PaidSpinTxt", [8107011, 8107013, 8107012])
+add_rect(8107011, 8107010, 8107001, [], amin=(0,0), amax=(1,1))
+add_cr(8107013, 8107010)
+add_tmp(8107012, 8107010, "СПИН ЗА 10,000 РУБ. 💰", fsize=20, fstyle=1, color=(1,1,1,1), align=514)
+
+# CloseWheelBtn
+add_go(8108000, "CloseWheelBtn", [8108001, 8108004, 8108002, 8108003])
+add_rect(8108001, 8108000, 8102001, [8108011], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -985), size=(560, 56), pivot=(0.5, 0.5))
+add_cr(8108004, 8108000)
+add_image(8108002, 8108000, GUID_SPR_CARD_BG, color=(0.14, 0.18, 0.26, 0.95), img_type=1)
+add_button(8108003, 8108000, 8108002)
+add_go(8108010, "CloseTxt", [8108011, 8108013, 8108012])
+add_rect(8108011, 8108010, 8108001, [], amin=(0,0), amax=(1,1))
+add_cr(8108013, 8108010)
+add_tmp(8108012, 8108010, "ЗАКРЫТЬ", fsize=18, fstyle=1, color=(1,1,1,1), align=514)
+
+# LuckyWheelUI component
+add(f"--- !u!114 &8100004")
+add("MonoBehaviour:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 8100000}")
+add("  m_Enabled: 1")
+add("  m_EditorHideFlags: 0")
+add("  m_Script: {fileID: 11500000, guid: " + GUID_LUCKY_WHEEL_UI + ", type: 3}")
+add("  m_Name: ")
+add("  m_EditorClassIdentifier: Assembly-CSharp::LuckyWheelUI")
+add("  openWheelBtn: {fileID: 2120003}")
+add("  openWheelBtnText: {fileID: 2121002}")
+add("  wheelBadgeDot: {fileID: 2122000}")
+add("  closeWheelBtn: {fileID: 8108003}")
+add("  closeXBtn: {fileID: 8103203}")
+add("  backdropBtn: {fileID: 8101003}")
+add("  modalRoot: {fileID: 8100000}")
+add("  modalCardTransform: {fileID: 8102001}")
+add("  wheelDiscTransform: {fileID: 8104101}")
+add("  freeSpinBtn: {fileID: 8106003}")
+add("  freeSpinBtnText: {fileID: 8106012}")
+add("  paidSpinBtn: {fileID: 8107003}")
+add("  paidSpinBtnText: {fileID: 8107012}")
+add("  statusDescText: {fileID: 8105002}")
+add("  wheelTickSound: {fileID: 8300000, guid: " + GUID_SFX_WHEEL_TICK + ", type: 3}")
+add("  wheelWinSound: {fileID: 8300000, guid: " + GUID_SFX_WHEEL_WIN + ", type: 3}")
+
+# ==============================================================
+# 5.7 SAVE EXPORT / IMPORT MODAL (Cloud & Clipboard Backup)
+# ==============================================================
+add_go(8200000, "SaveExportModalRoot", [8200001, 8200004], active=0)
+add_rect(8200001, 8200000, 1500001, [8201001, 8202001], amin=(0,0), amax=(1,1))
+
+# Dim Backdrop
+add_go(8201000, "SaveBackdrop", [8201001, 8201004, 8201002, 8201003])
+add_rect(8201001, 8201000, 8200001, [], amin=(0,0), amax=(1,1))
+add_cr(8201004, 8201000)
+add_image(8201002, 8201000, None, color=(0.02, 0.03, 0.05, 0.85), raycast=1)
+add_button(8201003, 8201000, 8201002)
+
+# Modal Card Container
+add_go(8202000, "SaveCard", [8202001, 8202004, 8202002])
+add_rect(8202001, 8202000, 8200001, [8203001, 8204001, 8205001, 8206001, 8207001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(940, 1160), pivot=(0.5, 0.5))
+add_cr(8202004, 8202000)
+add_image(8202002, 8202000, GUID_SPR_CARD_BG, color=(0.09, 0.11, 0.16, 0.98), img_type=1)
+
+# Modal Header (Title + Close X Button + Subtitle)
+add_go(8203000, "SaveHeader", [8203001])
+add_rect(8203001, 8203000, 8202001, [8203101, 8203201, 8203301], amin=(0, 1), amax=(1, 1), pos=(0, -45), size=(0, 110), pivot=(0.5, 1))
+
+add_go(8203100, "SaveHeaderTitle", [8203101, 8203103, 8203102])
+add_rect(8203101, 8203100, 8203001, [], amin=(0, 1), amax=(1, 1), pos=(-30, -22), size=(0, 42), pivot=(0.5, 0.5))
+add_cr(8203103, 8203100)
+add_tmp(8203102, 8203100, "💾 МЕНЕДЖЕР СОХРАНЕНИЙ", fsize=26, fstyle=1, color=(0.4, 0.9, 1, 1), align=514, autosize=1, fmin=18, fmax=28)
+
+add_go(8203200, "SaveCloseXBtn", [8203201, 8203204, 8203202, 8203203])
+add_rect(8203201, 8203200, 8203001, [8203211], amin=(1, 1), amax=(1, 1), pos=(-45, -22), size=(56, 56), pivot=(0.5, 0.5))
+add_cr(8203204, 8203200)
+add_image(8203202, 8203200, GUID_SPR_BTN_ORANGE, img_type=1)
+add_button(8203203, 8203200, 8203202)
+add_go(8203210, "CloseTxt", [8203211, 8203213, 8203212])
+add_rect(8203211, 8203210, 8203201, [], amin=(0,0), amax=(1,1))
+add_cr(8203213, 8203210)
+add_tmp(8203212, 8203210, "✕", fsize=24, fstyle=1, color=(1,1,1,1), align=514)
+
+add_go(8203300, "SaveSubtitle", [8203301, 8203303, 8203302])
+add_rect(8203301, 8203300, 8203001, [], amin=(0, 1), amax=(1, 1), pos=(0, -68), size=(0, 28), pivot=(0.5, 0.5))
+add_cr(8203303, 8203300)
+add_tmp(8203302, 8203300, "Резервная копия и перенос прогресса между устройствами", fsize=13, fstyle=0, color=(0.7, 0.8, 0.9, 1), align=514, autosize=1, fmin=10, fmax=15)
+
+# ExportCard
+add_go(8204000, "ExportCard", [8204001, 8204004, 8204002])
+add_rect(8204001, 8204000, 8202001, [8204101, 8204201, 8204301, 8204401], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -180), size=(860, 280), pivot=(0.5, 1))
+add_cr(8204004, 8204000)
+add_image(8204002, 8204000, GUID_SPR_CARD_BG, color=(0.06, 0.08, 0.13, 0.95), img_type=1)
+
+add_go(8204100, "ExportTitle", [8204101, 8204103, 8204102])
+add_rect(8204101, 8204100, 8204001, [], amin=(0, 1), amax=(1, 1), pos=(25, -24), size=(-50, 32), pivot=(0, 1))
+add_cr(8204103, 8204100)
+add_tmp(8204102, 8204100, "📤 ЭКСПОРТ СОХРАНЕНИЯ", fsize=18, fstyle=1, color=(1, 0.85, 0.35, 1), align=513)
+
+add_go(8204200, "ExportPreview", [8204201, 8204203, 8204202])
+add_rect(8204201, 8204200, 8204001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -80), size=(800, 60), pivot=(0.5, 0.5))
+add_cr(8204203, 8204200)
+add_tmp(8204202, 8204200, "Генерация кода сохранения...", fsize=14, fstyle=0, color=(0.8, 0.9, 1, 1), align=514, autosize=1, fmin=11, fmax=15)
+
+add_go(8204300, "CopyExportBtn", [8204301, 8204304, 8204302, 8204303])
+add_rect(8204301, 8204300, 8204001, [8204311], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -155), size=(480, 56), pivot=(0.5, 0.5))
+add_cr(8204304, 8204300)
+add_image(8204302, 8204300, GUID_SPR_BTN_GOLD, img_type=1)
+add_button(8204303, 8204300, 8204302)
+add_go(8204310, "CopyTxt", [8204311, 8204313, 8204312])
+add_rect(8204311, 8204310, 8204301, [], amin=(0,0), amax=(1,1))
+add_cr(8204313, 8204310)
+add_tmp(8204312, 8204310, "📋 СКОПИРОВАТЬ В БУФЕР", fsize=18, fstyle=1, color=(1,1,1,1), align=514)
+
+add_go(8204400, "CopyStatus", [8204401, 8204403, 8204402])
+add_rect(8204401, 8204400, 8204001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -215), size=(800, 30), pivot=(0.5, 0.5))
+add_cr(8204403, 8204400)
+add_tmp(8204402, 8204400, "Нажмите «Скопировать в буфер», чтобы скопировать.", fsize=13, fstyle=0, color=(0.6, 0.75, 0.9, 1), align=514, autosize=1, fmin=10, fmax=14)
+
+# ImportCard
+add_go(8205000, "ImportCard", [8205001, 8205004, 8205002])
+add_rect(8205001, 8205000, 8202001, [8205101, 8205201, 8205301, 8205401, 8205501], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -495), size=(860, 290), pivot=(0.5, 1))
+add_cr(8205004, 8205000)
+add_image(8205002, 8205000, GUID_SPR_CARD_BG, color=(0.06, 0.08, 0.13, 0.95), img_type=1)
+
+add_go(8205100, "ImportTitle", [8205101, 8205103, 8205102])
+add_rect(8205101, 8205100, 8205001, [], amin=(0, 1), amax=(1, 1), pos=(25, -24), size=(-50, 32), pivot=(0, 1))
+add_cr(8205103, 8205100)
+add_tmp(8205102, 8205100, "📥 ИМПОРТ СОХРАНЕНИЯ", fsize=18, fstyle=1, color=(0.2, 0.95, 0.7, 1), align=513)
+
+add_go(8205200, "PasteBtn", [8205201, 8205204, 8205202, 8205203])
+add_rect(8205201, 8205200, 8205001, [8205211], amin=(0.5, 1), amax=(0.5, 1), pos=(-210, -80), size=(390, 56), pivot=(0.5, 0.5))
+add_cr(8205204, 8205200)
+add_image(8205202, 8205200, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(8205203, 8205200, 8205202)
+add_go(8205210, "PasteTxt", [8205211, 8205213, 8205212])
+add_rect(8205211, 8205210, 8205201, [], amin=(0,0), amax=(1,1))
+add_cr(8205213, 8205210)
+add_tmp(8205212, 8205210, "📥 ВСТАВИТЬ ИЗ БУФЕРА", fsize=16, fstyle=1, color=(1,1,1,1), align=514)
+
+add_go(8205300, "LoadBtn", [8205301, 8205304, 8205302, 8205303])
+add_rect(8205301, 8205300, 8205001, [8205311], amin=(0.5, 1), amax=(0.5, 1), pos=(210, -80), size=(390, 56), pivot=(0.5, 0.5))
+add_cr(8205304, 8205300)
+add_image(8205302, 8205300, GUID_SPR_BTN_GOLD, img_type=1)
+add_button(8205303, 8205300, 8205302)
+add_go(8205310, "LoadTxt", [8205311, 8205313, 8205312])
+add_rect(8205311, 8205310, 8205301, [], amin=(0,0), amax=(1,1))
+add_cr(8205313, 8205310)
+add_tmp(8205312, 8205310, "🚀 ЗАГРУЗИТЬ СЕЙВ", fsize=16, fstyle=1, color=(1,1,1,1), align=514)
+
+add_go(8205400, "ImportPreview", [8205401, 8205403, 8205402])
+add_rect(8205401, 8205400, 8205001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -155), size=(800, 55), pivot=(0.5, 0.5))
+add_cr(8205403, 8205400)
+add_tmp(8205402, 8205400, "Нажмите «Вставить из буфера», чтобы проверить сохранение.", fsize=14, fstyle=0, color=(0.8, 0.9, 1, 1), align=514, autosize=1, fmin=11, fmax=15)
+
+add_go(8205500, "ImportStatus", [8205501, 8205503, 8205502])
+add_rect(8205501, 8205500, 8205001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -225), size=(800, 30), pivot=(0.5, 0.5))
+add_cr(8205503, 8205500)
+add_tmp(8205502, 8205500, "", fsize=13, fstyle=0, color=(0.6, 0.75, 0.9, 1), align=514, autosize=1, fmin=10, fmax=14)
+
+# HardResetBtn
+add_go(8206000, "HardResetBtn", [8206001, 8206004, 8206002, 8206003])
+add_rect(8206001, 8206000, 8202001, [8206011], amin=(0.5, 1), amax=(0.5, 1), pos=(-210, -840), size=(390, 64), pivot=(0.5, 0.5))
+add_cr(8206004, 8206000)
+add_image(8206002, 8206000, GUID_SPR_BTN_ORANGE, img_type=1)
+add_button(8206003, 8206000, 8206002)
+add_go(8206010, "ResetTxt", [8206011, 8206013, 8206012])
+add_rect(8206011, 8206010, 8206001, [], amin=(0,0), amax=(1,1))
+add_cr(8206013, 8206010)
+add_tmp(8206012, 8206010, "⚠️ СБРОСИТЬ ВСЁ", fsize=16, fstyle=1, color=(1,1,1,1), align=514)
+
+# CloseSaveBtn
+add_go(8207000, "CloseSaveBtn", [8207001, 8207004, 8207002, 8207003])
+add_rect(8207001, 8207000, 8202001, [8207011], amin=(0.5, 1), amax=(0.5, 1), pos=(210, -840), size=(390, 64), pivot=(0.5, 0.5))
+add_cr(8207004, 8207000)
+add_image(8207002, 8207000, GUID_SPR_CARD_BG, color=(0.14, 0.18, 0.26, 0.95), img_type=1)
+add_button(8207003, 8207000, 8207002)
+add_go(8207010, "CloseTxt", [8207011, 8207013, 8207012])
+add_rect(8207011, 8207010, 8207001, [], amin=(0,0), amax=(1,1))
+add_cr(8207013, 8207010)
+add_tmp(8207012, 8207010, "ЗАКРЫТЬ", fsize=18, fstyle=1, color=(1,1,1,1), align=514)
+
+# SaveExportUI component
+add(f"--- !u!114 &8200004")
+add("MonoBehaviour:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 8200000}")
+add("  m_Enabled: 1")
+add("  m_EditorHideFlags: 0")
+add("  m_Script: {fileID: 11500000, guid: " + GUID_SAVE_EXPORT_UI + ", type: 3}")
+add("  m_Name: ")
+add("  m_EditorClassIdentifier: Assembly-CSharp::SaveExportUI")
+add("  openSaveBtn: {fileID: 2130003}")
+add("  openSaveBtnText: {fileID: 2131002}")
+add("  closeSaveBtn: {fileID: 8207003}")
+add("  closeXBtn: {fileID: 8203203}")
+add("  backdropBtn: {fileID: 8201003}")
+add("  modalRoot: {fileID: 8200000}")
+add("  modalCardTransform: {fileID: 8202001}")
+add("  exportPreviewText: {fileID: 8204202}")
+add("  copyExportBtn: {fileID: 8204303}")
+add("  copyStatusText: {fileID: 8204402}")
+add("  pasteFromClipboardBtn: {fileID: 8205203}")
+add("  importPreviewText: {fileID: 8205402}")
+add("  loadImportBtn: {fileID: 8205303}")
+add("  importStatusText: {fileID: 8205502}")
+add("  hardResetBtn: {fileID: 8206003}")
+add("  hardResetBtnText: {fileID: 8206012}")
 
 # ==============================================================
 # 6. COUNTERSCRIPT (TapCounter)
