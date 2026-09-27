@@ -31,6 +31,10 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip catPurrSound;
     [SerializeField] private AudioClip sipSound;
     [SerializeField] private AudioClip mouseClickSound;
+    [SerializeField] private AudioClip lampSwitchSound;
+    [SerializeField] private AudioClip bugSquashSound;
+    [SerializeField] private AudioClip crateCollectSound;
+    [SerializeField] private AudioClip buildCompleteSound;
 
     [Header("Источники звука")]
     [SerializeField] private AudioSource sfxSource;
@@ -107,6 +111,26 @@ public class AudioManager : MonoBehaviour
         if (mouseClickSound == null)
         {
             mouseClickSound = CreateProceduralMouseClickClip();
+        }
+
+        if (lampSwitchSound == null)
+        {
+            lampSwitchSound = CreateProceduralLampSwitchClip();
+        }
+
+        if (bugSquashSound == null)
+        {
+            bugSquashSound = CreateProceduralBugSquashClip();
+        }
+
+        if (crateCollectSound == null)
+        {
+            crateCollectSound = CreateProceduralCrateCollectClip();
+        }
+
+        if (buildCompleteSound == null)
+        {
+            buildCompleteSound = CreateProceduralBuildCompleteClip();
         }
     }
 
@@ -358,6 +382,122 @@ public class AudioManager : MonoBehaviour
         {
             sfxSource.pitch = Random.Range(0.97f, 1.04f);
             sfxSource.PlayOneShot(mouseClickSound, 0.90f);
+        }
+    }
+
+    private AudioClip CreateProceduralLampSwitchClip()
+    {
+        int sampleRate = 44100;
+        int sampleCount = (int)(sampleRate * 0.08f);
+        float[] data = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float env = Mathf.Exp(-t * 220f);
+            float snap = Mathf.Sin(2f * Mathf.PI * 3200f * t) * env * 0.9f;
+            float body = Mathf.Sin(2f * Mathf.PI * 420f * t) * Mathf.Exp(-t * 120f) * 0.6f;
+            data[i] = Mathf.Clamp(snap + body, -1f, 1f);
+        }
+        AudioClip clip = AudioClip.Create("Procedural_LampSwitch", sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    private AudioClip CreateProceduralBugSquashClip()
+    {
+        int sampleRate = 44100;
+        int sampleCount = (int)(sampleRate * 0.12f);
+        float[] data = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float env = Mathf.Exp(-t * 80f);
+            float noise = (Random.value * 2f - 1f) * 0.4f;
+            float f = Mathf.Max(180f, 1200f - t * 8000f);
+            float pop = (Mathf.Sin(2f * Mathf.PI * f * t) + noise) * env;
+            data[i] = Mathf.Clamp(pop * 0.9f, -1f, 1f);
+        }
+        AudioClip clip = AudioClip.Create("Procedural_BugSquash", sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    private AudioClip CreateProceduralCrateCollectClip()
+    {
+        int sampleRate = 44100;
+        int sampleCount = (int)(sampleRate * 0.22f);
+        float[] data = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float f = t < 0.07f ? 523.25f : (t < 0.14f ? 659.25f : 783.99f);
+            float localT = t < 0.07f ? t : (t < 0.14f ? t - 0.07f : t - 0.14f);
+            float env = Mathf.Exp(-localT * 35f);
+            float chime = (Mathf.Sin(2f * Mathf.PI * f * t) + 0.3f * Mathf.Sin(4f * Mathf.PI * f * t)) * env;
+            data[i] = Mathf.Clamp(chime * 0.8f, -1f, 1f);
+        }
+        AudioClip clip = AudioClip.Create("Procedural_CrateCollect", sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    private AudioClip CreateProceduralBuildCompleteClip()
+    {
+        int sampleRate = 44100;
+        int sampleCount = (int)(sampleRate * 0.45f);
+        float[] data = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float f = t < 0.10f ? 523.25f : (t < 0.20f ? 659.25f : (t < 0.30f ? 783.99f : 1046.50f));
+            float offset = t < 0.10f ? 0f : (t < 0.20f ? 0.10f : (t < 0.30f ? 0.20f : 0.30f));
+            float decay = t >= 0.30f ? 10f : 15f;
+            float env = Mathf.Exp(-(t - offset) * decay);
+            float bell = (Mathf.Sin(2f * Mathf.PI * f * t) + 0.35f * Mathf.Sin(4f * Mathf.PI * f * t) + 0.15f * Mathf.Sin(6f * Mathf.PI * f * t)) * env;
+            data[i] = Mathf.Clamp(bell * 0.9f, -1f, 1f);
+        }
+        AudioClip clip = AudioClip.Create("Procedural_BuildComplete", sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    public void PlayLampSwitch()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (lampSwitchSound != null)
+        {
+            sfxSource.pitch = Random.Range(0.96f, 1.04f);
+            sfxSource.PlayOneShot(lampSwitchSound, 0.85f);
+        }
+    }
+
+    public void PlayBugSquash()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (bugSquashSound != null)
+        {
+            sfxSource.pitch = Random.Range(0.92f, 1.10f);
+            sfxSource.PlayOneShot(bugSquashSound, 0.90f);
+        }
+    }
+
+    public void PlayCrateCollect()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (crateCollectSound != null)
+        {
+            sfxSource.pitch = Random.Range(0.98f, 1.05f);
+            sfxSource.PlayOneShot(crateCollectSound, 0.90f);
+        }
+    }
+
+    public void PlayBuildComplete()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (buildCompleteSound != null)
+        {
+            sfxSource.pitch = 1.0f;
+            sfxSource.PlayOneShot(buildCompleteSound, 1.0f);
         }
     }
 

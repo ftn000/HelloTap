@@ -42,7 +42,20 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Image catImage;
     [SerializeField] private Sprite catSleepingSprite;
     [SerializeField] private Sprite catAwakeSprite;
+    [SerializeField] private Sprite catStretchSprite;
+    [SerializeField] private Image catAccessoryImage;
+    [SerializeField] private Sprite catGlassesSprite;
+    [SerializeField] private Sprite catBowtieSprite;
+    [SerializeField] private Button catAccessoryButton;
     [SerializeField] private RectTransform catHeartEmote;
+
+    [Header("Освещение, День/Ночь и Лампа")]
+    [SerializeField] private GameObject deskLampObj;
+    [SerializeField] private Button deskLampButton;
+    [SerializeField] private GameObject lampConeObj;
+    [SerializeField] private Graphic ambientOverlayGraphic;
+    [SerializeField] private Button timeOfDayButton;
+    [SerializeField] private TMP_Text timeOfDayText;
 
     [Header("Интерактивные напитки и мышь")]
     [SerializeField] private Button mouseButton;
@@ -240,6 +253,8 @@ public class WorkplaceVisuals : MonoBehaviour
         }
         InitSteamAndFizz();
         InitCatInteraction();
+        InitCatCustomization();
+        InitLighting();
         InitDrinksInteraction();
         InitMouseInteraction();
         InitStickersInteraction();
@@ -310,6 +325,9 @@ public class WorkplaceVisuals : MonoBehaviour
 
         // 10. Обновление хоткей-подсказок в IDE
         UpdateHotkeyHints(dt);
+
+        // 11. Освещение, день/ночь и настольная лампа
+        UpdateLighting(dt);
     }
 
     #region Визуальная эволюция стола
@@ -449,17 +467,23 @@ public class WorkplaceVisuals : MonoBehaviour
     {
         if (GameManager.Instance == null) return;
         GameProjectData nextProj = GameManager.Instance.GetNextTargetProject();
-        if (nextProj != null && GameManager.Instance.TryReleaseProject(nextProj.Id))
+        if (nextProj != null && GameManager.Instance.CodeLines >= nextProj.RequiredCodeLines)
         {
-            if (ClickJuice.Instance != null && quickReleaseButton != null)
+            ProjectBuildMiniGame.Instance.StartBuildMiniGame(nextProj, () =>
             {
-                ClickJuice.Instance.SpawnCustomPopup(
-                    $"РЕЛИЗ: {nextProj.Title}! +{NumberFormatter.Format(nextProj.RewardMoney)} руб.",
-                    quickReleaseButton.transform.position,
-                    new Color(1f, 0.85f, 0.25f),
-                    true);
-            }
-            RefreshProgressAndComboUI();
+                if (GameManager.Instance.TryReleaseProject(nextProj.Id))
+                {
+                    if (ClickJuice.Instance != null && quickReleaseButton != null)
+                    {
+                        ClickJuice.Instance.SpawnCustomPopup(
+                            $"РЕЛИЗ: {nextProj.Title}! +{NumberFormatter.Format(nextProj.RewardMoney)} руб.",
+                            quickReleaseButton.transform.position,
+                            new Color(1f, 0.85f, 0.25f),
+                            true);
+                    }
+                    RefreshProgressAndComboUI();
+                }
+            });
         }
     }
 
@@ -853,8 +877,23 @@ public class WorkplaceVisuals : MonoBehaviour
         TriggerCatTapReaction(true);
         if (AudioManager.Instance != null) AudioManager.Instance.PlayCatPurr();
 
+        // Поглаживание кота увеличивает уровень счастья ("Мурчалометр")
+        catHappiness = Mathf.Min(1.0f, catHappiness + 0.25f);
+        if (catHappiness >= 0.99f)
+        {
+            catHappiness = 0.35f;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.AddComboEnergy(0.35f);
+            }
+            if (ClickJuice.Instance != null && catTransform != null)
+            {
+                ClickJuice.Instance.SpawnCustomPopup("😻 МУРЧАЛОМЕТР 100%! +35% ПОТОКА!", catTransform.position + Vector3.up * 55f, new Color(1f, 0.4f, 0.85f, 1f), true);
+            }
+        }
+
         if (catAwakeCoroutine != null) StopCoroutine(catAwakeCoroutine);
-        catAwakeCoroutine = StartCoroutine(CatAwakeRoutine());
+        catAwakeCoroutine = StartCoroutine(CatPetReactionRoutine());
 
         if (catHeartEmote != null)
         {
@@ -866,24 +905,33 @@ public class WorkplaceVisuals : MonoBehaviour
             ClickJuice.Instance.SpawnCustomPopup("💖 Муррр~", catTransform.position + Vector3.up * 45f, new Color(1f, 0.40f, 0.70f, 1f), false);
         }
 
-        // Приятный мини-бонус от поглаживания котика
         if (GameManager.Instance != null)
         {
             GameManager.Instance.AddComboEnergy(0.08f);
         }
     }
 
-    private IEnumerator CatAwakeRoutine()
+    private IEnumerator CatPetReactionRoutine()
     {
+        // 1. Потягивание с выгнутой спинкой и лапками вперед
+        if (catImage != null && catStretchSprite != null)
+        {
+            catImage.sprite = catStretchSprite;
+            Vector3 baseScale = catTransform.localScale;
+            catTransform.localScale = new Vector3(1.10f, 0.92f, 1f);
+            yield return new WaitForSecondsRealtime(0.95f);
+            catTransform.localScale = baseScale;
+        }
+
+        // 2. Довольная пробужденная мордочка с прищуренными глазками
         if (catImage != null && catAwakeSprite != null)
         {
             catImage.sprite = catAwakeSprite;
         }
 
-        // Кот бодрствует с открытыми сверкающими глазками 1.8 секунды
-        yield return new WaitForSecondsRealtime(1.8f);
+        yield return new WaitForSecondsRealtime(2.2f);
 
-        // Мягкое моргание перед сном
+        // 3. Мягкое моргание перед возвращением в уютный клубок
         if (catImage != null && catSleepingSprite != null)
         {
             catImage.sprite = catSleepingSprite;
@@ -941,6 +989,233 @@ public class WorkplaceVisuals : MonoBehaviour
         catHeartEmote.gameObject.SetActive(false);
         catHeartCoroutine = null;
     }
+
+    #region Кастомизация Кота (Cat Accessories & Skin Tints)
+
+    private int catAccessoryIndex = 0; // 0 = Нет, 1 = Очки, 2 = Бабочка
+    private int catSkinIndex = 0; // 0 = Рыжик, 1 = Серый, 2 = Чёрный
+    private float catHappiness = 0.2f;
+
+    private readonly Color[] CatSkinTints = new Color[]
+    {
+        Color.white, // Classic ginger
+        new Color(0.85f, 0.88f, 0.95f), // Smoky grey
+        new Color(0.48f, 0.50f, 0.55f)  // Dark tuxedo
+    };
+
+    private void InitCatCustomization()
+    {
+        catAccessoryIndex = PlayerPrefs.GetInt("Dev_CatAccessory", 0);
+        catSkinIndex = PlayerPrefs.GetInt("Dev_CatSkin", 0);
+
+        if (catAccessoryImage == null && catTransform != null)
+        {
+            catAccessoryImage = catTransform.Find("CatAccessory")?.GetComponent<Image>();
+        }
+
+        if (catAccessoryButton == null && catTransform != null)
+        {
+            catAccessoryButton = catTransform.Find("CatAccessoryBtn")?.GetComponent<Button>();
+        }
+
+        if (catAccessoryButton != null)
+        {
+            catAccessoryButton.onClick.RemoveAllListeners();
+            catAccessoryButton.onClick.AddListener(OnCatAccessoryClicked);
+        }
+
+        ApplyCatVisuals();
+    }
+
+    private void ApplyCatVisuals()
+    {
+        if (catImage != null && catSkinIndex >= 0 && catSkinIndex < CatSkinTints.Length)
+        {
+            catImage.color = CatSkinTints[catSkinIndex];
+        }
+
+        if (catAccessoryImage != null)
+        {
+            if (catAccessoryIndex == 1 && catGlassesSprite != null)
+            {
+                catAccessoryImage.gameObject.SetActive(true);
+                catAccessoryImage.sprite = catGlassesSprite;
+                catAccessoryImage.rectTransform.anchoredPosition = new Vector2(-18, 12);
+                catAccessoryImage.rectTransform.sizeDelta = new Vector2(48, 24);
+            }
+            else if (catAccessoryIndex == 2 && catBowtieSprite != null)
+            {
+                catAccessoryImage.gameObject.SetActive(true);
+                catAccessoryImage.sprite = catBowtieSprite;
+                catAccessoryImage.rectTransform.anchoredPosition = new Vector2(-15, -18);
+                catAccessoryImage.rectTransform.sizeDelta = new Vector2(40, 24);
+            }
+            else
+            {
+                catAccessoryImage.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void OnCatAccessoryClicked()
+    {
+        catAccessoryIndex = (catAccessoryIndex + 1) % 3;
+        PlayerPrefs.SetInt("Dev_CatAccessory", catAccessoryIndex);
+        PlayerPrefs.Save();
+
+        HapticFeedback.Vibrate(25);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayMouseClick();
+        ApplyCatVisuals();
+
+        if (catAccessoryImage != null && catAccessoryImage.gameObject.activeSelf)
+        {
+            StartCoroutine(StickerPunchRoutine(catAccessoryImage.transform));
+        }
+
+        string accName = catAccessoryIndex == 1 ? "🕶️ Очки хакера" : (catAccessoryIndex == 2 ? "🎀 Бабочка" : "Без аксессуара");
+        if (ClickJuice.Instance != null && catTransform != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup(accName, catTransform.position + Vector3.up * 40f, new Color(1f, 0.65f, 0.9f, 1f), false);
+        }
+    }
+
+    #endregion
+
+    #region Освещение и День/Ночь (Day/Night & Desk Lamp)
+
+    private int timeOfDayIndex = 0; // 0 = День, 1 = Закат, 2 = Ночь
+    private bool isLampOn = true;
+    private readonly Color AmbientDay = new Color(1f, 0.96f, 0.88f, 0f);
+    private readonly Color AmbientSunset = new Color(0.96f, 0.44f, 0.12f, 0.16f);
+    private readonly Color AmbientNight = new Color(0.04f, 0.06f, 0.20f, 0.45f);
+
+    private void InitLighting()
+    {
+        timeOfDayIndex = PlayerPrefs.GetInt("Dev_TimeOfDay", 0);
+        isLampOn = PlayerPrefs.GetInt("Dev_LampOn", 1) == 1;
+
+        if (deskLampObj == null) deskLampObj = transform.Find("DeskMat/DeskLamp")?.gameObject;
+        if (deskLampButton == null && deskLampObj != null) deskLampButton = deskLampObj.GetComponent<Button>();
+        if (deskLampButton != null)
+        {
+            deskLampButton.onClick.RemoveAllListeners();
+            deskLampButton.onClick.AddListener(OnDeskLampClicked);
+        }
+
+        if (lampConeObj == null) lampConeObj = transform.Find("DeskMat/DeskLamp/LampLightCone")?.gameObject;
+        if (ambientOverlayGraphic == null) ambientOverlayGraphic = transform.Find("AmbientOverlay")?.GetComponent<Graphic>();
+        if (timeOfDayButton == null) timeOfDayButton = transform.Find("TimeOfDayToggleBtn")?.GetComponent<Button>();
+        if (timeOfDayText == null && timeOfDayButton != null) timeOfDayText = timeOfDayButton.GetComponentInChildren<TMP_Text>();
+
+        if (timeOfDayButton != null)
+        {
+            timeOfDayButton.onClick.RemoveAllListeners();
+            timeOfDayButton.onClick.AddListener(OnTimeOfDayClicked);
+        }
+
+        ApplyLightingState(false);
+    }
+
+    private void UpdateLighting(float dt)
+    {
+        // Плавное мягкое дыхание света лампы
+        if (isLampOn && lampConeObj != null && lampConeObj.activeSelf)
+        {
+            float pulse = 0.98f + Mathf.Sin(Time.time * 2.8f) * 0.025f;
+            lampConeObj.transform.localScale = new Vector3(pulse, pulse, 1f);
+        }
+
+        // Если вечер или ночь, клавиатура играет мягкими RGB Chroma волнами
+        if (keyboardGlowImage != null && (timeOfDayIndex == 1 || timeOfDayIndex == 2))
+        {
+            float hue = (Time.time * 0.15f) % 1f;
+            Color chroma = Color.HSVToRGB(hue, 0.70f, 0.90f);
+            chroma.a = timeOfDayIndex == 2 ? 0.40f : 0.25f;
+            keyboardGlowImage.color = chroma;
+        }
+    }
+
+    public void OnDeskLampClicked()
+    {
+        isLampOn = !isLampOn;
+        PlayerPrefs.SetInt("Dev_LampOn", isLampOn ? 1 : 0);
+        PlayerPrefs.Save();
+
+        HapticFeedback.Vibrate(35);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayLampSwitch();
+
+        if (deskLampObj != null)
+        {
+            StartCoroutine(StickerPunchRoutine(deskLampObj.transform));
+        }
+
+        ApplyLightingState(true);
+
+        if (ClickJuice.Instance != null && deskLampObj != null)
+        {
+            string msg = isLampOn ? "💡 Лампа включена" : "🌑 Лампа выключена";
+            ClickJuice.Instance.SpawnCustomPopup(msg, deskLampObj.transform.position + Vector3.up * 40f, new Color(1f, 0.92f, 0.35f, 1f), false);
+        }
+    }
+
+    public void OnTimeOfDayClicked()
+    {
+        timeOfDayIndex = (timeOfDayIndex + 1) % 3;
+        PlayerPrefs.SetInt("Dev_TimeOfDay", timeOfDayIndex);
+        PlayerPrefs.Save();
+
+        HapticFeedback.Vibrate(25);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayMouseClick();
+
+        if (timeOfDayIndex == 2 && !isLampOn)
+        {
+            isLampOn = true;
+            PlayerPrefs.SetInt("Dev_LampOn", 1);
+        }
+
+        ApplyLightingState(true);
+
+        string label = timeOfDayIndex == 0 ? "☀️ День" : (timeOfDayIndex == 1 ? "🌇 Закат" : "🌙 Ночь");
+        if (ClickJuice.Instance != null && timeOfDayButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup(label, timeOfDayButton.transform.position + Vector3.down * 25f, new Color(0.9f, 0.9f, 1f, 1f), false);
+        }
+    }
+
+    private void ApplyLightingState(bool animate)
+    {
+        if (lampConeObj != null)
+        {
+            lampConeObj.SetActive(isLampOn);
+        }
+
+        Color targetAmbient = timeOfDayIndex == 0 ? AmbientDay : (timeOfDayIndex == 1 ? AmbientSunset : AmbientNight);
+        if (ambientOverlayGraphic != null)
+        {
+            if (animate) StartCoroutine(FadeAmbientRoutine(ambientOverlayGraphic, targetAmbient, 0.4f));
+            else ambientOverlayGraphic.color = targetAmbient;
+        }
+
+        if (timeOfDayText != null)
+        {
+            timeOfDayText.text = timeOfDayIndex == 0 ? "☀️ ДЕНЬ" : (timeOfDayIndex == 1 ? "🌇 ЗАКАТ" : "🌙 НОЧЬ");
+        }
+    }
+
+    private IEnumerator FadeAmbientRoutine(Graphic g, Color target, float duration)
+    {
+        Color start = g.color;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            g.color = Color.Lerp(start, target, elapsed / duration);
+            yield return null;
+        }
+        g.color = target;
+    }
+
+    #endregion
 
     #endregion
 

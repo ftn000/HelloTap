@@ -373,6 +373,25 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Прямое добавление валюты (код, деньги) от мини-игр и бонусов
+    /// </summary>
+    public void AddDirectCurrencies(double code, double rewardMoney)
+    {
+        if (code > 0)
+        {
+            codeLines += code;
+            totalCodeWritten += code;
+        }
+        if (rewardMoney > 0)
+        {
+            money += rewardMoney;
+            totalMoneyEarned += rewardMoney;
+        }
+        CheckAchievements();
+        OnCurrenciesChanged?.Invoke();
+    }
+
+    /// <summary>
     /// Награда за обезвреживание бага на мониторе
     /// </summary>
     public void ClaimBugFixReward(Vector2 screenPos, out double bonusCode, out double bonusMoney)

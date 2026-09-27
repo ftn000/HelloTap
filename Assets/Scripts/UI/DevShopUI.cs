@@ -284,6 +284,16 @@ public class DevShopUI : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
+            var prj = FindProject(id);
+            if (prj != null && GameManager.Instance.CodeLines >= prj.RequiredCodeLines)
+            {
+                CloseShop();
+                ProjectBuildMiniGame.Instance.StartBuildMiniGame(prj, () =>
+                {
+                    GameManager.Instance.TryReleaseProject(id);
+                });
+                return;
+            }
             GameManager.Instance.TryReleaseProject(id);
         }
     }

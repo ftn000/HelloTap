@@ -290,6 +290,76 @@ def make_mouse_click():
         samples.append(s)
     return samples
 
+def make_lamp_switch():
+    duration = 0.08
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        # Metallic clack & snap
+        env = math.exp(-t * 220.0)
+        snap = math.sin(2.0 * math.pi * 3200.0 * t) * env * 0.9
+        body = math.sin(2.0 * math.pi * 420.0 * t) * math.exp(-t * 120.0) * 0.6
+        samples.append(snap + body)
+    return samples
+
+def make_bug_squash():
+    duration = 0.12
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        env = math.exp(-t * 80.0)
+        noise = (random.random() * 2.0 - 1.0) * 0.4
+        f = max(180.0, 1200.0 - t * 8000.0)
+        pop = (math.sin(2.0 * math.pi * f * t) + noise) * env
+        samples.append(pop * 0.9)
+    return samples
+
+def make_crate_collect():
+    duration = 0.22
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+    # Upward arpeggio (C5 -> E5 -> G5)
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        if t < 0.07:
+            f = 523.25
+            local_t = t
+        elif t < 0.14:
+            f = 659.25
+            local_t = t - 0.07
+        else:
+            f = 783.99
+            local_t = t - 0.14
+        env = math.exp(-local_t * 35.0)
+        chime = (math.sin(2.0 * math.pi * f * t) + 0.3 * math.sin(4.0 * math.pi * f * t)) * env
+        samples.append(chime * 0.8)
+    return samples
+
+def make_build_complete():
+    duration = 0.45
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+    # Fanfare: C5 (0.09s), G5 (0.09s), C6 (0.27s)
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        if t < 0.10:
+            f = 523.25
+            env = math.exp(-(t) * 15.0)
+        elif t < 0.20:
+            f = 659.25
+            env = math.exp(-(t - 0.10) * 15.0)
+        elif t < 0.30:
+            f = 783.99
+            env = math.exp(-(t - 0.20) * 15.0)
+        else:
+            f = 1046.50
+            env = math.exp(-(t - 0.30) * 10.0)
+        bell = (math.sin(2.0 * math.pi * f * t) + 0.35 * math.sin(4.0 * math.pi * f * t) + 0.15 * math.sin(6.0 * math.pi * f * t)) * env
+        samples.append(bell * 0.9)
+    return samples
+
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
@@ -304,4 +374,8 @@ save_wav(os.path.join(out_dir, "boost_activate.wav"), make_boost_sound())
 save_wav(os.path.join(out_dir, "cat_purr.wav"), make_cat_purr())
 save_wav(os.path.join(out_dir, "drink_sip.wav"), make_drink_sip())
 save_wav(os.path.join(out_dir, "mouse_click.wav"), make_mouse_click())
+save_wav(os.path.join(out_dir, "lamp_switch.wav"), make_lamp_switch())
+save_wav(os.path.join(out_dir, "bug_squash.wav"), make_bug_squash())
+save_wav(os.path.join(out_dir, "crate_collect.wav"), make_crate_collect())
+save_wav(os.path.join(out_dir, "build_complete.wav"), make_build_complete())
 print("All sound effects generated successfully!")

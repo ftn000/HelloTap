@@ -410,6 +410,172 @@ def make_stickers():
     im.save(os.path.join(sprites_dir, "spr_sticker_works.png"))
     print("Created spr_sticker_works.png")
 
+# 12. Modern Desk Lamp (140 x 220)
+def make_desk_lamp():
+    im = Image.new("RGBA", (140, 220), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Heavy weighted base
+    create_rounded_rect(d, (25, 192, 115, 214), 8, fill=(28, 32, 42, 255), outline=(55, 62, 80, 255), width=2)
+    # Metallic switch button on base
+    create_rounded_rect(d, (62, 186, 78, 194), 3, fill=(255, 200, 50, 255), outline=(180, 140, 20, 255), width=1)
+    
+    # Lower metal arm
+    d.line([(70, 192), (48, 115)], fill=(45, 52, 68, 255), width=6)
+    d.line([(70, 192), (48, 115)], fill=(75, 86, 110, 255), width=2)
+    # Middle joint pivot
+    d.ellipse([42, 108, 54, 120], fill=(25, 28, 36, 255), outline=(90, 105, 135, 255), width=2)
+    
+    # Upper arm leaning toward right
+    d.line([(48, 114), (92, 58)], fill=(45, 52, 68, 255), width=6)
+    d.line([(48, 114), (92, 58)], fill=(75, 86, 110, 255), width=2)
+    # Head joint
+    d.ellipse([86, 52, 98, 64], fill=(25, 28, 36, 255), outline=(90, 105, 135, 255), width=2)
+    
+    # Lamp shade (cone pointing down-right)
+    shade_pts = [(88, 48), (124, 76), (114, 94), (74, 62)]
+    d.polygon(shade_pts, fill=(32, 38, 50, 255), outline=(65, 75, 98, 255))
+    # Inner reflector warm glow
+    d.polygon([(114, 74), (128, 85), (112, 97)], fill=(255, 235, 160, 255))
+    d.ellipse([108, 76, 124, 92], fill=(255, 250, 200, 255))
+    
+    im.save(os.path.join(sprites_dir, "spr_desk_lamp.png"))
+    print("Created spr_desk_lamp.png")
+
+# 13. Lamp Light Cone Overlay (600 x 500)
+def make_lamp_cone():
+    im = Image.new("RGBA", (600, 500), (0, 0, 0, 0))
+    # Build soft gradient light cone
+    cx, cy = 110, 50 # Lamp head source
+    for y in range(500):
+        for x in range(600):
+            dx = x - cx
+            dy = y - cy
+            dist = math.sqrt(dx * dx + dy * dy)
+            if dist < 10 or dist > 550:
+                continue
+            angle = math.atan2(dy, dx) # in radians (-pi to pi)
+            # Beam points down-right: angle between 0.35 rad (~20 deg) and 1.35 rad (~77 deg)
+            beam_center = 0.85
+            beam_width = 0.50
+            diff = abs(angle - beam_center)
+            if diff < beam_width:
+                ang_factor = math.cos((diff / beam_width) * (math.pi / 2.0))
+                dist_factor = max(0.0, 1.0 - (dist / 550.0))
+                intensity = ang_factor * dist_factor * 0.40 # max alpha ~0.40
+                if intensity > 0.01:
+                    alpha = int(intensity * 255)
+                    im.putpixel((x, y), (255, 230, 140, alpha))
+    im.save(os.path.join(sprites_dir, "spr_lamp_cone.png"))
+    print("Created spr_lamp_cone.png")
+
+# 14. Cute Stretching Cat Pose (170 x 110)
+def make_cat_stretch():
+    im = Image.new("RGBA", (170, 110), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Cat body arched up in back, sloping down to front paws
+    # Back arch
+    d.ellipse([60, 22, 148, 86], fill=(235, 140, 50, 255), outline=(190, 100, 30, 255), width=2)
+    # Front torso sloping down
+    d.polygon([(50, 72), (90, 48), (92, 85), (45, 90)], fill=(245, 150, 60, 255))
+    
+    # Head down near mat
+    d.ellipse([26, 52, 74, 94], fill=(245, 150, 60, 255), outline=(190, 100, 30, 255), width=2)
+    # Ears flat/perked backwards
+    d.polygon([(46, 54), (58, 34), (68, 52)], fill=(245, 150, 60, 255))
+    d.polygon([(48, 50), (58, 38), (64, 49)], fill=(255, 185, 195, 255))
+    
+    # Stretched front paws reaching out forward
+    d.ellipse([10, 84, 46, 98], fill=(255, 250, 240, 255), outline=(200, 120, 40, 255), width=1)
+    d.line([(22, 84), (22, 98)], fill=(200, 180, 170, 255), width=1)
+    d.line([(32, 84), (32, 98)], fill=(200, 180, 170, 255), width=1)
+    
+    # Rear standing legs & paws
+    d.ellipse([118, 72, 144, 98], fill=(245, 150, 60, 255), outline=(190, 100, 30, 255), width=1)
+    d.ellipse([124, 88, 148, 99], fill=(255, 250, 240, 255))
+    
+    # Joyful arched tail curling up
+    d.arc([115, 10, 168, 75], start=240, end=90, fill=(220, 125, 40, 255), width=8)
+    
+    # Blissful stretching eyes (happy slits)
+    d.arc([35, 68, 47, 80], start=200, end=340, fill=(70, 35, 15, 255), width=2)
+    d.arc([51, 68, 63, 80], start=200, end=340, fill=(70, 35, 15, 255), width=2)
+    # Pink nose
+    d.polygon([(47, 80), (51, 80), (49, 83)], fill=(255, 130, 150, 255))
+    # Blush
+    d.ellipse([30, 78, 38, 84], fill=(255, 130, 160, 150))
+    d.ellipse([60, 78, 68, 84], fill=(255, 130, 160, 150))
+    
+    im.save(os.path.join(sprites_dir, "spr_cat_stretch.png"))
+    print("Created spr_cat_stretch.png")
+
+# 15. Cat Accessories (Hacker Glasses & Bowtie)
+def make_cat_accessories():
+    # Cool Hacker Sunglasses (54 x 26)
+    im = Image.new("RGBA", (54, 26), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Left lens
+    create_rounded_rect(d, (4, 4, 24, 22), 4, fill=(18, 20, 28, 255), outline=(0, 229, 255, 255), width=2)
+    # Right lens
+    create_rounded_rect(d, (30, 4, 50, 22), 4, fill=(18, 20, 28, 255), outline=(0, 229, 255, 255), width=2)
+    # Bridge
+    d.line([(24, 11), (30, 11)], fill=(0, 229, 255, 255), width=2)
+    # Glint shine
+    d.line([(7, 7), (14, 14)], fill=(255, 255, 255, 220), width=2)
+    d.line([(33, 7), (40, 14)], fill=(255, 255, 255, 220), width=2)
+    im.save(os.path.join(sprites_dir, "spr_cat_glasses.png"))
+    print("Created spr_cat_glasses.png")
+
+    # Red Dapper Bowtie (44 x 26)
+    im = Image.new("RGBA", (44, 26), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Left wing
+    d.polygon([(22, 13), (4, 4), (4, 22)], fill=(230, 45, 65, 255), outline=(170, 20, 40, 255))
+    # Right wing
+    d.polygon([(22, 13), (40, 4), (40, 22)], fill=(230, 45, 65, 255), outline=(170, 20, 40, 255))
+    # Center golden knot
+    create_rounded_rect(d, (18, 8, 26, 18), 3, fill=(255, 205, 50, 255), outline=(190, 150, 20, 255), width=1)
+    im.save(os.path.join(sprites_dir, "spr_cat_bowtie.png"))
+    print("Created spr_cat_bowtie.png")
+
+# 16. Build Mini-Game Sprites (Falling Bug & Patch Crate)
+def make_minigame_sprites():
+    # Compile Bug (50 x 50)
+    im = Image.new("RGBA", (50, 50), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # 6 Twitchy Legs
+    d.line([(10, 16), (22, 22)], fill=(180, 20, 50, 255), width=3)
+    d.line([(38, 22), (50, 16)], fill=(180, 20, 50, 255), width=3)
+    d.line([(8, 28), (20, 28)], fill=(180, 20, 50, 255), width=3)
+    d.line([(30, 28), (42, 28)], fill=(180, 20, 50, 255), width=3)
+    d.line([(10, 40), (22, 34)], fill=(180, 20, 50, 255), width=3)
+    d.line([(38, 34), (50, 40)], fill=(180, 20, 50, 255), width=3)
+    # Bug Shell / Body
+    d.ellipse([16, 14, 34, 42], fill=(255, 45, 85, 255), outline=(140, 15, 40, 255), width=2)
+    # Bug Head
+    d.ellipse([19, 8, 31, 20], fill=(50, 10, 20, 255))
+    # Glowing yellow eyes
+    d.ellipse([21, 10, 24, 13], fill=(255, 230, 0, 255))
+    d.ellipse([26, 10, 29, 13], fill=(255, 230, 0, 255))
+    # Antennae
+    d.line([(22, 9), (16, 3)], fill=(50, 10, 20, 255), width=2)
+    d.line([(28, 9), (34, 3)], fill=(50, 10, 20, 255), width=2)
+    im.save(os.path.join(sprites_dir, "spr_minigame_bug.png"))
+    print("Created spr_minigame_bug.png")
+
+    # Patch Crate (54 x 54)
+    im = Image.new("RGBA", (54, 54), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Box body
+    create_rounded_rect(d, (4, 4, 50, 50), 6, fill=(28, 34, 48, 255), outline=(0, 229, 255, 255), width=2)
+    # Cross banding
+    d.line([(4, 4), (50, 50)], fill=(45, 58, 80, 255), width=3)
+    d.line([(4, 50), (50, 4)], fill=(45, 58, 80, 255), width=3)
+    # Golden package label in center
+    create_rounded_rect(d, (14, 16, 40, 38), 4, fill=(255, 190, 40, 255), outline=(200, 140, 20, 255), width=1)
+    d.polygon([(27, 20), (21, 28), (25, 28), (25, 34), (29, 34), (29, 28), (33, 28)], fill=(30, 30, 40, 255))
+    im.save(os.path.join(sprites_dir, "spr_minigame_crate.png"))
+    print("Created spr_minigame_crate.png")
+
 make_desk()
 make_monitor_frame()
 make_monitor_screen()
@@ -426,4 +592,9 @@ make_button_sprites()
 make_steam_particle()
 make_bubble_particle()
 make_stickers()
+make_desk_lamp()
+make_lamp_cone()
+make_cat_stretch()
+make_cat_accessories()
+make_minigame_sprites()
 print("All sprites successfully generated!")

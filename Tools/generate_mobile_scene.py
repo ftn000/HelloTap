@@ -53,6 +53,13 @@ GUID_SPR_STICKER_UNITY = "7b300000000000000000000000000015"
 GUID_SPR_STICKER_CSHARP = "7b300000000000000000000000000016"
 GUID_SPR_STICKER_GIT = "7b300000000000000000000000000017"
 GUID_SPR_STICKER_WORKS = "7b300000000000000000000000000018"
+GUID_SPR_DESK_LAMP = "7b300000000000000000000000000019"
+GUID_SPR_LAMP_CONE = "7b30000000000000000000000000001a"
+GUID_SPR_CAT_STRETCH = "7b30000000000000000000000000001b"
+GUID_SPR_CAT_GLASSES = "7b30000000000000000000000000001c"
+GUID_SPR_CAT_BOWTIE = "7b30000000000000000000000000001d"
+GUID_SPR_MINI_BUG = "7b30000000000000000000000000001e"
+GUID_SPR_MINI_CRATE = "7b30000000000000000000000000001f"
 
 # Audio SFX Clips
 GUID_SFX_KEY1 = "9a200000000000000000000000000001"
@@ -66,6 +73,11 @@ GUID_SFX_BOOST = "9a200000000000000000000000000008"
 GUID_SFX_PURR = "9a200000000000000000000000000009"
 GUID_SFX_SIP = "9a200000000000000000000000000010"
 GUID_SFX_MOUSE_CLICK = "9a200000000000000000000000000011"
+GUID_SFX_LAMP_SWITCH = "9a200000000000000000000000000012"
+GUID_SFX_BUG_SQUASH = "9a200000000000000000000000000013"
+GUID_SFX_CRATE_COLLECT = "9a200000000000000000000000000014"
+GUID_SFX_BUILD_COMPLETE = "9a200000000000000000000000000015"
+GUID_PROJECT_BUILD_MINIGAME = "8a100000000000000000000000000004"
 
 out = []
 def add(s=""):
@@ -791,6 +803,10 @@ add("  boostSound: {fileID: 8300000, guid: " + GUID_SFX_BOOST + ", type: 3}")
 add("  catPurrSound: {fileID: 8300000, guid: " + GUID_SFX_PURR + ", type: 3}")
 add("  sipSound: {fileID: 8300000, guid: " + GUID_SFX_SIP + ", type: 3}")
 add("  mouseClickSound: {fileID: 8300000, guid: " + GUID_SFX_MOUSE_CLICK + ", type: 3}")
+add("  lampSwitchSound: {fileID: 8300000, guid: " + GUID_SFX_LAMP_SWITCH + ", type: 3}")
+add("  bugSquashSound: {fileID: 8300000, guid: " + GUID_SFX_BUG_SQUASH + ", type: 3}")
+add("  crateCollectSound: {fileID: 8300000, guid: " + GUID_SFX_CRATE_COLLECT + ", type: 3}")
+add("  buildCompleteSound: {fileID: 8300000, guid: " + GUID_SFX_BUILD_COMPLETE + ", type: 3}")
 add("  sfxSource: {fileID: 1002003}")
 add("  typingSource: {fileID: 1002004}")
 add("  minTypingPitch: 0.94")
@@ -902,9 +918,15 @@ add_image(1400002, 1400000, None, color=(0.03, 0.035, 0.05, 1.0), raycast=0)
 
 # MobileFrame (Full Responsive Stretch Canvas Container)
 add_go(1500000, "MobileFrame", [1500001, 1500003, 1500002])
-add_rect(1500001, 1500000, 1442568835, [3000001, 3090001, 2010001, 2080001, 4000001, 5000001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(1500001, 1500000, 1442568835, [3000001, 3090001, 2010001, 2080001, 4000001, 5000001, 1501001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(1500003, 1500000)
 add_image(1500002, 1500000, None, color=(0.055, 0.065, 0.09, 1.0), raycast=0)
+
+# AmbientOverlay (Smooth day/sunset/night room lighting tint)
+add_go(1501000, "AmbientOverlay", [1501001, 1501003, 1501002])
+add_rect(1501001, 1501000, 1500001, [], amin=(0,0), amax=(1,1))
+add_cr(1501003, 1501000)
+add_image(1501002, 1501000, None, color=(1, 0.96, 0.88, 0), raycast=0)
 
 # FloatingTextParent
 add_go(3090000, "FloatingTextParent", [3090001])
@@ -924,9 +946,9 @@ add_rect(2010001, 2010000, 1500001, [2011001, 2020001, 2030001], amin=(0,1), ama
 add_cr(2010003, 2010000)
 add_image(2010002, 2010000, None, color=(0.07, 0.086, 0.12, 0.95), raycast=0)
 
-# Row 1: Top mini-controls (Reset, Mute, Boost)
+# Row 1: Top mini-controls (Reset, Mute, TimeOfDay, Boost)
 add_go(2011000, "TopControlsRow", [2011001])
-add_rect(2011001, 2011000, 2010001, [2060001, 2050001, 2040001], amin=(0, 1), amax=(1, 1), pos=(0, -40), size=(-40, 60), pivot=(0.5, 0.5))
+add_rect(2011001, 2011000, 2010001, [2060001, 2050001, 2070001, 2040001], amin=(0, 1), amax=(1, 1), pos=(0, -40), size=(-40, 60), pivot=(0.5, 0.5))
 
 # ResetButton (Lab requirement)
 add_go(2060000, "ResetButton", [2060001, 2060004, 2060002, 2060003])
@@ -949,6 +971,17 @@ add_go(2051000, "MuteIcon", [2051001, 2051003, 2051002])
 add_rect(2051001, 2051000, 2050001, [], amin=(0,0), amax=(1,1))
 add_cr(2051003, 2051000)
 add_tmp(2051002, 2051000, "ЗВУК: ВКЛ", fsize=15, fstyle=1, color=(0.2, 0.95, 0.65, 1), align=514, autosize=1, fmin=11, fmax=16)
+
+# TimeOfDayToggleBtn
+add_go(2070000, "TimeOfDayToggleBtn", [2070001, 2070004, 2070002, 2070003])
+add_rect(2070001, 2070000, 2011001, [2071001], amin=(0, 0.5), amax=(0, 0.5), pos=(365, 0), size=(130, 56), pivot=(0.5, 0.5))
+add_cr(2070004, 2070000)
+add_image(2070002, 2070000, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(2070003, 2070000, 2070002)
+add_go(2071000, "TimeOfDayTxt", [2071001, 2071003, 2071002])
+add_rect(2071001, 2071000, 2070001, [], amin=(0,0), amax=(1,1))
+add_cr(2071003, 2071000)
+add_tmp(2071002, 2071000, "☀️ ДЕНЬ", fsize=14, fstyle=1, color=(1,1,1,1), align=514, autosize=1, fmin=10, fmax=15)
 # AudioToggleButton
 add(f"--- !u!114 &2050005")
 add("MonoBehaviour:")
@@ -1004,14 +1037,27 @@ add_tmp(2031002, 2031000, "Баланс: 0 руб.  (+0 руб./сек)", fsize=
 # ==============================================================
 # 2. WORKPLACE AREA (Central 9:16 Vertical Workstation & Tap)
 # ==============================================================
-add_go(3000000, "WorkplaceArea", [3000001, 3000002, 3000003])
+add_go(3000000, "WorkplaceArea", [3000001, 3000002, 3000003, 3000004])
 add_rect(3000001, 3000000, 1500001, [3010001, 3080001, 3011001], amin=(0, 0), amax=(1, 1), pos=(0, -50), size=(0, -420), pivot=(0.5, 0.5))
 
 # DeskMat (Background desk surface)
 add_go(3010000, "DeskMat", [3010001, 3010003, 3010002])
-add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3010003, 3010000)
 add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
+
+# DeskLamp (Architectural modern desk lamp to left of monitor)
+add_go(3013000, "DeskLamp", [3013001, 3013004, 3013002, 3013003])
+add_rect(3013001, 3013000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-425, -290), size=(130, 200), pivot=(0.5, 0.5))
+add_cr(3013004, 3013000)
+add_image(3013002, 3013000, GUID_SPR_DESK_LAMP, raycast=1)
+add_button(3013003, 3013000, 3013002)
+
+# LampLightCone (Warm soft spotlight cone shining across workstation)
+add_go(3014000, "LampLightCone", [3014001, 3014003, 3014002])
+add_rect(3014001, 3014000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-210, -460), size=(580, 480), pivot=(0.5, 0.5))
+add_cr(3014003, 3014000)
+add_image(3014002, 3014000, GUID_SPR_LAMP_CONE, raycast=0)
 
 # MonitorFrame (Upper half of workstation - 840x420 with 756x306 bezel cutout)
 add_go(3020000, "MonitorFrame", [3020001, 3020003, 3020002])
@@ -1112,10 +1158,27 @@ add_tmp(3012202, 3012200, "ТЕМП ПЕЧАТИ: x1.0 (тапай быстре�
 
 # Cat Mascot (curled up sleeping peacefully under the keyboard on desk mat)
 add_go(3070000, "CatMascot", [3070001, 3070003, 3070002, 3070004])
-add_rect(3070001, 3070000, 3010001, [3071001], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -1210), size=(180, 125), pivot=(0.5, 0.5))
+add_rect(3070001, 3070000, 3010001, [3071001, 3072001, 3073001], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -1210), size=(180, 125), pivot=(0.5, 0.5))
 add_cr(3070003, 3070000)
 add_image(3070002, 3070000, GUID_SPR_CAT, raycast=1)
 add_button(3070004, 3070000, 3070002)
+
+# CatAccessory (Glasses or Bowtie)
+add_go(3072000, "CatAccessory", [3072001, 3072003, 3072002], active=0)
+add_rect(3072001, 3072000, 3070001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-15, -18), size=(40, 24), pivot=(0.5, 0.5))
+add_cr(3072003, 3072000)
+add_image(3072002, 3072000, GUID_SPR_CAT_BOWTIE, raycast=0)
+
+# CatAccessoryBtn (Mini tap button on collar/ear to cycle accessories)
+add_go(3073000, "CatAccessoryBtn", [3073001, 3073004, 3073002, 3073003])
+add_rect(3073001, 3073000, 3070001, [3073101], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(65, 40), size=(36, 36), pivot=(0.5, 0.5))
+add_cr(3073004, 3073000)
+add_image(3073002, 3073000, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(3073003, 3073000, 3073002)
+add_go(3073100, "CatAccTxt", [3073101, 3073103, 3073102])
+add_rect(3073101, 3073100, 3073001, [], amin=(0,0), amax=(1,1))
+add_cr(3073103, 3073100)
+add_tmp(3073102, 3073100, "🎀", fsize=16, fstyle=0, color=(1,1,1,1), align=514)
 
 # CatHeartEmote (Pops up with floating heart when cat purrs / woke up)
 add_go(3071000, "CatHeartEmote", [3071001, 3071003, 3071002], active=0)
@@ -1333,6 +1396,17 @@ add("  keyGlowS: {fileID: 3036002}")
 add("  keyGlowD: {fileID: 3037002}")
 add("  keyGlowSpace: {fileID: 3038002}")
 add("  keyGlowEsc: {fileID: 3033002}")
+add("  catStretchSprite: {fileID: 21300000, guid: " + GUID_SPR_CAT_STRETCH + ", type: 3}")
+add("  catAccessoryImage: {fileID: 3072002}")
+add("  catGlassesSprite: {fileID: 21300000, guid: " + GUID_SPR_CAT_GLASSES + ", type: 3}")
+add("  catBowtieSprite: {fileID: 21300000, guid: " + GUID_SPR_CAT_BOWTIE + ", type: 3}")
+add("  catAccessoryButton: {fileID: 3073003}")
+add("  deskLampObj: {fileID: 3013000}")
+add("  deskLampButton: {fileID: 3013003}")
+add("  lampConeObj: {fileID: 3014000}")
+add("  ambientOverlayGraphic: {fileID: 1501002}")
+add("  timeOfDayButton: {fileID: 2070003}")
+add("  timeOfDayText: {fileID: 2071002}")
 
 # ClickJuice component
 add(f"--- !u!114 &3000003")
@@ -1354,6 +1428,22 @@ add("  floatingTextPrefab: {fileID: 3091002}")
 add("  floatingTextParent: {fileID: 3090001}")
 add("  floatDistance: 110")
 add("  floatDuration: 0.8")
+
+# ProjectBuildMiniGame component
+add(f"--- !u!114 &3000004")
+add("MonoBehaviour:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 3000000}")
+add("  m_Enabled: 1")
+add("  m_EditorHideFlags: 0")
+add("  m_Script: {fileID: 11500000, guid: " + GUID_PROJECT_BUILD_MINIGAME + ", type: 3}")
+add("  m_Name: ")
+add("  m_EditorClassIdentifier: Assembly-CSharp::ProjectBuildMiniGame")
+add("  bugSprite: {fileID: 21300000, guid: " + GUID_SPR_MINI_BUG + ", type: 3}")
+add("  crateSprite: {fileID: 21300000, guid: " + GUID_SPR_MINI_CRATE + ", type: 3}")
 
 # ==============================================================
 # 3. BOTTOM NAVIGATION DOCK (Persistent mobile bottom bar - 3 tabs)
