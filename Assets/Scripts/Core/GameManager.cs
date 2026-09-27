@@ -269,6 +269,15 @@ public class GameManager : MonoBehaviour
         return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier();
     }
 
+    private double screensaverMultiplier = 1.0;
+
+    public void SetScreensaverActive(bool active)
+    {
+        screensaverMultiplier = active ? 1.20 : 1.0;
+    }
+
+    public bool IsScreensaverActive => screensaverMultiplier > 1.0;
+
     /// <summary>
     /// Расчет пассивных строк кода в секунду (боты, помощники, джуны)
     /// </summary>
@@ -282,7 +291,11 @@ public class GameManager : MonoBehaviour
                 staffBonus += upg.GetTotalPower();
             }
         }
-        return staffBonus * GetGlobalMultiplier();
+        if (screensaverMultiplier > 1.0 && staffBonus < 1.0)
+        {
+            staffBonus = 1.0; // Базовый поток в режиме заставки даже без найма джунов
+        }
+        return staffBonus * GetGlobalMultiplier() * screensaverMultiplier;
     }
 
     /// <summary>
@@ -390,6 +403,9 @@ public class GameManager : MonoBehaviour
         CheckAchievements();
         OnCurrenciesChanged?.Invoke();
     }
+
+    public void AddMoney(double amount) => AddDirectCurrencies(0.0, amount);
+    public void AddLinesOfCode(double amount) => AddDirectCurrencies(amount, 0.0);
 
     /// <summary>
     /// Списание денег (на покупку спинов колеса, предметов и т.д.)

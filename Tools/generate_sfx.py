@@ -733,6 +733,47 @@ def make_wheel_win(duration=1.2):
             samples[s_idx + i] += sig * env
     return samples
 
+def make_rush_alert(duration=0.55):
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+    # 3 urgent telemetry pings
+    pings = [(0.0, 987.77, 1975.53), (0.13, 1174.66, 2349.32), (0.26, 1479.98, 2959.96)]
+    for p_start, f1, f2 in pings:
+        s_idx = int(p_start * SAMPLE_RATE)
+        p_len = min(int(0.18 * SAMPLE_RATE), total_samples - s_idx)
+        for i in range(p_len):
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 26.0)
+            sig = (math.sin(2.0 * math.pi * f1 * t) * 0.45 + math.sin(2.0 * math.pi * f2 * t) * 0.25) * env
+            samples[s_idx + i] += sig
+    return samples
+
+def make_rush_success(duration=1.1):
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+    # Uplifting triumph arpeggio + coin sparkles
+    chords = [(0.0, 587.33), (0.10, 739.99), (0.20, 880.00), (0.32, 1174.66)]
+    for c_start, freq in chords:
+        s_idx = int(c_start * SAMPLE_RATE)
+        c_len = min(int((duration - c_start) * SAMPLE_RATE), total_samples - s_idx)
+        for i in range(c_len):
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 5.5) * 0.35
+            sig = (math.sin(2.0 * math.pi * freq * t) +
+                   0.45 * math.sin(2.0 * math.pi * freq * 2.0 * t) +
+                   0.20 * math.sin(2.0 * math.pi * freq * 3.0 * t)) * env
+            samples[s_idx + i] += sig
+    # Sparkle shimmer
+    for s_i in range(12):
+        t_sp = 0.35 + s_i * 0.045
+        sp_f = 2400.0 + (s_i * 260.0)
+        s_idx = int(t_sp * SAMPLE_RATE)
+        if s_idx < total_samples:
+            for i in range(min(int(0.08 * SAMPLE_RATE), total_samples - s_idx)):
+                t = i / SAMPLE_RATE
+                samples[s_idx + i] += math.sin(2.0 * math.pi * sp_f * t) * math.exp(-t * 40.0) * 0.08
+    return samples
+
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
@@ -765,4 +806,6 @@ save_wav(os.path.join(out_dir, "night_ambience_loop.wav"), make_night_ambience()
 save_wav(os.path.join(out_dir, "quest_complete.wav"), make_quest_complete())
 save_wav(os.path.join(out_dir, "wheel_tick.wav"), make_wheel_tick())
 save_wav(os.path.join(out_dir, "wheel_win.wav"), make_wheel_win())
+save_wav(os.path.join(out_dir, "rush_alert.wav"), make_rush_alert())
+save_wav(os.path.join(out_dir, "rush_success.wav"), make_rush_success())
 print("All sound effects generated successfully!")

@@ -21,6 +21,12 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private GameObject secondMonitorPanel;
     [SerializeField] private int maxVisibleLines = 12;
 
+    [Header("Экранная заставка (Matrix Screensaver)")]
+    [SerializeField] private GameObject screensaverRoot;
+    [SerializeField] private TMP_Text screensaverText;
+    [SerializeField] private Graphic screensaverGlow;
+    [SerializeField] private Button screensaverToggleBtn;
+
     [Header("Клавиатура")]
     [SerializeField] private Transform keyboardTransform;
     [SerializeField] private Graphic keyboardGlowImage;
@@ -28,6 +34,8 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Sprite sprKeyboardDefault;
     [SerializeField] private Sprite sprKeyboardRetro;
     [SerializeField] private Sprite sprKeyboardNeon;
+    [SerializeField] private Sprite sprKeyboardCarbon;
+    [SerializeField] private Sprite sprKeyboardPastel;
     [SerializeField] private Button keyboardStyleButton;
     [SerializeField] private TMP_Text keyboardStyleText;
     [SerializeField] private Button keyboardSwitchButton;
@@ -327,6 +335,7 @@ public class WorkplaceVisuals : MonoBehaviour
         InitRoomThemeCustomization();
         InitPetCompanionCustomization();
         InitDeskMatCustomization();
+        InitScreensaver();
         InitLighting();
         InitDrinksInteraction();
         InitMouseInteraction();
@@ -401,6 +410,9 @@ public class WorkplaceVisuals : MonoBehaviour
 
         // 11. Освещение, день/ночь и настольная лампа
         UpdateLighting(dt);
+
+        // 12. Экранная заставка (Matrix Screensaver)
+        UpdateScreensaver(dt);
     }
 
     #region Визуальная эволюция стола
@@ -704,6 +716,12 @@ public class WorkplaceVisuals : MonoBehaviour
 
     private void HandleCodeClicked(double amount, bool isCrit, Vector2 screenPos)
     {
+        ResetIdleTimer();
+        if (isScreensaverActive)
+        {
+            DeactivateScreensaver();
+        }
+
         string nextLine = CodeSnippets[Random.Range(0, CodeSnippets.Length)];
         terminalHistory.Add(nextLine);
 
@@ -1846,9 +1864,10 @@ public class WorkplaceVisuals : MonoBehaviour
 
     private static readonly string[] KeyboardStyleNames = new string[]
     {
-        "CYBERPUNK",
-        "RETRO IBM",
-        "TOKYO NEON"
+        "RETRO GREY",
+        "CYBER NEON",
+        "CARBON DARK",
+        "PASTEL DREAM"
     };
 
     private static readonly string[] SwitchTypeNames = new string[]
@@ -1861,7 +1880,7 @@ public class WorkplaceVisuals : MonoBehaviour
 
     private void InitKeyboardCustomization()
     {
-        currentKeyboardStyle = PlayerPrefs.GetInt("SelectedKeyboardStyle", 0);
+        currentKeyboardStyle = PlayerPrefs.GetInt("SelectedKeycapPalette", PlayerPrefs.GetInt("SelectedKeyboardStyle", 0));
         currentSwitchType = PlayerPrefs.GetInt("SelectedSwitchType", 0);
 
         if (keyboardStyleButton != null)
@@ -1882,17 +1901,25 @@ public class WorkplaceVisuals : MonoBehaviour
 
     public void CycleKeyboardStyle()
     {
-        currentKeyboardStyle = (currentKeyboardStyle + 1) % 3;
+        currentKeyboardStyle = (currentKeyboardStyle + 1) % 4;
         PlayerPrefs.SetInt("SelectedKeyboardStyle", currentKeyboardStyle);
+        PlayerPrefs.SetInt("SelectedKeycapPalette", currentKeyboardStyle);
         PlayerPrefs.Save();
         ApplyKeyboardStyle(currentKeyboardStyle, true);
         UpdateKeyboardCustomizationLabels();
 
         HapticFeedback.Vibrate(25);
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayCassetteClick();
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayKeycapThemeSound(currentKeyboardStyle);
+        }
         if (ClickJuice.Instance != null && keyboardStyleButton != null)
         {
-            ClickJuice.Instance.SpawnCustomPopup($"КЛАВИАТУРА: {KeyboardStyleNames[currentKeyboardStyle]}", keyboardStyleButton.transform.position, new Color(0.3f, 0.9f, 1f), true);
+            Color popupCol = currentKeyboardStyle == 0 ? new Color(1f, 0.85f, 0.4f) :
+                             currentKeyboardStyle == 1 ? new Color(0.2f, 0.95f, 1f) :
+                             currentKeyboardStyle == 2 ? new Color(1f, 0.55f, 0.2f) :
+                             new Color(1f, 0.7f, 0.9f);
+            ClickJuice.Instance.SpawnCustomPopup($"🎨 КОЛПАЧКИ: {KeyboardStyleNames[currentKeyboardStyle]}", keyboardStyleButton.transform.position, popupCol, true);
         }
     }
 
@@ -1917,22 +1944,27 @@ public class WorkplaceVisuals : MonoBehaviour
     private void ApplyKeyboardStyle(int style, bool animate)
     {
         if (keyboardBaseImage == null) return;
-        Sprite targetSprite = sprKeyboardDefault;
-        Color glowColor = new Color(0f, 0.89f, 1f, 0f);
+        Sprite targetSprite = sprKeyboardRetro;
+        Color glowColor = new Color(1f, 0.72f, 0.25f, 0f);
 
         switch (style)
         {
-            case 0: // Cyberpunk
-                targetSprite = sprKeyboardDefault != null ? sprKeyboardDefault : keyboardBaseImage.sprite;
-                glowColor = new Color(0f, 0.89f, 1f, 0f);
-                break;
-            case 1: // Retro IBM
+            case 0: // Retro Grey
                 if (sprKeyboardRetro != null) targetSprite = sprKeyboardRetro;
-                glowColor = new Color(1f, 0.7f, 0.2f, 0f);
+                glowColor = new Color(1f, 0.72f, 0.25f, 0f);
                 break;
-            case 2: // Tokyo Neon
+            case 1: // Cyber Neon
                 if (sprKeyboardNeon != null) targetSprite = sprKeyboardNeon;
-                glowColor = new Color(1f, 0.2f, 0.8f, 0f);
+                else if (sprKeyboardDefault != null) targetSprite = sprKeyboardDefault;
+                glowColor = new Color(0f, 0.95f, 1f, 0f);
+                break;
+            case 2: // Carbon Dark
+                if (sprKeyboardCarbon != null) targetSprite = sprKeyboardCarbon;
+                glowColor = new Color(1f, 0.45f, 0.05f, 0f);
+                break;
+            case 3: // Pastel Dream
+                if (sprKeyboardPastel != null) targetSprite = sprKeyboardPastel;
+                glowColor = new Color(1f, 0.55f, 0.85f, 0f);
                 break;
         }
 
@@ -2197,6 +2229,116 @@ public class WorkplaceVisuals : MonoBehaviour
         if (deskMatSkinText != null)
         {
             deskMatSkinText.text = $"🟪 {DeskMatSkinNames[currentDeskMatSkin]}";
+        }
+    }
+
+    #endregion
+
+    #region Экранная заставка терминала (Matrix Screensaver)
+
+    private float idleInteractionTimer = 0f;
+    private bool isScreensaverActive = false;
+    private float matrixRainTimer = 0f;
+    private const float ScreensaverIdleThreshold = 45f;
+
+    private static readonly string[] MatrixSymbols = new string[]
+    {
+        "0", "1", "<", ">", "/", ";", "{", "}", "=", "+", "*", "!",
+        "ﾊ", "ﾐ", "ﾋ", "ｰ", "ｳ", "ｼ", "ﾅ", "ﾓ", "ﾆ", "ｻ", "ﾜ", "ﾂ", "ﾃ", "ｵ", "ﾘ", "ｱ", "ﾎ", "ﾃ", "ﾏ"
+    };
+
+    private void InitScreensaver()
+    {
+        if (screensaverRoot != null)
+        {
+            screensaverRoot.SetActive(false);
+        }
+
+        if (screensaverToggleBtn != null)
+        {
+            screensaverToggleBtn.onClick.RemoveAllListeners();
+            screensaverToggleBtn.onClick.AddListener(ToggleScreensaver);
+        }
+    }
+
+    public void ResetIdleTimer()
+    {
+        idleInteractionTimer = 0f;
+    }
+
+    public void ToggleScreensaver()
+    {
+        if (isScreensaverActive) DeactivateScreensaver();
+        else ActivateScreensaver();
+    }
+
+    public void ActivateScreensaver()
+    {
+        if (isScreensaverActive) return;
+        isScreensaverActive = true;
+        if (screensaverRoot != null) screensaverRoot.SetActive(true);
+        if (GameManager.Instance != null) GameManager.Instance.SetScreensaverActive(true);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayRoboBeep();
+        if (ClickJuice.Instance != null && screensaverRoot != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup("💻 MATRIX ЗАСТАВКА (+20% АВТО-КОД)", screensaverRoot.transform.position, new Color(0.2f, 1f, 0.5f), true);
+        }
+    }
+
+    public void DeactivateScreensaver()
+    {
+        if (!isScreensaverActive) return;
+        isScreensaverActive = false;
+        idleInteractionTimer = 0f;
+        if (screensaverRoot != null) screensaverRoot.SetActive(false);
+        if (GameManager.Instance != null) GameManager.Instance.SetScreensaverActive(false);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCassetteClick();
+        if (ClickJuice.Instance != null && screensaverRoot != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup("🚀 Терминал активен! (+бонус получен)", screensaverRoot.transform.position, new Color(0.2f, 1f, 0.8f), false);
+        }
+    }
+
+    private void UpdateScreensaver(float dt)
+    {
+        if (!isScreensaverActive)
+        {
+            idleInteractionTimer += dt;
+            if (idleInteractionTimer >= ScreensaverIdleThreshold)
+            {
+                ActivateScreensaver();
+            }
+            return;
+        }
+
+        matrixRainTimer += dt;
+        if (matrixRainTimer >= 0.08f)
+        {
+            matrixRainTimer = 0f;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("<color=#39FF14><b>[ ⚡ MATRIX SCREENSAVER: +20% АВТО-КОД | ТАПНИ ДЛЯ ВЫХОДА ]</b></color>");
+            for (int r = 0; r < 9; r++)
+            {
+                sb.Append("  ");
+                for (int c = 0; c < 20; c++)
+                {
+                    string s = MatrixSymbols[Random.Range(0, MatrixSymbols.Length)];
+                    float alpha = Random.Range(0.35f, 1.0f);
+                    string hexAlpha = ((int)(alpha * 255)).ToString("X2");
+                    sb.Append($"<color=#00FF66{hexAlpha}>{s}</color> ");
+                }
+                sb.AppendLine();
+            }
+            if (screensaverText != null)
+            {
+                screensaverText.text = sb.ToString();
+            }
+        }
+
+        if (screensaverGlow != null)
+        {
+            float pulse = (Mathf.Sin(Time.time * 4f) + 1f) * 0.5f;
+            screensaverGlow.color = new Color(0f, 1f, 0.4f, 0.15f + pulse * 0.15f);
         }
     }
 

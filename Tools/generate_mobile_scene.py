@@ -84,6 +84,7 @@ GUID_DAILY_QUESTS_UI = "8a100000000000000000000000000007"
 GUID_DAILY_STREAK_UI = "8a100000000000000000000000000008"
 GUID_LUCKY_WHEEL_UI = "8a100000000000000000000000000009"
 GUID_SAVE_EXPORT_UI = "8a10000000000000000000000000000a"
+GUID_FREELANCE_RUSH_UI = "8a10000000000000000000000000000b"
 
 # Keyboard Variant Sprites, LoFi Player, Wallpapers, Quest Icon, Pets & Streak
 GUID_SPR_KEYBOARD_RETRO = "7b300000000000000000000000000020"
@@ -105,6 +106,8 @@ GUID_SPR_MAT_FELT = "7b30000000000000000000000000002f"
 GUID_SPR_MAT_CYBER = "7b300000000000000000000000000030"
 GUID_SPR_MAT_BLUEPRINT = "7b300000000000000000000000000031"
 GUID_SPR_MAT_RGB = "7b300000000000000000000000000032"
+GUID_SPR_KEYBOARD_CARBON = "7b300000000000000000000000000033"
+GUID_SPR_KEYBOARD_PASTEL = "7b300000000000000000000000000034"
 
 # Audio SFX & Music Loops
 GUID_SFX_CASSETTE_CLICK = "9a200000000000000000000000000016"
@@ -121,6 +124,8 @@ GUID_SFX_ROBO_BEEP = "9a200000000000000000000000000026"
 GUID_SFX_STREAK_CLAIM = "9a200000000000000000000000000027"
 GUID_SFX_WHEEL_TICK = "9a200000000000000000000000000028"
 GUID_SFX_WHEEL_WIN = "9a200000000000000000000000000029"
+GUID_SFX_RUSH_ALERT = "9a200000000000000000000000000030"
+GUID_SFX_RUSH_SUCCESS = "9a200000000000000000000000000031"
 
 out = []
 def add(s=""):
@@ -860,6 +865,8 @@ add("  bugSquashSound: {fileID: 8300000, guid: " + GUID_SFX_BUG_SQUASH + ", type
 add("  crateCollectSound: {fileID: 8300000, guid: " + GUID_SFX_CRATE_COLLECT + ", type: 3}")
 add("  buildCompleteSound: {fileID: 8300000, guid: " + GUID_SFX_BUILD_COMPLETE + ", type: 3}")
 add("  cassetteClickSound: {fileID: 8300000, guid: " + GUID_SFX_CASSETTE_CLICK + ", type: 3}")
+add("  rushAlertSound: {fileID: 8300000, guid: " + GUID_SFX_RUSH_ALERT + ", type: 3}")
+add("  rushSuccessSound: {fileID: 8300000, guid: " + GUID_SFX_RUSH_SUCCESS + ", type: 3}")
 add("  sfxSource: {fileID: 1002003}")
 add("  typingSource: {fileID: 1002004}")
 add("  minTypingPitch: 0.94")
@@ -971,7 +978,7 @@ add_image(1400002, 1400000, None, color=(0.03, 0.035, 0.05, 1.0), raycast=0)
 
 # MobileFrame (Full Responsive Stretch Canvas Container)
 add_go(1500000, "MobileFrame", [1500001, 1500003, 1500002])
-add_rect(1500001, 1500000, 1442568835, [1502001, 3000001, 3090001, 2010001, 2080001, 1501001, 4000001, 5000001, 6000001, 7000001, 8000001, 8100001, 8200001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(1500001, 1500000, 1442568835, [1502001, 3000001, 3090001, 2010001, 2080001, 1501001, 4000001, 5000001, 6000001, 7000001, 8000001, 8100001, 8200001, 8300001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(1500003, 1500000)
 add_image(1500002, 1500000, None, color=(0.055, 0.065, 0.09, 1.0), raycast=0)
 
@@ -1178,7 +1185,7 @@ add_rect(3000001, 3000000, 1500001, [3010001, 3080001, 3011001], amin=(0, 0), am
 
 # DeskMat (Background desk surface)
 add_go(3010000, "DeskMat", [3010001, 3010003, 3010002])
-add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001, 3015001, 3016001, 3042001, 3017001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001, 3015001, 3016001, 3042001, 3017001, 3018001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3010003, 3010000)
 add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
 
@@ -1455,7 +1462,7 @@ add_button(3022503, 3022500, 3022502)
 
 # MonitorScreen (Exact 756x306 fit inside MonitorFrame cutout, perfectly centered)
 add_go(3021000, "MonitorScreen", [3021001, 3021003, 3021002])
-add_rect(3021001, 3021000, 3020001, [3021051, 3021201, 3021301, 3021401, 3021501], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 27), size=(756, 306), pivot=(0.5, 0.5))
+add_rect(3021001, 3021000, 3020001, [3021051, 3021201, 3021301, 3021401, 3021501, 3021601, 3021621], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 27), size=(756, 306), pivot=(0.5, 0.5))
 add_cr(3021003, 3021000)
 add_image(3021002, 3021000, GUID_SPR_MON_SCREEN, raycast=0)
 
@@ -1498,6 +1505,83 @@ add_go(3021510, "HotkeyHintText", [3021511, 3021513, 3021512])
 add_rect(3021511, 3021510, 3021501, [], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3021513, 3021510)
 add_tmp(3021512, 3021510, "<color=#569CD6>[Ctrl+S]</color> Быстрое сохранение", fsize=13, fstyle=1, color=(0.85, 0.92, 1, 1), align=514, autosize=1, fmin=10, fmax=14)
+
+# ScreensaverToggleBtn (Quick manual toggle for Matrix Screensaver on top-right bezel)
+add_go(3021620, "ScreensaverToggleBtn", [3021621, 3021624, 3021622, 3021623])
+add_rect(3021621, 3021620, 3021001, [3021625], amin=(1, 1), amax=(1, 1), pos=(-58, -18), size=(96, 26), pivot=(0.5, 0.5))
+add_cr(3021624, 3021620)
+add_image(3021622, 3021620, GUID_SPR_CARD_BG, color=(0.04, 0.12, 0.08, 0.95), img_type=1)
+add_button(3021623, 3021620, 3021622)
+
+add_go(3021626, "ScreensaverBtnTxt", [3021625, 3021627, 3021628])
+add_rect(3021625, 3021626, 3021621, [], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_cr(3021627, 3021626)
+add_tmp(3021628, 3021626, "💻 MATRIX", fsize=10, fstyle=1, color=(0.2, 1, 0.5, 1), align=514)
+
+# ScreensaverRoot (Full monitor cyber digital rain overlay)
+add_go(3021600, "ScreensaverRoot", [3021601, 3021604, 3021602], active=0)
+add_rect(3021601, 3021600, 3021001, [3021611, 3021631], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_cr(3021604, 3021600)
+add_image(3021602, 3021600, None, color=(0.02, 0.04, 0.03, 0.96), raycast=0)
+
+add_go(3021610, "ScreensaverText", [3021611, 3021613, 3021612])
+add_rect(3021611, 3021610, 3021601, [], amin=(0, 0), amax=(1, 1), pos=(0, -10), size=(-20, -20), pivot=(0.5, 0.5))
+add_cr(3021613, 3021610)
+add_tmp(3021612, 3021610, "<color=#39FF14><b>[ ⚡ MATRIX SCREENSAVER: +20% АВТО-КОД | ТАПНИ ДЛЯ ВЫХОДА ]</b></color>\\n0 1 0 1 ﾊ ﾐ ﾋ ｰ ｳ ｼ ﾅ ﾓ ﾆ ｻ ﾜ ﾂ ﾃ ｵ ﾘ ｱ", fsize=12, fstyle=1, color=(0.2, 1, 0.4, 1), align=514, autosize=0)
+
+add_go(3021630, "ScreensaverDismissBtn", [3021631, 3021634, 3021632, 3021633])
+add_rect(3021631, 3021630, 3021601, [], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_cr(3021634, 3021630)
+add_image(3021632, 3021630, None, color=(1, 1, 1, 0.001), raycast=1)
+add_button(3021633, 3021630, 3021632)
+
+# FreelanceRushBanner (Pill dock on workstation between monitor and combo bar)
+add_go(3018000, "FreelanceRushBanner", [3018001, 3018004, 3018002])
+add_rect(3018001, 3018000, 3010001, [3018011, 3018101, 3018201, 3018301, 3018401, 3018501], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -700), size=(760, 56), pivot=(0.5, 1))
+add_cr(3018004, 3018000)
+add_image(3018002, 3018000, GUID_SPR_CARD_BG, color=(0.08, 0.11, 0.17, 0.95), img_type=1)
+
+# Glow
+add_go(3018010, "RushBannerGlow", [3018011, 3018013, 3018012])
+add_rect(3018011, 3018010, 3018001, [], amin=(0, 0), amax=(1, 1))
+add_cr(3018013, 3018010)
+add_image(3018012, 3018010, GUID_SPR_CARD_BG, color=(0.2, 0.6, 1.0, 0.25), img_type=1, raycast=0)
+
+# Banner Title
+add_go(3018100, "RushBannerTitle", [3018101, 3018103, 3018102])
+add_rect(3018101, 3018100, 3018001, [], amin=(0, 0.5), amax=(0, 0.5), pos=(210, 11), size=(380, 24), pivot=(0.5, 0.5))
+add_cr(3018103, 3018100)
+add_tmp(3018102, 3018100, "⚡ БИРЖА ФРИЛАНСА", fsize=13, fstyle=1, color=(1, 0.85, 0.3, 1), align=513, autosize=1, fmin=10, fmax=14)
+
+# Banner Progress Text
+add_go(3018200, "RushBannerProgressText", [3018201, 3018203, 3018202])
+add_rect(3018201, 3018200, 3018001, [], amin=(0, 0.5), amax=(0, 0.5), pos=(210, -11), size=(380, 20), pivot=(0.5, 0.5))
+add_cr(3018203, 3018200)
+add_tmp(3018202, 3018200, "Поиск заказов... (12с)", fsize=11, fstyle=0, color=(0.7, 0.8, 0.9, 1), align=513, autosize=1, fmin=9, fmax=12)
+
+# Banner Timer Text
+add_go(3018300, "RushBannerTimerText", [3018301, 3018303, 3018302])
+add_rect(3018301, 3018300, 3018001, [], amin=(1, 0.5), amax=(1, 0.5), pos=(-195, 0), size=(110, 30), pivot=(0.5, 0.5))
+add_cr(3018303, 3018300)
+add_tmp(3018302, 3018300, "02:30", fsize=15, fstyle=1, color=(0.3, 1, 0.8, 1), align=514, autosize=1, fmin=11, fmax=16)
+
+# Banner Progress Fill (Bottom bar)
+add_go(3018400, "RushBannerFill", [3018401, 3018403, 3018402])
+add_rect(3018401, 3018400, 3018001, [], amin=(0, 0), amax=(1, 0), pos=(0, 3), size=(-10, 6), pivot=(0.5, 0.5))
+add_cr(3018403, 3018400)
+add_image(3018402, 3018400, GUID_SPR_BTN_GOLD, color=(0.2, 0.85, 0.55, 0.85), img_type=3, fill_method=0, fill_amount=0)
+
+# Banner Action Button ("ПРИНЯТЬ" / "ОБЗОР")
+add_go(3018500, "RushBannerActionBtn", [3018501, 3018504, 3018502, 3018503])
+add_rect(3018501, 3018500, 3018001, [3018511], amin=(1, 0.5), amax=(1, 0.5), pos=(-75, 0), size=(110, 38), pivot=(0.5, 0.5))
+add_cr(3018504, 3018500)
+add_image(3018502, 3018500, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(3018503, 3018500, 3018502)
+
+add_go(3018510, "RushBannerActionTxt", [3018511, 3018513, 3018512])
+add_rect(3018511, 3018510, 3018501, [], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_cr(3018513, 3018510)
+add_tmp(3018512, 3018510, "ОБЗОР", fsize=12, fstyle=1, color=(1, 1, 1, 1), align=514, autosize=1, fmin=9, fmax=14)
 
 # ComboBar (Between monitor and keyboard)
 add_go(3012000, "ComboBar", [3012001, 3012003, 3012002])
@@ -1756,12 +1840,18 @@ add("  monitorCodeText: {fileID: 3021102}")
 add("  monitorScreenGlow: {fileID: 3021402}")
 add("  secondMonitorText: {fileID: 3021212}")
 add("  secondMonitorPanel: {fileID: 3021200}")
+add("  screensaverRoot: {fileID: 3021600}")
+add("  screensaverText: {fileID: 3021612}")
+add("  screensaverGlow: {fileID: 3021602}")
+add("  screensaverToggleBtn: {fileID: 3021623}")
 add("  keyboardTransform: {fileID: 3030001}")
 add("  keyboardGlowImage: {fileID: 3032002}")
 add("  keyboardBaseImage: {fileID: 3031002}")
 add("  sprKeyboardDefault: {fileID: 21300000, guid: " + GUID_SPR_KEYBOARD + ", type: 3}")
 add("  sprKeyboardRetro: {fileID: 21300000, guid: " + GUID_SPR_KEYBOARD_RETRO + ", type: 3}")
 add("  sprKeyboardNeon: {fileID: 21300000, guid: " + GUID_SPR_KEYBOARD_NEON + ", type: 3}")
+add("  sprKeyboardCarbon: {fileID: 21300000, guid: " + GUID_SPR_KEYBOARD_CARBON + ", type: 3}")
+add("  sprKeyboardPastel: {fileID: 21300000, guid: " + GUID_SPR_KEYBOARD_PASTEL + ", type: 3}")
 add("  keyboardStyleButton: {fileID: 3039103}")
 add("  keyboardStyleText: {fileID: 3039112}")
 add("  keyboardSwitchButton: {fileID: 3039203}")
@@ -3177,6 +3267,204 @@ add("  loadImportBtn: {fileID: 8205303}")
 add("  importStatusText: {fileID: 8205502}")
 add("  hardResetBtn: {fileID: 8206003}")
 add("  hardResetBtnText: {fileID: 8206012}")
+
+# ==============================================================
+# FREELANCE RUSH MODAL POPUP (8300000)
+# ==============================================================
+add_go(8300000, "FreelanceRushModalRoot", [8300001, 8300004], active=0)
+add_rect(8300001, 8300000, 1500001, [8301001, 8302001], amin=(0,0), amax=(1,1))
+
+# Dim Backdrop
+add_go(8301000, "ModalBackdrop", [8301001, 8301004, 8301002, 8301003])
+add_rect(8301001, 8301000, 8300001, [], amin=(0,0), amax=(1,1))
+add_cr(8301004, 8301000)
+add_image(8301002, 8301000, None, color=(0, 0, 0, 0.8), raycast=1)
+add_button(8301003, 8301000, 8301002)
+
+# Modal Card
+add_go(8302000, "ModalCard", [8302001, 8302004, 8302002])
+add_rect(8302001, 8302000, 8300001, [8303001, 8304001, 8304101, 8304201, 8305001, 8306001, 8307001, 8308001, 8309001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 20), size=(960, 1260))
+add_cr(8302004, 8302000)
+add_image(8302002, 8302000, GUID_SPR_CARD_BG, color=(0.08, 0.10, 0.15, 0.98), img_type=1)
+
+# Header
+add_go(8303000, "Header", [8303001])
+add_rect(8303001, 8303000, 8302001, [8303101, 8303201], amin=(0, 1), amax=(1, 1), pos=(0, -45), size=(0, 70), pivot=(0.5, 1))
+
+add_go(8303100, "Title", [8303101, 8303103, 8303102])
+add_rect(8303101, 8303100, 8303001, [], amin=(0, 0), amax=(1, 1), pos=(40, 0))
+add_cr(8303103, 8303100)
+add_tmp(8303102, 8303100, "⚡ СРОЧНЫЙ ДЕДЛАЙН", fsize=30, fstyle=1, color=(1, 0.85, 0.3, 1), align=513)
+
+add_go(8303200, "CloseXBtn", [8303201, 8303204, 8303202, 8303203])
+add_rect(8303201, 8303200, 8303001, [8303211], amin=(1, 0.5), amax=(1, 0.5), pos=(-50, 0), size=(56, 56))
+add_cr(8303204, 8303200)
+add_image(8303202, 8303200, GUID_SPR_BTN_ORANGE, img_type=1)
+add_button(8303203, 8303200, 8303202)
+add_go(8303210, "Txt", [8303211, 8303213, 8303212])
+add_rect(8303211, 8303210, 8303201, [], amin=(0, 0), amax=(1, 1))
+add_cr(8303213, 8303210)
+add_tmp(8303212, 8303210, "✕", fsize=24, fstyle=1, color=(1, 1, 1, 1), align=514)
+
+# Client Pill
+add_go(8304000, "ClientPill", [8304001, 8304004, 8304002])
+add_rect(8304001, 8304000, 8302001, [8304011], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -140), size=(880, 52), pivot=(0.5, 0.5))
+add_cr(8304004, 8304000)
+add_image(8304002, 8304000, GUID_SPR_CARD_BG, color=(0.12, 0.16, 0.25, 0.95), img_type=1)
+add_go(8304010, "ClientTxt", [8304011, 8304013, 8304012])
+add_rect(8304011, 8304010, 8304001, [], amin=(0, 0), amax=(1, 1))
+add_cr(8304013, 8304010)
+add_tmp(8304012, 8304010, "🏢 Финтех 'CryptoPay'", fsize=17, fstyle=1, color=(0.4, 0.85, 1, 1), align=514)
+
+# Order Title
+add_go(8304100, "OrderTitleTxt", [8304101, 8304103, 8304102])
+add_rect(8304101, 8304100, 8302001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -210), size=(880, 48), pivot=(0.5, 0.5))
+add_cr(8304103, 8304100)
+add_tmp(8304102, 8304100, "Срочный хотфикс краша в проде", fsize=22, fstyle=1, color=(1, 0.85, 0.25, 1), align=514)
+
+# Order Description
+add_go(8304200, "OrderDescTxt", [8304201, 8304203, 8304202])
+add_rect(8304201, 8304200, 8302001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -290), size=(860, 80), pivot=(0.5, 0.5))
+add_cr(8304203, 8304200)
+add_tmp(8304202, 8304200, "Инвесторы уже сидят в переговорной! Нужен стабильный билд без крашей.", fsize=16, fstyle=0, color=(0.8, 0.88, 0.98, 1), align=514)
+
+# ProgressBox (Target, Timer, Fill bar)
+add_go(8305000, "ProgressBox", [8305001, 8305004, 8305002])
+add_rect(8305001, 8305000, 8302001, [8305101, 8305201, 8305301, 8305401], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -425), size=(880, 140), pivot=(0.5, 0.5))
+add_cr(8305004, 8305000)
+add_image(8305002, 8305000, GUID_SPR_CARD_BG, color=(0.06, 0.08, 0.12, 0.95), img_type=1)
+
+# Target text
+add_go(8305100, "TargetTxt", [8305101, 8305103, 8305102])
+add_rect(8305101, 8305100, 8305001, [], amin=(0, 1), amax=(0.5, 1), pos=(220, -30), size=(400, 30), pivot=(0.5, 0.5))
+add_cr(8305103, 8305100)
+add_tmp(8305102, 8305100, "Цель: 2,500 строк кода", fsize=16, fstyle=1, color=(1, 1, 1, 1), align=513)
+
+# Timer text
+add_go(8305200, "TimerTxt", [8305201, 8305203, 8305202])
+add_rect(8305201, 8305200, 8305001, [], amin=(0.5, 1), amax=(1, 1), pos=(-220, -30), size=(400, 30), pivot=(0.5, 0.5))
+add_cr(8305203, 8305200)
+add_tmp(8305202, 8305200, "⏰ До дедлайна: 02:45", fsize=16, fstyle=1, color=(1, 0.65, 0.2, 1), align=515)
+
+# Progress Track & Fill
+add_go(8305300, "ProgressTrack", [8305301, 8305304, 8305302])
+add_rect(8305301, 8305300, 8305001, [8305311], amin=(0.5, 0), amax=(0.5, 0), pos=(0, 48), size=(820, 30), pivot=(0.5, 0.5))
+add_cr(8305304, 8305300)
+add_image(8305302, 8305300, GUID_SPR_CARD_BG, color=(0.04, 0.05, 0.08, 0.95), img_type=1)
+
+add_go(8305310, "ModalProgressFill", [8305311, 8305313, 8305312])
+add_rect(8305311, 8305310, 8305301, [], amin=(0, 0), amax=(1, 1))
+add_cr(8305313, 8305310)
+add_image(8305312, 8305310, GUID_SPR_BTN_CYAN, color=(0.2, 0.95, 0.65, 0.9), img_type=3, fill_method=0, fill_amount=0)
+
+# Percent text
+add_go(8305400, "PercentTxt", [8305401, 8305403, 8305402])
+add_rect(8305401, 8305400, 8305001, [], amin=(0.5, 0), amax=(0.5, 0), pos=(0, 48), size=(820, 30), pivot=(0.5, 0.5))
+add_cr(8305403, 8305400)
+add_tmp(8305402, 8305400, "0 / 2,500 (0%)", fsize=14, fstyle=1, color=(1, 1, 1, 1), align=514)
+
+# Rewards Box
+add_go(8306000, "RewardsBox", [8306001])
+add_rect(8306001, 8306000, 8302001, [8306101, 8306201], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -570), size=(880, 100), pivot=(0.5, 0.5))
+
+add_go(8306100, "RewardMoneyPill", [8306101, 8306104, 8306102])
+add_rect(8306101, 8306100, 8306001, [8306111], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-215, 0), size=(410, 80))
+add_cr(8306104, 8306100)
+add_image(8306102, 8306100, GUID_SPR_BTN_GOLD, img_type=1)
+add_go(8306110, "MoneyTxt", [8306111, 8306113, 8306112])
+add_rect(8306111, 8306110, 8306101, [], amin=(0, 0), amax=(1, 1))
+add_cr(8306113, 8306110)
+add_tmp(8306112, 8306110, "+45,000 ₽", fsize=22, fstyle=1, color=(1, 1, 1, 1), align=514)
+
+add_go(8306200, "RewardCodePill", [8306201, 8306204, 8306202])
+add_rect(8306201, 8306200, 8306001, [8306211], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(215, 0), size=(410, 80))
+add_cr(8306204, 8306200)
+add_image(8306202, 8306200, GUID_SPR_BTN_CYAN, img_type=1)
+add_go(8306210, "CodeTxt", [8306211, 8306213, 8306212])
+add_rect(8306211, 8306210, 8306201, [], amin=(0, 0), amax=(1, 1))
+add_cr(8306213, 8306210)
+add_tmp(8306212, 8306210, "+625 строк", fsize=22, fstyle=1, color=(1, 1, 1, 1), align=514)
+
+# Action Buttons (Accept & Reject)
+add_go(8307000, "ActionButtonsRow", [8307001])
+add_rect(8307001, 8307000, 8302001, [8307101, 8307201], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -690), size=(880, 84), pivot=(0.5, 0.5))
+
+add_go(8307100, "AcceptBtn", [8307101, 8307104, 8307102, 8307103])
+add_rect(8307101, 8307100, 8307001, [8307111], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-140, 0), size=(550, 78))
+add_cr(8307104, 8307100)
+add_image(8307102, 8307100, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(8307103, 8307100, 8307102)
+add_go(8307110, "AcceptBtnTxt", [8307111, 8307113, 8307112])
+add_rect(8307111, 8307110, 8307101, [], amin=(0, 0), amax=(1, 1))
+add_cr(8307113, 8307110)
+add_tmp(8307112, 8307110, "ВЗЯТЬ В РАБОТУ", fsize=22, fstyle=1, color=(1, 1, 1, 1), align=514)
+
+add_go(8307200, "RejectBtn", [8307201, 8307204, 8307202, 8307203])
+add_rect(8307201, 8307200, 8307001, [8307211], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(285, 0), size=(270, 78))
+add_cr(8307204, 8307200)
+add_image(8307202, 8307200, GUID_SPR_BTN_ORANGE, img_type=1)
+add_button(8307203, 8307200, 8307202)
+add_go(8307210, "RejectBtnTxt", [8307211, 8307213, 8307212])
+add_rect(8307211, 8307210, 8307201, [], amin=(0, 0), amax=(1, 1))
+add_cr(8307213, 8307210)
+add_tmp(8307212, 8307210, "ОТКЛОНИТЬ", fsize=18, fstyle=1, color=(1, 1, 1, 1), align=514)
+
+# Stats Summary
+add_go(8308000, "StatsSummaryTxt", [8308001, 8308003, 8308002])
+add_rect(8308001, 8308000, 8302001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -780), size=(880, 44), pivot=(0.5, 0.5))
+add_cr(8308003, 8308000)
+add_tmp(8308002, 8308000, "📊 Карьера: 0 выполненных контрактов | Заработано: 0 ₽", fsize=14, fstyle=0, color=(0.6, 0.75, 0.9, 1), align=514)
+
+# Bottom Close Button
+add_go(8309000, "ModalBottomCloseBtn", [8309001, 8309004, 8309002, 8309003])
+add_rect(8309001, 8309000, 8302001, [8309101], amin=(0.5, 0), amax=(0.5, 0), pos=(0, 65), size=(560, 76), pivot=(0.5, 0.5))
+add_cr(8309004, 8309000)
+add_image(8309002, 8309000, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(8309003, 8309000, 8309002)
+add_go(8309100, "BtnTxt", [8309101, 8309103, 8309102])
+add_rect(8309101, 8309100, 8309001, [], amin=(0,0), amax=(1,1))
+add_cr(8309103, 8309100)
+add_tmp(8309102, 8309100, "ЗАКРЫТЬ", fsize=22, fstyle=1, color=(1,1,1,1), align=514)
+
+# FreelanceRushUI Component
+add(f"--- !u!114 &8300004")
+add("MonoBehaviour:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 8300000}")
+add("  m_Enabled: 1")
+add("  m_EditorHideFlags: 0")
+add("  m_Script: {fileID: 11500000, guid: " + GUID_FREELANCE_RUSH_UI + ", type: 3}")
+add("  m_Name: ")
+add("  m_EditorClassIdentifier: Assembly-CSharp::FreelanceRushUI")
+add("  bannerRoot: {fileID: 3018000}")
+add("  bannerTitleText: {fileID: 3018102}")
+add("  bannerProgressText: {fileID: 3018202}")
+add("  bannerTimerText: {fileID: 3018302}")
+add("  bannerProgressFill: {fileID: 3018402}")
+add("  bannerActionBtn: {fileID: 3018503}")
+add("  bannerActionBtnText: {fileID: 3018512}")
+add("  bannerGlowGraphic: {fileID: 3018012}")
+add("  modalRoot: {fileID: 8300000}")
+add("  modalCard: {fileID: 8302001}")
+add("  closeModalBtn: {fileID: 8309003}")
+add("  closeXBtn: {fileID: 8303203}")
+add("  backdropBtn: {fileID: 8301003}")
+add("  modalClientText: {fileID: 8304012}")
+add("  modalTitleText: {fileID: 8304102}")
+add("  modalDescriptionText: {fileID: 8304202}")
+add("  modalTargetText: {fileID: 8305102}")
+add("  modalProgressFill: {fileID: 8305312}")
+add("  modalProgressPercentText: {fileID: 8305402}")
+add("  modalTimerText: {fileID: 8305202}")
+add("  modalRewardMoneyText: {fileID: 8306112}")
+add("  modalRewardCodeText: {fileID: 8306212}")
+add("  modalAcceptBtn: {fileID: 8307103}")
+add("  modalAcceptBtnText: {fileID: 8307112}")
+add("  modalRejectBtn: {fileID: 8307203}")
+add("  statsSummaryText: {fileID: 8308002}")
 
 # ==============================================================
 # 6. COUNTERSCRIPT (TapCounter)

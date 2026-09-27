@@ -671,6 +671,109 @@ def make_keyboard_neon():
     im.save(os.path.join(sprites_dir, "spr_keyboard_neon.png"))
     print("Created spr_keyboard_neon.png")
 
+# 18b. Carbon Racing Mechanical Keyboard (540 x 200)
+def make_keyboard_carbon():
+    im = Image.new("RGBA", (540, 200), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Carbon Slate Chassis
+    create_rounded_rect(d, (10, 10, 530, 190), 14, fill=(22, 24, 28, 255), outline=(55, 60, 70, 255), width=3)
+    create_rounded_rect(d, (20, 20, 520, 180), 8, fill=(14, 15, 18, 255))
+    row_y = [28, 58, 88, 118, 148]
+    key_h = 24
+    for r_idx, y in enumerate(row_y):
+        if r_idx == 4:
+            create_rounded_rect(d, (28, y, 62, y+key_h), 4, fill=(28, 30, 36, 255), outline=(48, 52, 60, 255))
+            create_rounded_rect(d, (68, y, 102, y+key_h), 4, fill=(28, 30, 36, 255), outline=(48, 52, 60, 255))
+            # Spacebar Rich Racing Orange
+            create_rounded_rect(d, (148, y, 380, y+key_h), 4, fill=(255, 95, 20, 240), outline=(255, 140, 50, 255))
+            create_rounded_rect(d, (386, y, 420, y+key_h), 4, fill=(28, 30, 36, 255), outline=(48, 52, 60, 255))
+            create_rounded_rect(d, (426, y, 460, y+key_h), 4, fill=(28, 30, 36, 255), outline=(48, 52, 60, 255))
+            create_rounded_rect(d, (466, y, 512, y+key_h), 4, fill=(255, 95, 20, 240), outline=(255, 140, 50, 255))
+        else:
+            cur_x = 28
+            while cur_x < 510:
+                kw = 30
+                if r_idx == 0 and cur_x > 460: kw = 48
+                elif r_idx == 1 and cur_x == 28: kw = 42
+                elif r_idx == 2 and cur_x == 28: kw = 48
+                elif r_idx == 2 and cur_x > 450: kw = 58
+                elif r_idx == 3 and cur_x == 28: kw = 64
+                elif r_idx == 3 and cur_x > 430: kw = 78
+                if cur_x + kw > 514: kw = 514 - cur_x
+                if kw < 10: break
+
+                kfill = (38, 40, 46, 255) # Matte charcoal
+                kout = (62, 66, 76, 255)
+                if r_idx == 0 and cur_x == 28:
+                    kfill = (255, 95, 20, 255) # Orange Racing ESC
+                    kout = (255, 140, 50, 255)
+                elif (r_idx == 1 and cur_x in range(95, 140)) or (r_idx == 2 and cur_x in range(75, 185)):
+                    kfill = (50, 46, 44, 255) # Warm charcoal WASD
+                    kout = (120, 75, 45, 255)
+                elif (r_idx in (1, 2, 3) and cur_x == 28) or (r_idx in (0, 1, 2, 3) and cur_x > 430):
+                    kfill = (26, 28, 34, 255) # Dark graphite modifiers
+                    kout = (45, 48, 58, 255)
+                elif r_idx == 2 and cur_x > 440:
+                    kfill = (255, 95, 20, 255) # Orange Enter
+                    kout = (255, 140, 50, 255)
+
+                create_rounded_rect(d, (cur_x, y, cur_x+kw, y+key_h), 4, fill=kfill, outline=kout)
+                cur_x += kw + 5
+    im.save(os.path.join(sprites_dir, "spr_keyboard_carbon.png"))
+    print("Created spr_keyboard_carbon.png")
+
+# 18c. Pastel Dream Mechanical Keyboard (540 x 200)
+def make_keyboard_pastel():
+    im = Image.new("RGBA", (540, 200), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Soft Lilac Chassis
+    create_rounded_rect(d, (10, 10, 530, 190), 14, fill=(236, 228, 248, 255), outline=(200, 188, 222, 255), width=3)
+    create_rounded_rect(d, (20, 20, 520, 180), 8, fill=(245, 240, 252, 255))
+    row_y = [28, 58, 88, 118, 148]
+    key_h = 24
+    for r_idx, y in enumerate(row_y):
+        if r_idx == 4:
+            create_rounded_rect(d, (28, y, 62, y+key_h), 4, fill=(185, 235, 222, 255), outline=(155, 215, 198, 255))
+            create_rounded_rect(d, (68, y, 102, y+key_h), 4, fill=(185, 235, 222, 255), outline=(155, 215, 198, 255))
+            # Spacebar Pastel Strawberry Pink
+            create_rounded_rect(d, (148, y, 380, y+key_h), 4, fill=(255, 190, 210, 255), outline=(245, 155, 182, 255))
+            create_rounded_rect(d, (386, y, 420, y+key_h), 4, fill=(185, 235, 222, 255), outline=(155, 215, 198, 255))
+            create_rounded_rect(d, (426, y, 460, y+key_h), 4, fill=(185, 235, 222, 255), outline=(155, 215, 198, 255))
+            create_rounded_rect(d, (466, y, 512, y+key_h), 4, fill=(255, 190, 210, 255), outline=(245, 155, 182, 255))
+        else:
+            cur_x = 28
+            while cur_x < 510:
+                kw = 30
+                if r_idx == 0 and cur_x > 460: kw = 48
+                elif r_idx == 1 and cur_x == 28: kw = 42
+                elif r_idx == 2 and cur_x == 28: kw = 48
+                elif r_idx == 2 and cur_x > 450: kw = 58
+                elif r_idx == 3 and cur_x == 28: kw = 64
+                elif r_idx == 3 and cur_x > 430: kw = 78
+                if cur_x + kw > 514: kw = 514 - cur_x
+                if kw < 10: break
+
+                kfill = (255, 252, 254, 255) # Marshmallow milk cream
+                kout = (228, 220, 226, 255)
+                if r_idx == 0 and cur_x == 28:
+                    kfill = (255, 190, 210, 255) # Pastel Pink ESC
+                    kout = (245, 155, 182, 255)
+                elif (r_idx == 1 and cur_x in range(95, 140)) or (r_idx == 2 and cur_x in range(75, 185)):
+                    kfill = (216, 204, 242, 255) # Pastel Lavender WASD
+                    kout = (188, 172, 222, 255)
+                elif (r_idx in (1, 2, 3) and cur_x == 28) or (r_idx in (0, 1, 2, 3) and cur_x > 430):
+                    kfill = (185, 235, 222, 255) # Pastel Mint modifiers
+                    kout = (155, 215, 198, 255)
+                elif r_idx == 2 and cur_x > 440:
+                    kfill = (255, 190, 210, 255) # Pastel Pink Enter
+                    kout = (245, 155, 182, 255)
+
+                create_rounded_rect(d, (cur_x, y, cur_x+kw, y+key_h), 4, fill=kfill, outline=kout)
+                cur_x += kw + 5
+    im.save(os.path.join(sprites_dir, "spr_keyboard_pastel.png"))
+    print("Created spr_keyboard_pastel.png")
+
+
 # 19. Desktop Lo-Fi Chillhop Player (160 x 95)
 def make_lofi_player():
     im = Image.new("RGBA", (160, 95), (0, 0, 0, 0))
@@ -1224,6 +1327,8 @@ make_cat_accessories()
 make_minigame_sprites()
 make_keyboard_retro()
 make_keyboard_neon()
+make_keyboard_carbon()
+make_keyboard_pastel()
 make_lofi_player()
 make_wallpapers()
 make_quest_icon()

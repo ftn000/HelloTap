@@ -42,6 +42,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip crateCollectSound;
     [SerializeField] private AudioClip buildCompleteSound;
     [SerializeField] private AudioClip cassetteClickSound;
+    [SerializeField] private AudioClip rushAlertSound;
+    [SerializeField] private AudioClip rushSuccessSound;
 
     [Header("Источники звука")]
     [SerializeField] private AudioSource sfxSource;
@@ -176,6 +178,16 @@ public class AudioManager : MonoBehaviour
         if (cassetteClickSound == null)
         {
             cassetteClickSound = CreateProceduralCassetteClickClip();
+        }
+
+        if (rushAlertSound == null)
+        {
+            rushAlertSound = CreateProceduralRushAlertClip();
+        }
+
+        if (rushSuccessSound == null)
+        {
+            rushSuccessSound = CreateProceduralRushSuccessClip();
         }
     }
 
@@ -351,7 +363,8 @@ public class AudioManager : MonoBehaviour
         AudioListener.pause = false;
 
         int switchType = PlayerPrefs.GetInt("SelectedSwitchType", 0);
-        PlayTypingWithSwitch(switchType, isCrit);
+        int paletteType = PlayerPrefs.GetInt("SelectedKeycapPalette", 0);
+        PlayTypingWithPalette(switchType, paletteType, isCrit);
     }
 
     public void PlayUpgrade()
@@ -475,6 +488,75 @@ public class AudioManager : MonoBehaviour
             sfxSource.pitch = 1.0f;
             sfxSource.PlayOneShot(wheelWinSound, 0.95f);
         }
+    }
+
+    public void PlayRushAlert()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (rushAlertSound != null)
+        {
+            sfxSource.pitch = 1.0f;
+            sfxSource.PlayOneShot(rushAlertSound, 0.90f);
+        }
+    }
+
+    public void PlayRushSuccess()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (rushSuccessSound != null)
+        {
+            sfxSource.pitch = 1.0f;
+            sfxSource.PlayOneShot(rushSuccessSound, 0.95f);
+        }
+    }
+
+    private AudioClip CreateProceduralRushAlertClip()
+    {
+        int sampleRate = 44100;
+        int count = (int)(sampleRate * 0.55f);
+        float[] d = new float[count];
+        float[,] pings = new float[,] { { 0.0f, 987.77f, 1975.53f }, { 0.13f, 1174.66f, 2349.32f }, { 0.26f, 1479.98f, 2959.96f } };
+        for (int p = 0; p < 3; p++)
+        {
+            int sIdx = (int)(pings[p, 0] * sampleRate);
+            int pLen = Mathf.Min((int)(0.18f * sampleRate), count - sIdx);
+            float f1 = pings[p, 1];
+            float f2 = pings[p, 2];
+            for (int i = 0; i < pLen; i++)
+            {
+                float t = (float)i / sampleRate;
+                float env = Mathf.Exp(-t * 26f);
+                float sig = (Mathf.Sin(2f * Mathf.PI * f1 * t) * 0.45f + Mathf.Sin(2f * Mathf.PI * f2 * t) * 0.25f) * env;
+                d[sIdx + i] += sig;
+            }
+        }
+        AudioClip c = AudioClip.Create("Procedural_RushAlert", count, 1, sampleRate, false);
+        c.SetData(d, 0);
+        return c;
+    }
+
+    private AudioClip CreateProceduralRushSuccessClip()
+    {
+        int sampleRate = 44100;
+        int count = (int)(sampleRate * 1.10f);
+        float[] d = new float[count];
+        float[,] chords = new float[,] { { 0.0f, 587.33f }, { 0.10f, 739.99f }, { 0.20f, 880f }, { 0.32f, 1174.66f } };
+        for (int ch = 0; ch < 4; ch++)
+        {
+            int sIdx = (int)(chords[ch, 0] * sampleRate);
+            int cLen = Mathf.Min((int)(0.75f * sampleRate), count - sIdx);
+            float freq = chords[ch, 1];
+            for (int i = 0; i < cLen; i++)
+            {
+                float t = (float)i / sampleRate;
+                float env = Mathf.Exp(-t * 5.5f) * 0.35f;
+                float sig = (Mathf.Sin(2f * Mathf.PI * freq * t) + 0.45f * Mathf.Sin(4f * Mathf.PI * freq * t)) * env;
+                d[sIdx + i] += sig;
+            }
+        }
+        AudioClip c = AudioClip.Create("Procedural_RushSuccess", count, 1, sampleRate, false);
+        c.SetData(d, 0);
+        return c;
     }
 
     private AudioClip CreateProceduralMouseSwitchClip(int switchType)
@@ -756,6 +838,12 @@ public class AudioManager : MonoBehaviour
 
     public void PlayTypingWithSwitch(int switchType, bool isCrit = false)
     {
+        int paletteType = PlayerPrefs.GetInt("SelectedKeycapPalette", 0);
+        PlayTypingWithPalette(switchType, paletteType, isCrit);
+    }
+
+    public void PlayTypingWithPalette(int switchType, int paletteType, bool isCrit = false)
+    {
         if (isMuted || isFocusLost) return;
         AudioListener.pause = false;
 
@@ -765,7 +853,15 @@ public class AudioManager : MonoBehaviour
             AudioClip clip = typingSounds[index];
             if (clip != null)
             {
-                typingSource.pitch = Random.Range(minTypingPitch, maxTypingPitch);
+                float basePitch = 1.0f;
+                switch (paletteType)
+                {
+                    case 0: basePitch = 0.94f; break; // Retro Grey: heavy vintage clack
+                    case 1: basePitch = 1.10f; break; // Cyber Neon: snappy laser click
+                    case 2: basePitch = 0.86f; break; // Carbon: deep solid thock
+                    case 3: basePitch = 1.22f; break; // Pastel Dream: sweet bubbly pop
+                }
+                typingSource.pitch = Random.Range(basePitch * minTypingPitch, basePitch * maxTypingPitch);
                 typingSource.PlayOneShot(clip, 1.0f);
             }
         }
@@ -775,6 +871,11 @@ public class AudioManager : MonoBehaviour
             sfxSource.pitch = Random.Range(1.02f, 1.15f);
             sfxSource.PlayOneShot(critSound, 0.40f);
         }
+    }
+
+    public void PlayKeycapThemeSound(int paletteType)
+    {
+        PlayTypingWithPalette(0, paletteType, false);
     }
 
     public bool ToggleMute()
