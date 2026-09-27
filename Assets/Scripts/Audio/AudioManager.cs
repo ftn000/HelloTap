@@ -30,6 +30,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip boostSound;
     [SerializeField] private AudioClip catPurrSound;
     [SerializeField] private AudioClip sipSound;
+    [SerializeField] private AudioClip mouseClickSound;
 
     [Header("Источники звука")]
     [SerializeField] private AudioSource sfxSource;
@@ -102,6 +103,40 @@ public class AudioManager : MonoBehaviour
         {
             sipSound = CreateProceduralSipClip();
         }
+
+        if (mouseClickSound == null)
+        {
+            mouseClickSound = CreateProceduralMouseClickClip();
+        }
+    }
+
+    private AudioClip CreateProceduralMouseClickClip()
+    {
+        int sampleRate = 44100;
+        int sampleCount = (int)(sampleRate * 0.055f);
+        float[] data = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float envSnap = Mathf.Exp(-t * 320f);
+            float noise = Random.value * 2f - 1f;
+            float snap = (Mathf.Sin(2f * Mathf.PI * 5200f * t) + 0.4f * noise) * envSnap * 1.3f;
+
+            float envBody = Mathf.Exp(-t * 160f);
+            float body = (Mathf.Sin(2f * Mathf.PI * 850f * t) * 0.5f + Mathf.Sin(2f * Mathf.PI * 340f * t) * 0.4f) * envBody;
+
+            float tick = 0f;
+            if (t >= 0.022f)
+            {
+                float tTick = t - 0.022f;
+                tick = Mathf.Sin(2f * Mathf.PI * 4800f * tTick) * Mathf.Exp(-tTick * 400f) * 0.45f;
+            }
+
+            data[i] = Mathf.Clamp((snap + body + tick) * 0.85f, -1f, 1f);
+        }
+        AudioClip clip = AudioClip.Create("Procedural_MouseClick", sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
     }
 
     private AudioClip CreateProceduralSipClip()
@@ -313,6 +348,16 @@ public class AudioManager : MonoBehaviour
         {
             sfxSource.pitch = Random.Range(0.95f, 1.08f);
             sfxSource.PlayOneShot(sipSound, 0.85f);
+        }
+    }
+
+    public void PlayMouseClick()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (mouseClickSound != null)
+        {
+            sfxSource.pitch = Random.Range(0.97f, 1.04f);
+            sfxSource.PlayOneShot(mouseClickSound, 0.90f);
         }
     }
 

@@ -79,6 +79,19 @@ public class GameManager : MonoBehaviour
     public double TotalMoneyEarned => totalMoneyEarned;
     public int PrestigeLevel => prestigeLevel;
     public int BugsFixedCount => bugsFixedCount;
+    public int TotalReleasesCount
+    {
+        get
+        {
+            if (projects == null) return 0;
+            int count = 0;
+            for (int i = 0; i < projects.Count; i++)
+            {
+                if (projects[i] != null && projects[i].IsCompleted) count++;
+            }
+            return count;
+        }
+    }
     public float ComboEnergy => comboEnergy;
     public bool IsBoostActive => energyBoostTimeRemaining > 0f;
     public float BoostTimeRemaining => energyBoostTimeRemaining;

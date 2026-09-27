@@ -49,6 +49,10 @@ GUID_SPR_BUBBLE = "7b30000000000000000000000000000e"
 GUID_SPR_MOUSE_GLOW = "7b30000000000000000000000000000f"
 GUID_SPR_CAT_AWAKE = "7b300000000000000000000000000013"
 GUID_SPR_HEART = "7b300000000000000000000000000014"
+GUID_SPR_STICKER_UNITY = "7b300000000000000000000000000015"
+GUID_SPR_STICKER_CSHARP = "7b300000000000000000000000000016"
+GUID_SPR_STICKER_GIT = "7b300000000000000000000000000017"
+GUID_SPR_STICKER_WORKS = "7b300000000000000000000000000018"
 
 # Audio SFX Clips
 GUID_SFX_KEY1 = "9a200000000000000000000000000001"
@@ -61,6 +65,7 @@ GUID_SFX_REL = "9a200000000000000000000000000007"
 GUID_SFX_BOOST = "9a200000000000000000000000000008"
 GUID_SFX_PURR = "9a200000000000000000000000000009"
 GUID_SFX_SIP = "9a200000000000000000000000000010"
+GUID_SFX_MOUSE_CLICK = "9a200000000000000000000000000011"
 
 out = []
 def add(s=""):
@@ -785,6 +790,7 @@ add("  releaseSound: {fileID: 8300000, guid: " + GUID_SFX_REL + ", type: 3}")
 add("  boostSound: {fileID: 8300000, guid: " + GUID_SFX_BOOST + ", type: 3}")
 add("  catPurrSound: {fileID: 8300000, guid: " + GUID_SFX_PURR + ", type: 3}")
 add("  sipSound: {fileID: 8300000, guid: " + GUID_SFX_SIP + ", type: 3}")
+add("  mouseClickSound: {fileID: 8300000, guid: " + GUID_SFX_MOUSE_CLICK + ", type: 3}")
 add("  sfxSource: {fileID: 1002003}")
 add("  typingSource: {fileID: 1002004}")
 add("  minTypingPitch: 0.94")
@@ -1009,13 +1015,42 @@ add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
 
 # MonitorFrame (Upper half of workstation - 840x420 with 756x306 bezel cutout)
 add_go(3020000, "MonitorFrame", [3020001, 3020003, 3020002])
-add_rect(3020001, 3020000, 3010001, [3021001], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -250), size=(840, 420), pivot=(0.5, 1))
+add_rect(3020001, 3020000, 3010001, [3021001, 3022101, 3022201, 3022301, 3022401], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -250), size=(840, 420), pivot=(0.5, 1))
 add_cr(3020003, 3020000)
 add_image(3020002, 3020000, GUID_SPR_MON_FRAME, raycast=0)
 
+# Stickers on Monitor Frame (Unlockable dev badges with interactive tap reactions)
+# 1. Unity Hex Badge (top-left frame)
+add_go(3022100, "StickerUnity", [3022101, 3022104, 3022102, 3022103], active=0)
+add_rect(3022101, 3022100, 3020001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-375, -35), size=(54, 54), pivot=(0.5, 0.5))
+add_cr(3022104, 3022100)
+add_image(3022102, 3022100, GUID_SPR_STICKER_UNITY, raycast=1)
+add_button(3022103, 3022100, 3022102)
+
+# 2. C# Purple Badge (bottom-left chin)
+add_go(3022200, "StickerCSharp", [3022201, 3022204, 3022202, 3022203], active=0)
+add_rect(3022201, 3022200, 3020001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(-365, -370), size=(54, 54), pivot=(0.5, 0.5))
+add_cr(3022204, 3022200)
+add_image(3022202, 3022200, GUID_SPR_STICKER_CSHARP, raycast=1)
+add_button(3022203, 3022200, 3022202)
+
+# 3. Git Branch Diamond Badge (top-right frame)
+add_go(3022300, "StickerGit", [3022301, 3022304, 3022302, 3022303], active=0)
+add_rect(3022301, 3022300, 3020001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(375, -35), size=(54, 54), pivot=(0.5, 0.5))
+add_cr(3022304, 3022300)
+add_image(3022302, 3022300, GUID_SPR_STICKER_GIT, raycast=1)
+add_button(3022303, 3022300, 3022302)
+
+# 4. "It Works On My Machine" Bumper Sticker (bottom-right chin)
+add_go(3022400, "StickerWorks", [3022401, 3022404, 3022402, 3022403], active=0)
+add_rect(3022401, 3022400, 3020001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(330, -372), size=(108, 42), pivot=(0.5, 0.5))
+add_cr(3022404, 3022400)
+add_image(3022402, 3022400, GUID_SPR_STICKER_WORKS, raycast=1)
+add_button(3022403, 3022400, 3022402)
+
 # MonitorScreen (Exact 756x306 fit inside MonitorFrame cutout, perfectly centered)
 add_go(3021000, "MonitorScreen", [3021001, 3021003, 3021002])
-add_rect(3021001, 3021000, 3020001, [3021051, 3021201, 3021301, 3021401], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 27), size=(756, 306), pivot=(0.5, 0.5))
+add_rect(3021001, 3021000, 3020001, [3021051, 3021201, 3021301, 3021401, 3021501], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 27), size=(756, 306), pivot=(0.5, 0.5))
 add_cr(3021003, 3021000)
 add_image(3021002, 3021000, GUID_SPR_MON_SCREEN, raycast=0)
 
@@ -1046,6 +1081,18 @@ add_go(3021400, "MonitorScreenGlow", [3021401, 3021403, 3021402])
 add_rect(3021401, 3021400, 3021001, [], amin=(0,0), amax=(1,1))
 add_cr(3021403, 3021400)
 add_image(3021402, 3021400, GUID_SPR_CARD_BG, color=(1, 0.12, 0.15, 0), img_type=1, raycast=0)
+
+# HotkeyHintBadge (Floating IDE shortcut pill at bottom of code editor)
+add_go(3021500, "HotkeyHintBadge", [3021501, 3021504, 3021502, 3021503], active=1)
+add_rect(3021501, 3021500, 3021001, [3021511], amin=(0.5, 0), amax=(0.5, 0), pos=(0, 22), size=(260, 32), pivot=(0.5, 0.5))
+add_cr(3021504, 3021500)
+add_image(3021502, 3021500, GUID_SPR_CARD_BG, color=(0.06, 0.09, 0.14, 0.92), img_type=1)
+add_button(3021503, 3021500, 3021502)
+
+add_go(3021510, "HotkeyHintText", [3021511, 3021513, 3021512])
+add_rect(3021511, 3021510, 3021501, [], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_cr(3021513, 3021510)
+add_tmp(3021512, 3021510, "<color=#569CD6>[Ctrl+S]</color> Быстрое сохранение", fsize=13, fstyle=1, color=(0.85, 0.92, 1, 1), align=514, autosize=1, fmin=10, fmax=14)
 
 # ComboBar (Between monitor and keyboard)
 add_go(3012000, "ComboBar", [3012001, 3012003, 3012002])
@@ -1128,11 +1175,12 @@ add_rect(3051301, 3051300, 3051001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(1
 add_cr(3051303, 3051300)
 add_image(3051302, 3051300, GUID_SPR_STEAM, color=(1, 1, 1, 0.30), raycast=0)
 
-# Gaming Mouse (positioned cleanly to the right of keyboard)
-add_go(3040000, "GamingMouse", [3040001, 3040003, 3040002])
+# Gaming Mouse (positioned cleanly to the right of keyboard, interactive Omron click)
+add_go(3040000, "GamingMouse", [3040001, 3040003, 3040002, 3040004])
 add_rect(3040001, 3040000, 3010001, [3041001], amin=(0.5, 1), amax=(0.5, 1), pos=(465, -960), size=(100, 180), pivot=(0.5, 0.5))
 add_cr(3040003, 3040000)
-add_image(3040002, 3040000, GUID_SPR_MOUSE, raycast=0)
+add_image(3040002, 3040000, GUID_SPR_MOUSE, raycast=1)
+add_button(3040004, 3040000, 3040002)
 
 # GamingMouseGlow (RGB rainbow wave strip and braided cord pulse)
 add_go(3041000, "GamingMouseGlow", [3041001, 3041003, 3041002])
@@ -1247,6 +1295,7 @@ add("  keyboardTransform: {fileID: 3030001}")
 add("  keyboardGlowImage: {fileID: 3032002}")
 add("  mouseTransform: {fileID: 3040001}")
 add("  mouseGlowGraphic: {fileID: 3041002}")
+add("  mouseButton: {fileID: 3040004}")
 add("  coffeeMugTransform: {fileID: 3050001}")
 add("  energyCanTransform: {fileID: 3060001}")
 add("  catTransform: {fileID: 3070001}")
@@ -1256,6 +1305,13 @@ add("  catAwakeSprite: {fileID: 21300000, guid: " + GUID_SPR_CAT_AWAKE + ", type
 add("  catHeartEmote: {fileID: 3071001}")
 add("  coffeeButton: {fileID: 3050004}")
 add("  energyButton: {fileID: 3060004}")
+add("  stickerUnity: {fileID: 3022100}")
+add("  stickerCSharp: {fileID: 3022200}")
+add("  stickerGit: {fileID: 3022300}")
+add("  stickerWorks: {fileID: 3022400}")
+add("  hotkeyBadgeObj: {fileID: 3021500}")
+add("  hotkeyBadgeText: {fileID: 3021512}")
+add("  hotkeyBadgeButton: {fileID: 3021503}")
 add("  coffeeSteamWisps:")
 add("  - {fileID: 3051101}")
 add("  - {fileID: 3051201}")

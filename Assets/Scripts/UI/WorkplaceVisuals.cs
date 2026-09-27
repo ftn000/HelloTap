@@ -44,9 +44,21 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Sprite catAwakeSprite;
     [SerializeField] private RectTransform catHeartEmote;
 
-    [Header("Интерактивные напитки")]
+    [Header("Интерактивные напитки и мышь")]
+    [SerializeField] private Button mouseButton;
     [SerializeField] private Button coffeeButton;
     [SerializeField] private Button energyButton;
+
+    [Header("Стикеры на мониторе (Достижения)")]
+    [SerializeField] private GameObject stickerUnity;
+    [SerializeField] private GameObject stickerCSharp;
+    [SerializeField] private GameObject stickerGit;
+    [SerializeField] private GameObject stickerWorks;
+
+    [Header("Хоткеи и Подсказки IDE")]
+    [SerializeField] private GameObject hotkeyBadgeObj;
+    [SerializeField] private TMP_Text hotkeyBadgeText;
+    [SerializeField] private Button hotkeyBadgeButton;
 
     [Header("Партиклы пара и пузырьков")]
     [SerializeField] private RectTransform[] coffeeSteamWisps;
@@ -229,6 +241,9 @@ public class WorkplaceVisuals : MonoBehaviour
         InitSteamAndFizz();
         InitCatInteraction();
         InitDrinksInteraction();
+        InitMouseInteraction();
+        InitStickersInteraction();
+        InitHotkeyBadge();
         RefreshDeskUnlockables(false);
         RefreshProgressAndComboUI();
     }
@@ -292,6 +307,9 @@ public class WorkplaceVisuals : MonoBehaviour
 
         // 9. RGB радужный перелив клавиатуры при комбо x3.0
         UpdateKeyboardRgb(dt);
+
+        // 10. Обновление хоткей-подсказок в IDE
+        UpdateHotkeyHints(dt);
     }
 
     #region Визуальная эволюция стола
@@ -361,6 +379,8 @@ public class WorkplaceVisuals : MonoBehaviour
             }
         }
         wasMonitor2Unlocked = hasMonitor2;
+
+        UpdateStickersVisibility(animateNew);
     }
 
     private IEnumerator PopInRoutine(Transform target)
@@ -1217,6 +1237,231 @@ public class WorkplaceVisuals : MonoBehaviour
         mouseTransform.localScale = new Vector3(0.97f, 0.94f, 1f);
         yield return new WaitForSecondsRealtime(0.05f);
         mouseTransform.localScale = baseScale;
+    }
+
+    #endregion
+
+    #region Интерактивная Мышь (Omron Microswitch Click & Cord Sway)
+
+    private void InitMouseInteraction()
+    {
+        if (mouseTransform != null)
+        {
+            if (mouseButton == null) mouseButton = mouseTransform.GetComponent<Button>();
+            if (mouseButton == null) mouseButton = mouseTransform.gameObject.AddComponent<Button>();
+            mouseButton.onClick.RemoveAllListeners();
+            mouseButton.onClick.AddListener(OnMouseClickedDirectly);
+        }
+    }
+
+    public void OnMouseClickedDirectly()
+    {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayMouseClick();
+        if (mouseTransform != null) StartCoroutine(MouseDirectClickRoutine());
+
+        // Нажатие на игровую мышь кликает код
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ClickCode(mouseTransform.position);
+        }
+
+        if (ClickJuice.Instance != null && mouseTransform != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup("Клик! 🖱️", mouseTransform.position, new Color(0.2f, 0.95f, 1f, 1f), false);
+        }
+    }
+
+    private IEnumerator MouseDirectClickRoutine()
+    {
+        if (mouseTransform == null) yield break;
+        Vector3 baseScale = Vector3.one;
+        Quaternion baseRot = Quaternion.identity;
+
+        mouseTransform.localScale = new Vector3(0.93f, 0.89f, 1f);
+        mouseTransform.localRotation = Quaternion.Euler(0, 0, Random.Range(-4.5f, 4.5f));
+
+        if (mouseGlowGraphic != null)
+        {
+            mouseGlowGraphic.color = Color.white;
+        }
+
+        float duration = 0.16f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            mouseTransform.localScale = Vector3.Lerp(new Vector3(0.93f, 0.89f, 1f), baseScale, t);
+            mouseTransform.localRotation = Quaternion.Slerp(mouseTransform.localRotation, baseRot, t);
+            yield return null;
+        }
+
+        mouseTransform.localScale = baseScale;
+        mouseTransform.localRotation = baseRot;
+    }
+
+    #endregion
+
+    #region Стикеры на Мониторе (Developer Badges & Tooltips)
+
+    private bool wasStickerUnity = false;
+    private bool wasStickerCSharp = false;
+    private bool wasStickerGit = false;
+    private bool wasStickerWorks = false;
+
+    private void InitStickersInteraction()
+    {
+        BindSticker(stickerUnity, "Unity 2D", "Сделано на Unity 2D (URP)!");
+        BindSticker(stickerCSharp, "C# .NET", "Чистый C# 12 без багов!");
+        BindSticker(stickerGit, "Git", "Git: ветка main актуальна!");
+        BindSticker(stickerWorks, "It Works!", "На моём компьютере всё работало!");
+    }
+
+    private void BindSticker(GameObject stickerGo, string title, string tooltip)
+    {
+        if (stickerGo == null) return;
+        Button btn = stickerGo.GetComponent<Button>();
+        if (btn == null) btn = stickerGo.AddComponent<Button>();
+        btn.onClick.RemoveAllListeners();
+        btn.onClick.AddListener(() => OnStickerClicked(stickerGo.transform, tooltip));
+    }
+
+    private void OnStickerClicked(Transform tr, string tooltip)
+    {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayMouseClick();
+        StartCoroutine(StickerPunchRoutine(tr));
+        if (ClickJuice.Instance != null && tr != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup(tooltip, tr.position, new Color(1f, 0.85f, 0.35f, 1f), false);
+        }
+    }
+
+    private IEnumerator StickerPunchRoutine(Transform tr)
+    {
+        if (tr == null) yield break;
+        Vector3 baseScale = Vector3.one;
+        Quaternion baseRot = tr.localRotation;
+
+        tr.localScale = new Vector3(1.24f, 1.24f, 1f);
+        tr.localRotation = baseRot * Quaternion.Euler(0, 0, Random.Range(-9f, 9f));
+
+        float duration = 0.22f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            tr.localScale = Vector3.Lerp(new Vector3(1.24f, 1.24f, 1f), baseScale, t);
+            tr.localRotation = Quaternion.Slerp(tr.localRotation, baseRot, t);
+            yield return null;
+        }
+
+        tr.localScale = baseScale;
+        tr.localRotation = baseRot;
+    }
+
+    private void UpdateStickersVisibility(bool animateNew)
+    {
+        if (GameManager.Instance == null) return;
+
+        bool hasUnity = GameManager.Instance.TotalCodeWritten >= 5 || GameManager.Instance.CodeLines >= 5;
+        bool hasCSharp = GameManager.Instance.GetUpgradeLevel("soft_coffee") > 0 || GameManager.Instance.GetUpgradeLevel("hw_mouse") > 0 || GameManager.Instance.TotalCodeWritten >= 30;
+        bool hasGit = GameManager.Instance.TotalReleasesCount > 0 || GameManager.Instance.TotalCodeWritten >= 100;
+        bool hasWorks = GameManager.Instance.BugsFixedCount > 0 || GameManager.Instance.GetComboMultiplier() >= 1.5;
+
+        if (stickerUnity != null)
+        {
+            stickerUnity.SetActive(hasUnity);
+            if (animateNew && hasUnity && !wasStickerUnity) StartCoroutine(PopInRoutine(stickerUnity.transform));
+        }
+        wasStickerUnity = hasUnity;
+
+        if (stickerCSharp != null)
+        {
+            stickerCSharp.SetActive(hasCSharp);
+            if (animateNew && hasCSharp && !wasStickerCSharp) StartCoroutine(PopInRoutine(stickerCSharp.transform));
+        }
+        wasStickerCSharp = hasCSharp;
+
+        if (stickerGit != null)
+        {
+            stickerGit.SetActive(hasGit);
+            if (animateNew && hasGit && !wasStickerGit) StartCoroutine(PopInRoutine(stickerGit.transform));
+        }
+        wasStickerGit = hasGit;
+
+        if (stickerWorks != null)
+        {
+            stickerWorks.SetActive(hasWorks);
+            if (animateNew && hasWorks && !wasStickerWorks) StartCoroutine(PopInRoutine(stickerWorks.transform));
+        }
+        wasStickerWorks = hasWorks;
+    }
+
+    #endregion
+
+    #region Хоткей-подсказки на мониторе (IDE Shortcut Hints)
+
+    private static readonly string[] HotkeyHints = new string[]
+    {
+        "<color=#569CD6>[Ctrl+S]</color> Быстрое сохранение",
+        "<color=#4EC9B0>[F5]</color> Запуск сборки проекта",
+        "<color=#CE9178>[git commit]</color> Фиксация изменений",
+        "<color=#FFCC00>[Ctrl+Space]</color> IntelliSense код",
+        "<color=#00FF88>[F12]</color> Перейти к определению"
+    };
+
+    private float hotkeyTimer = 0f;
+    private int hotkeyIndex = 0;
+
+    private void InitHotkeyBadge()
+    {
+        if (hotkeyBadgeButton != null)
+        {
+            hotkeyBadgeButton.onClick.RemoveAllListeners();
+            hotkeyBadgeButton.onClick.AddListener(OnHotkeyBadgeClicked);
+        }
+        if (hotkeyBadgeText != null && HotkeyHints.Length > 0)
+        {
+            hotkeyBadgeText.text = HotkeyHints[0];
+        }
+    }
+
+    private void UpdateHotkeyHints(float dt)
+    {
+        if (hotkeyBadgeObj == null || !hotkeyBadgeObj.activeSelf) return;
+
+        hotkeyTimer += dt;
+        if (hotkeyTimer >= 7.5f)
+        {
+            hotkeyTimer = 0f;
+            hotkeyIndex = (hotkeyIndex + 1) % HotkeyHints.Length;
+            if (hotkeyBadgeText != null)
+            {
+                hotkeyBadgeText.text = HotkeyHints[hotkeyIndex];
+            }
+        }
+    }
+
+    public void OnHotkeyBadgeClicked()
+    {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayMouseClick();
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SaveGame();
+            GameManager.Instance.AddComboEnergy(0.06f);
+        }
+
+        if (hotkeyBadgeObj != null)
+        {
+            StartCoroutine(StickerPunchRoutine(hotkeyBadgeObj.transform));
+        }
+
+        if (ClickJuice.Instance != null && hotkeyBadgeObj != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup("💾 Проект сохранён!", hotkeyBadgeObj.transform.position + Vector3.up * 30f, new Color(0.3f, 0.95f, 0.7f, 1f), false);
+        }
     }
 
     #endregion

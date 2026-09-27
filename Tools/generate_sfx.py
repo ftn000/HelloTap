@@ -266,6 +266,30 @@ def make_drink_sip():
         samples.append(val)
     return samples
 
+def make_mouse_click():
+    duration = 0.055
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        env_snap = math.exp(-t * 320.0)
+        noise = (random.random() * 2.0 - 1.0)
+        snap = (math.sin(2.0 * math.pi * 5200.0 * t) + 0.4 * noise) * env_snap * 1.3
+        
+        env_body = math.exp(-t * 160.0)
+        body = (math.sin(2.0 * math.pi * 850.0 * t) * 0.5 + 
+                math.sin(2.0 * math.pi * 340.0 * t) * 0.4) * env_body
+                
+        tick = 0.0
+        if t >= 0.022:
+            t_tick = t - 0.022
+            env_tick = math.exp(-t_tick * 400.0)
+            tick = math.sin(2.0 * math.pi * 4800.0 * t_tick) * env_tick * 0.45
+            
+        s = snap + body + tick
+        samples.append(s)
+    return samples
+
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
@@ -279,4 +303,5 @@ save_wav(os.path.join(out_dir, "project_release.wav"), make_cash_release())
 save_wav(os.path.join(out_dir, "boost_activate.wav"), make_boost_sound())
 save_wav(os.path.join(out_dir, "cat_purr.wav"), make_cat_purr())
 save_wav(os.path.join(out_dir, "drink_sip.wav"), make_drink_sip())
+save_wav(os.path.join(out_dir, "mouse_click.wav"), make_mouse_click())
 print("All sound effects generated successfully!")
