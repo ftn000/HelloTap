@@ -250,7 +250,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public double GetGlobalMultiplier()
     {
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier;
+        double streakMult = DailyStreakUI.Instance != null ? DailyStreakUI.Instance.GetStreakMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult;
     }
 
     /// <summary>
@@ -311,7 +312,8 @@ public class GameManager : MonoBehaviour
                 moneyIncome += prj.PassiveMoneyIncomePerSec;
             }
         }
-        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier();
+        double streakMult = DailyStreakUI.Instance != null ? DailyStreakUI.Instance.GetStreakMultiplier() : 1.0;
+        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult;
     }
 
     /// <summary>

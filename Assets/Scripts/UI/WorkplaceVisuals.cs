@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 using UnityEngine.UI;
 using TMPro;
 
@@ -86,6 +88,7 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Sprite sprWallpaperCozy;
     [SerializeField] private Sprite sprWallpaperCyberpunk;
     [SerializeField] private Sprite sprWallpaperMinimal;
+    [SerializeField] private Sprite sprWallpaperServer;
     [SerializeField] private Button roomThemeButton;
     [SerializeField] private TMP_Text roomThemeText;
 
@@ -96,8 +99,19 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Sprite sprDeskMatCyber;
     [SerializeField] private Sprite sprDeskMatBlueprint;
     [SerializeField] private Sprite sprDeskMatRGB;
+    [SerializeField] private Sprite sprDeskMatMatrix;
     [SerializeField] private Button deskMatSkinButton;
     [SerializeField] private TMP_Text deskMatSkinText;
+
+    [Header("Резиновая Уточка (Rubber Duck Debugging)")]
+    [SerializeField] private GameObject rubberDuckObj;
+    [SerializeField] private Image rubberDuckImage;
+    [SerializeField] private Button rubberDuckButton;
+    [SerializeField] private Button duckSkinButton;
+    [SerializeField] private TMP_Text duckSkinText;
+    [SerializeField] private Sprite sprDuckYellow;
+    [SerializeField] private Sprite sprDuckCoder;
+    [SerializeField] private Sprite sprDuckCyber;
 
     [Header("Интерактивные напитки и мышь")]
     [SerializeField] private Button mouseButton;
@@ -336,6 +350,7 @@ public class WorkplaceVisuals : MonoBehaviour
         InitPetCompanionCustomization();
         InitDeskMatCustomization();
         InitScreensaver();
+        InitRubberDuck();
         InitLighting();
         InitDrinksInteraction();
         InitMouseInteraction();
@@ -1993,12 +2008,13 @@ public class WorkplaceVisuals : MonoBehaviour
 
     #region Кастомизация обоев и атмосферы комнаты
 
-    private int currentRoomTheme = 0; // 0=Cozy Indie, 1=Cyberpunk, 2=Minimal
+    private int currentRoomTheme = 0; // 0=Cozy Indie, 1=Cyberpunk, 2=Minimal, 3=Server Room
     private static readonly string[] RoomThemeNames = new string[]
     {
         "COZY INDIE",
         "CYBER LOFT",
-        "MINIMAL TECH"
+        "MINIMAL TECH",
+        "SERVER ROOM"
     };
 
     private void InitRoomThemeCustomization()
@@ -2015,7 +2031,7 @@ public class WorkplaceVisuals : MonoBehaviour
 
     public void CycleRoomTheme()
     {
-        currentRoomTheme = (currentRoomTheme + 1) % 3;
+        currentRoomTheme = (currentRoomTheme + 1) % 4;
         PlayerPrefs.SetInt("SelectedRoomTheme", currentRoomTheme);
         PlayerPrefs.Save();
         ApplyRoomTheme(currentRoomTheme, true);
@@ -2035,6 +2051,7 @@ public class WorkplaceVisuals : MonoBehaviour
         Sprite targetSprite = sprWallpaperCozy;
         if (theme == 1 && sprWallpaperCyberpunk != null) targetSprite = sprWallpaperCyberpunk;
         else if (theme == 2 && sprWallpaperMinimal != null) targetSprite = sprWallpaperMinimal;
+        else if (theme == 3 && sprWallpaperServer != null) targetSprite = sprWallpaperServer;
 
         if (targetSprite != null)
         {
@@ -2172,14 +2189,15 @@ public class WorkplaceVisuals : MonoBehaviour
 
     #region Кастомизация коврика (Desk Mat Skins)
 
-    private int currentDeskMatSkin = 0; // 0=Default, 1=Felt, 2=Cyber, 3=Blueprint, 4=RGB
+    private int currentDeskMatSkin = 0; // 0=Default, 1=Felt, 2=Cyber, 3=Blueprint, 4=RGB, 5=Matrix
     private static readonly string[] DeskMatSkinNames = new string[]
     {
         "БАЗОВЫЙ",
         "ВОЙЛОК",
         "КИБЕР",
         "ЧЕРТЁЖ",
-        "RGB GLOW"
+        "RGB GLOW",
+        "МАТРИЦА"
     };
 
     private void InitDeskMatCustomization()
@@ -2196,7 +2214,7 @@ public class WorkplaceVisuals : MonoBehaviour
 
     public void CycleDeskMatSkin()
     {
-        currentDeskMatSkin = (currentDeskMatSkin + 1) % 5;
+        currentDeskMatSkin = (currentDeskMatSkin + 1) % 6;
         PlayerPrefs.SetInt("SelectedDeskMatSkin", currentDeskMatSkin);
         PlayerPrefs.Save();
         ApplyDeskMatSkin(currentDeskMatSkin, true);
@@ -2222,6 +2240,7 @@ public class WorkplaceVisuals : MonoBehaviour
             else if (skinIdx == 2 && sprDeskMatCyber != null) targetSprite = sprDeskMatCyber;
             else if (skinIdx == 3 && sprDeskMatBlueprint != null) targetSprite = sprDeskMatBlueprint;
             else if (skinIdx == 4 && sprDeskMatRGB != null) targetSprite = sprDeskMatRGB;
+            else if (skinIdx == 5 && sprDeskMatMatrix != null) targetSprite = sprDeskMatMatrix;
 
             if (targetSprite != null) deskMatImage.sprite = targetSprite;
         }
@@ -2230,6 +2249,150 @@ public class WorkplaceVisuals : MonoBehaviour
         {
             deskMatSkinText.text = $"🟪 {DeskMatSkinNames[currentDeskMatSkin]}";
         }
+    }
+
+    #endregion
+
+    #region Резиновая Уточка (Rubber Duck Debugging)
+
+    private int currentDuckSkin = 0; // 0=Yellow Classic, 1=Programmer Duck, 2=Cyberpunk Duck
+    private static readonly string[] DuckSkinNames = new string[]
+    {
+        "КЛАССИКА",
+        "ПРОГРАММИСТ",
+        "КИБЕР-ДЕВ"
+    };
+
+    private static readonly string[] DuckDebugTips = new string[]
+    {
+        "🦆 «А ты проверил NullReferenceException?»",
+        "🦆 «Попробуй разбить метод на два поменьше!»",
+        "🦆 «Может опечатка в имени переменной?»",
+        "🦆 «А если кэшировать результат вычислений?»",
+        "🦆 «Баг локализован в логике! +12% энергии потока!»",
+        "🦆 «Кря! Проверь граничные условия массивов!»",
+        "🦆 «Работает на моей машине! +10% комбо!»",
+        "🦆 «Не забудь зафиксировать изменения в Git!»",
+        "🦆 «А ты точно отписался от событий?»",
+        "🦆 «Инди-код великолепен. Продолжай тапать!»"
+    };
+
+    private Coroutine duckSquishCoroutine;
+
+    private void InitRubberDuck()
+    {
+        currentDuckSkin = PlayerPrefs.GetInt("SelectedDuckSkin", 0);
+        ApplyDuckSkin(currentDuckSkin, false);
+
+        if (rubberDuckButton != null)
+        {
+            rubberDuckButton.onClick.RemoveAllListeners();
+            rubberDuckButton.onClick.AddListener(OnRubberDuckClicked);
+        }
+
+        if (duckSkinButton != null)
+        {
+            duckSkinButton.onClick.RemoveAllListeners();
+            duckSkinButton.onClick.AddListener(CycleDuckSkin);
+        }
+    }
+
+    public void OnRubberDuckClicked()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayDuckQuack();
+        }
+        HapticFeedback.Vibrate(30);
+
+        if (duckSquishCoroutine != null) StopCoroutine(duckSquishCoroutine);
+        duckSquishCoroutine = StartCoroutine(DuckSquishRoutine());
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddComboEnergy(0.12f);
+            double bonusCode = Math.Max(10.0, GameManager.Instance.GetCodePerClick() * 4.0);
+            GameManager.Instance.AddDirectCurrencies(bonusCode, 0.0);
+        }
+
+        if (ClickJuice.Instance != null && rubberDuckObj != null)
+        {
+            string randomTip = DuckDebugTips[UnityEngine.Random.Range(0, DuckDebugTips.Length)];
+            Color tipColor = currentDuckSkin == 1 ? new Color(0.3f, 0.95f, 1f) :
+                            (currentDuckSkin == 2 ? new Color(0.9f, 0.3f, 1f) : new Color(1f, 0.88f, 0.2f));
+            ClickJuice.Instance.SpawnCustomPopup(randomTip, rubberDuckObj.transform.position + Vector3.up * 45f, tipColor, true);
+        }
+    }
+
+    public void CycleDuckSkin()
+    {
+        currentDuckSkin = (currentDuckSkin + 1) % 3;
+        PlayerPrefs.SetInt("SelectedDuckSkin", currentDuckSkin);
+        PlayerPrefs.Save();
+        ApplyDuckSkin(currentDuckSkin, true);
+
+        HapticFeedback.Vibrate(25);
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayDuckQuack();
+        }
+        if (ClickJuice.Instance != null && duckSkinButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"🦆 СКИН: {DuckSkinNames[currentDuckSkin]}", duckSkinButton.transform.position, new Color(1f, 0.88f, 0.25f), true);
+        }
+    }
+
+    private void ApplyDuckSkin(int skinIdx, bool animate)
+    {
+        if (rubberDuckImage != null)
+        {
+            Sprite targetSpr = sprDuckYellow;
+            if (skinIdx == 1 && sprDuckCoder != null) targetSpr = sprDuckCoder;
+            else if (skinIdx == 2 && sprDuckCyber != null) targetSpr = sprDuckCyber;
+
+            if (targetSpr != null) rubberDuckImage.sprite = targetSpr;
+        }
+
+        if (duckSkinText != null)
+        {
+            duckSkinText.text = $"🦆 {DuckSkinNames[currentDuckSkin]}";
+        }
+
+        if (animate && rubberDuckObj != null)
+        {
+            StartCoroutine(PopInRoutine(rubberDuckObj.transform));
+        }
+    }
+
+    private IEnumerator DuckSquishRoutine()
+    {
+        if (rubberDuckObj == null) yield break;
+        Transform t = rubberDuckObj.transform;
+        Vector3 baseScale = Vector3.one;
+
+        float elapsed = 0f;
+        float dur = 0.08f;
+        while (elapsed < dur)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float p = elapsed / dur;
+            t.localScale = new Vector3(baseScale.x * Mathf.Lerp(1f, 1.25f, p), baseScale.y * Mathf.Lerp(1f, 0.75f, p), 1f);
+            yield return null;
+        }
+
+        elapsed = 0f;
+        dur = 0.14f;
+        while (elapsed < dur)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float p = elapsed / dur;
+            float bounceY = Mathf.Sin(p * Mathf.PI) * 0.25f;
+            t.localScale = new Vector3(baseScale.x * (1f - bounceY * 0.5f), baseScale.y * (1f + bounceY), 1f);
+            yield return null;
+        }
+
+        t.localScale = baseScale;
+        duckSquishCoroutine = null;
     }
 
     #endregion

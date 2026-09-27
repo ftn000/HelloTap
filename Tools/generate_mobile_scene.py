@@ -108,6 +108,11 @@ GUID_SPR_MAT_BLUEPRINT = "7b300000000000000000000000000031"
 GUID_SPR_MAT_RGB = "7b300000000000000000000000000032"
 GUID_SPR_KEYBOARD_CARBON = "7b300000000000000000000000000033"
 GUID_SPR_KEYBOARD_PASTEL = "7b300000000000000000000000000034"
+GUID_SPR_WALLPAPER_SERVER = "7b300000000000000000000000000035"
+GUID_SPR_MAT_MATRIX = "7b300000000000000000000000000036"
+GUID_SPR_DUCK_YELLOW = "7b300000000000000000000000000037"
+GUID_SPR_DUCK_CODER = "7b300000000000000000000000000038"
+GUID_SPR_DUCK_CYBER = "7b300000000000000000000000000039"
 
 # Audio SFX & Music Loops
 GUID_SFX_CASSETTE_CLICK = "9a200000000000000000000000000016"
@@ -126,6 +131,7 @@ GUID_SFX_WHEEL_TICK = "9a200000000000000000000000000028"
 GUID_SFX_WHEEL_WIN = "9a200000000000000000000000000029"
 GUID_SFX_RUSH_ALERT = "9a200000000000000000000000000030"
 GUID_SFX_RUSH_SUCCESS = "9a200000000000000000000000000031"
+GUID_SFX_DUCK_QUACK = "9a200000000000000000000000000032"
 
 out = []
 def add(s=""):
@@ -867,6 +873,7 @@ add("  buildCompleteSound: {fileID: 8300000, guid: " + GUID_SFX_BUILD_COMPLETE +
 add("  cassetteClickSound: {fileID: 8300000, guid: " + GUID_SFX_CASSETTE_CLICK + ", type: 3}")
 add("  rushAlertSound: {fileID: 8300000, guid: " + GUID_SFX_RUSH_ALERT + ", type: 3}")
 add("  rushSuccessSound: {fileID: 8300000, guid: " + GUID_SFX_RUSH_SUCCESS + ", type: 3}")
+add("  duckQuackSound: {fileID: 8300000, guid: " + GUID_SFX_DUCK_QUACK + ", type: 3}")
 add("  sfxSource: {fileID: 1002003}")
 add("  typingSource: {fileID: 1002004}")
 add("  minTypingPitch: 0.94")
@@ -1185,7 +1192,7 @@ add_rect(3000001, 3000000, 1500001, [3010001, 3080001, 3011001], amin=(0, 0), am
 
 # DeskMat (Background desk surface)
 add_go(3010000, "DeskMat", [3010001, 3010003, 3010002])
-add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001, 3015001, 3016001, 3042001, 3017001, 3018001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001, 3015001, 3016001, 3042001, 3017001, 3018001, 3019001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3010003, 3010000)
 add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
 
@@ -1199,6 +1206,25 @@ add_go(3017010, "DeskMatSkinTxt", [3017011, 3017013, 3017012])
 add_rect(3017011, 3017010, 3017001, [], amin=(0,0), amax=(1,1))
 add_cr(3017013, 3017010)
 add_tmp(3017012, 3017010, "🟪 БАЗОВЫЙ", fsize=10, fstyle=1, color=(0.6, 0.85, 1, 1), align=514, autosize=1, fmin=8, fmax=12)
+
+# RubberDuck (Interactive Rubber Duck Debugging on desk mat)
+add_go(3019000, "RubberDuck", [3019001, 3019003, 3019002, 3019004])
+add_rect(3019001, 3019000, 3010001, [3019101], amin=(0.5, 1), amax=(0.5, 1), pos=(-380, -780), size=(110, 100), pivot=(0.5, 0.5))
+add_cr(3019003, 3019000)
+add_image(3019002, 3019000, GUID_SPR_DUCK_YELLOW, raycast=1)
+add_button(3019004, 3019000, 3019002)
+
+# DuckSkinBtn (Skin toggle button below duck)
+add_go(3019100, "DuckSkinBtn", [3019101, 3019104, 3019102, 3019103])
+add_rect(3019101, 3019100, 3019001, [3019111], amin=(0.5, 0), amax=(0.5, 0), pos=(0, -22), size=(100, 24), pivot=(0.5, 0.5))
+add_cr(3019104, 3019100)
+add_image(3019102, 3019100, GUID_SPR_CARD_BG, color=(0.10, 0.14, 0.22, 0.95), img_type=1)
+add_button(3019103, 3019100, 3019102)
+
+add_go(3019110, "DuckSkinTxt", [3019111, 3019113, 3019112])
+add_rect(3019111, 3019110, 3019101, [], amin=(0,0), amax=(1,1))
+add_cr(3019113, 3019110)
+add_tmp(3019112, 3019110, "🦆 КЛАССИКА", fsize=10, fstyle=1, color=(1, 0.88, 0.25, 1), align=514, autosize=1, fmin=8, fmax=12)
 
 # RoomThemeBtn (Quick room background style changer on desk mat)
 add_go(3016000, "RoomThemeBtn", [3016001, 3016004, 3016002, 3016003])
@@ -1911,6 +1937,7 @@ add("  roomWallpaperImage: {fileID: 1502002}")
 add("  sprWallpaperCozy: {fileID: 21300000, guid: " + GUID_SPR_WALLPAPER_COZY + ", type: 3}")
 add("  sprWallpaperCyberpunk: {fileID: 21300000, guid: " + GUID_SPR_WALLPAPER_CYBER + ", type: 3}")
 add("  sprWallpaperMinimal: {fileID: 21300000, guid: " + GUID_SPR_WALLPAPER_MINIMAL + ", type: 3}")
+add("  sprWallpaperServer: {fileID: 21300000, guid: " + GUID_SPR_WALLPAPER_SERVER + ", type: 3}")
 add("  roomThemeButton: {fileID: 3016003}")
 add("  roomThemeText: {fileID: 3016012}")
 add("  mouseSwitchButton: {fileID: 3042003}")
@@ -1928,8 +1955,17 @@ add("  sprDeskMatFelt: {fileID: 21300000, guid: " + GUID_SPR_MAT_FELT + ", type:
 add("  sprDeskMatCyber: {fileID: 21300000, guid: " + GUID_SPR_MAT_CYBER + ", type: 3}")
 add("  sprDeskMatBlueprint: {fileID: 21300000, guid: " + GUID_SPR_MAT_BLUEPRINT + ", type: 3}")
 add("  sprDeskMatRGB: {fileID: 21300000, guid: " + GUID_SPR_MAT_RGB + ", type: 3}")
+add("  sprDeskMatMatrix: {fileID: 21300000, guid: " + GUID_SPR_MAT_MATRIX + ", type: 3}")
 add("  deskMatSkinButton: {fileID: 3017003}")
 add("  deskMatSkinText: {fileID: 3017012}")
+add("  rubberDuckObj: {fileID: 3019000}")
+add("  rubberDuckImage: {fileID: 3019002}")
+add("  rubberDuckButton: {fileID: 3019004}")
+add("  duckSkinButton: {fileID: 3019103}")
+add("  duckSkinText: {fileID: 3019112}")
+add("  sprDuckYellow: {fileID: 21300000, guid: " + GUID_SPR_DUCK_YELLOW + ", type: 3}")
+add("  sprDuckCoder: {fileID: 21300000, guid: " + GUID_SPR_DUCK_CODER + ", type: 3}")
+add("  sprDuckCyber: {fileID: 21300000, guid: " + GUID_SPR_DUCK_CYBER + ", type: 3}")
 
 # ClickJuice component
 add(f"--- !u!114 &3000003")

@@ -44,6 +44,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip cassetteClickSound;
     [SerializeField] private AudioClip rushAlertSound;
     [SerializeField] private AudioClip rushSuccessSound;
+    [SerializeField] private AudioClip duckQuackSound;
 
     [Header("Источники звука")]
     [SerializeField] private AudioSource sfxSource;
@@ -188,6 +189,11 @@ public class AudioManager : MonoBehaviour
         if (rushSuccessSound == null)
         {
             rushSuccessSound = CreateProceduralRushSuccessClip();
+        }
+
+        if (duckQuackSound == null)
+        {
+            duckQuackSound = CreateProceduralDuckQuackClip();
         }
     }
 
@@ -508,6 +514,52 @@ public class AudioManager : MonoBehaviour
             sfxSource.pitch = 1.0f;
             sfxSource.PlayOneShot(rushSuccessSound, 0.95f);
         }
+    }
+
+    public void PlayDuckQuack()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (duckQuackSound != null)
+        {
+            sfxSource.pitch = Random.Range(0.95f, 1.05f);
+            sfxSource.PlayOneShot(duckQuackSound, 0.90f);
+        }
+    }
+
+    private AudioClip CreateProceduralDuckQuackClip()
+    {
+        int sampleRate = 44100;
+        int count = (int)(sampleRate * 0.28f);
+        float[] d = new float[count];
+        for (int i = 0; i < count; i++)
+        {
+            float t = (float)i / sampleRate;
+            float val = 0f;
+            if (t < 0.07f)
+            {
+                float prog = t / 0.07f;
+                float freq = 1200f + Mathf.Sin(prog * Mathf.PI) * 900f;
+                float env = Mathf.Pow(Mathf.Sin(prog * Mathf.PI), 1.5f);
+                val += (Mathf.Sin(2f * Mathf.PI * freq * t) + 0.3f * Mathf.Sin(4f * Mathf.PI * freq * t)) * env * 0.75f;
+            }
+            if (t >= 0.05f)
+            {
+                float qt = t - 0.05f;
+                float qdur = 0.23f;
+                float prog = qt / qdur;
+                float f0 = 480f - Mathf.Pow(prog, 0.8f) * 150f;
+                float amp = Mathf.Sin(Mathf.Min(1f, prog * 4f) * Mathf.PI * 0.5f) * Mathf.Pow(1f - prog, 1.3f);
+                float h1 = Mathf.Sin(2f * Mathf.PI * f0 * qt);
+                float h2 = 0.85f * Mathf.Sin(4f * Mathf.PI * f0 * qt);
+                float h3 = 0.60f * Mathf.Sin(6f * Mathf.PI * f0 * qt);
+                float h4 = 0.35f * Mathf.Sin(8f * Mathf.PI * f0 * qt);
+                val += (h1 + h2 + h3 + h4) * amp * 0.85f;
+            }
+            d[i] = Mathf.Clamp(val * 0.9f, -1f, 1f);
+        }
+        AudioClip c = AudioClip.Create("Procedural_DuckQuack", count, 1, sampleRate, false);
+        c.SetData(d, 0);
+        return c;
     }
 
     private AudioClip CreateProceduralRushAlertClip()

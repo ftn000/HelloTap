@@ -774,6 +774,33 @@ def make_rush_success(duration=1.1):
                 samples[s_idx + i] += math.sin(2.0 * math.pi * sp_f * t) * math.exp(-t * 40.0) * 0.08
     return samples
 
+def make_duck_quack(duration=0.28):
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        val = 0.0
+        if t < 0.07:
+            squeak_progress = t / 0.07
+            freq = 1200.0 + math.sin(squeak_progress * math.pi) * 900.0
+            env = math.sin(squeak_progress * math.pi) ** 1.5
+            squeak_wave = math.sin(2.0 * math.pi * freq * t) + 0.3 * math.sin(4.0 * math.pi * freq * t)
+            val += squeak_wave * env * 0.75
+        if t >= 0.05:
+            quack_t = t - 0.05
+            quack_dur = duration - 0.05
+            prog = quack_t / quack_dur
+            f0 = 480.0 - (prog ** 0.8) * 150.0
+            amp = math.sin(min(1.0, prog * 4.0) * math.pi * 0.5) * (1.0 - prog) ** 1.3
+            harm1 = math.sin(2.0 * math.pi * f0 * quack_t)
+            harm2 = 0.85 * math.sin(4.0 * math.pi * f0 * quack_t)
+            harm3 = 0.60 * math.sin(6.0 * math.pi * f0 * quack_t)
+            harm4 = 0.35 * math.sin(8.0 * math.pi * f0 * quack_t)
+            noise = (math.sin(quack_t * 8920.0) * 0.08)
+            val += (harm1 + harm2 + harm3 + harm4 + noise) * amp * 0.85
+        samples.append(val)
+    return samples
+
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
@@ -808,4 +835,5 @@ save_wav(os.path.join(out_dir, "wheel_tick.wav"), make_wheel_tick())
 save_wav(os.path.join(out_dir, "wheel_win.wav"), make_wheel_win())
 save_wav(os.path.join(out_dir, "rush_alert.wav"), make_rush_alert())
 save_wav(os.path.join(out_dir, "rush_success.wav"), make_rush_success())
+save_wav(os.path.join(out_dir, "duck_quack.wav"), make_duck_quack())
 print("All sound effects generated successfully!")

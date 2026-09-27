@@ -92,6 +92,11 @@ public class DailyStreakUI : MonoBehaviour
     public bool IsModalOpen => modalRoot != null && modalRoot.activeInHierarchy;
     public bool HasCrownUnlocked => PlayerPrefs.GetInt(PrefHasCrown, 0) == 1;
 
+    public double GetStreakMultiplier()
+    {
+        return 1.0 + (Mathf.Clamp(currentStreakDay, 1, 7) - 1) * 0.05;
+    }
+
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -110,6 +115,20 @@ public class DailyStreakUI : MonoBehaviour
         BindButtons();
         EvaluateStreakStatus();
         UpdateUI();
+    }
+
+    private void Update()
+    {
+        if (IsModalOpen && !canClaimToday && streakStatusDescText != null)
+        {
+            DateTime nextDay = DateTime.UtcNow.Date.AddDays(1);
+            TimeSpan rem = nextDay - DateTime.UtcNow;
+            if (rem.TotalSeconds > 0)
+            {
+                int bonusPct = (currentStreakDay - 1) * 5;
+                streakStatusDescText.text = $"День {currentStreakDay} получен! Активен суточный бонус: <color=#39FF14>+{bonusPct}%</color> ко всему фарму!\n⏳ До следующего дня: <color=#00E5FF>{rem.Hours:D2}:{rem.Minutes:D2}:{rem.Seconds:D2}</color>";
+            }
+        }
     }
 
     private void BindButtons()
@@ -276,7 +295,8 @@ public class DailyStreakUI : MonoBehaviour
     {
         if (streakDaysText != null)
         {
-            streakDaysText.text = $"🔥 СЕРИЯ: {currentStreakDay} ДНЕЙ ПОДРЯД";
+            int bonusPct = (currentStreakDay - 1) * 5;
+            streakDaysText.text = $"🔥 СЕРИЯ: {currentStreakDay} ДНЕЙ (+{bonusPct}% К ДОХОДУ)";
         }
         if (streakStatusDescText != null)
         {

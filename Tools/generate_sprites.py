@@ -1304,6 +1304,148 @@ def make_desk_mat_skins():
     im_rgb.save(os.path.join(sprites_dir, "spr_desk_mat_rgb.png"))
     print("Created spr_desk_mat_rgb.png")
 
+# 34. Server Room Wallpaper (540 x 960)
+def make_wallpaper_server():
+    im = Image.new("RGBA", (540, 960), (10, 14, 20, 255))
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, 540, 90], fill=(16, 20, 30, 255))
+    for y in range(20, 80, 15):
+        d.line([(0, y), (540, y)], fill=(32, 40, 58, 255), width=2)
+    cables = [
+        ((0, 45), (140, 85), (270, 65), (420, 80), (540, 45), (0, 230, 255, 220)),
+        ((0, 60), (120, 95), (280, 80), (390, 100), (540, 60), (255, 0, 140, 200)),
+        ((0, 75), (160, 110), (310, 90), (450, 105), (540, 75), (255, 200, 30, 210)),
+        ((0, 30), (180, 70), (340, 60), (480, 65), (540, 30), (50, 130, 255, 220)),
+    ]
+    for *pts, col in cables:
+        for i in range(len(pts) - 1):
+            d.line([pts[i], pts[i+1]], fill=col, width=3)
+    for row in range(500, 960, 36):
+        d.line([(0, row), (540, row)], fill=(18, 26, 38, 255), width=2)
+    for col in [-100, 0, 100, 200, 270, 340, 440, 540, 640]:
+        d.line([(270, 480), (col, 960)], fill=(22, 32, 48, 255), width=2)
+    for gy in range(560, 920, 60):
+        w = int(60 + (gy - 500) * 0.45)
+        d.rectangle([270 - w, gy, 270 + w, gy + 14], fill=(12, 35, 50, 255), outline=(0, 220, 255, 120), width=1)
+        for vx in range(270 - w + 6, 270 + w - 6, 12):
+            d.line([(vx, gy + 3), (vx, gy + 11)], fill=(0, 240, 255, 180), width=1)
+    for rx, rw, is_left in [(12, 175, True), (353, 175, False)]:
+        create_rounded_rect(d, (rx, 100, rx + rw, 880), 8, fill=(18, 22, 32, 255), outline=(36, 46, 68, 255), width=3)
+        d.line([(rx + rw, 105), (rx + rw, 875)] if is_left else [(rx, 105), (rx, 875)], fill=(0, 200, 255, 90), width=2)
+        sy = 112
+        unit_idx = 0
+        while sy < 860:
+            uh = 28 if (unit_idx % 3 != 0) else 44
+            if sy + uh > 865: break
+            plate_color = (24, 30, 44, 255) if unit_idx % 2 == 0 else (20, 26, 38, 255)
+            create_rounded_rect(d, (rx + 8, sy, rx + rw - 8, sy + uh - 4), 3, fill=plate_color, outline=(34, 44, 64, 255), width=1)
+            for gx in range(rx + 16, rx + rw - 70, 10):
+                d.line([(gx, sy + 6), (gx, sy + uh - 10)], fill=(12, 16, 24, 255), width=2)
+            led_x = rx + rw - 58
+            led_y = sy + (uh // 2) - 4
+            led_cols = [(40, 255, 110, 255), (0, 220, 255, 255), (255, 180, 30, 255) if unit_idx % 4 == 0 else (40, 255, 110, 255), (0, 160, 255, 255)]
+            for li, lcol in enumerate(led_cols):
+                lx = led_x + li * 11
+                d.ellipse([lx - 2, led_y - 2, lx + 5, led_y + 5], fill=(*lcol[:3], 80))
+                d.ellipse([lx, led_y, lx + 3, led_y + 3], fill=lcol)
+            sy += uh
+            unit_idx += 1
+    create_rounded_rect(d, (205, 150, 335, 290), 6, fill=(14, 20, 30, 255), outline=(0, 220, 255, 180), width=2)
+    d.rectangle([212, 158, 328, 282], fill=(8, 12, 18, 255))
+    for ty, tcol in [(168, (0, 255, 150, 255)), (186, (0, 220, 255, 255)), (204, (255, 210, 50, 255)), (222, (0, 255, 150, 255)), (240, (0, 180, 255, 255)), (258, (0, 255, 150, 255))]:
+        d.line([(220, ty), (220 + (ty * 13) % 90 + 15, ty)], fill=tcol, width=3)
+    im.save(os.path.join(sprites_dir, "spr_wallpaper_server.png"))
+    print("Created spr_wallpaper_server.png")
+
+# 35. Matrix Desk Mat (1200 x 700)
+def make_desk_mat_matrix():
+    im = Image.new("RGBA", (1200, 700), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    create_rounded_rect(d, (20, 20, 1180, 680), 24, fill=(10, 16, 14, 255), outline=(20, 45, 32, 255), width=3)
+    create_rounded_rect(d, (80, 120, 1120, 640), 16, fill=(8, 20, 14, 255), outline=(0, 255, 128, 220), width=2)
+    d.line([(96, 122), (1104, 122)], fill=(0, 255, 140, 240), width=3)
+    d.line([(1118, 136), (1118, 624)], fill=(0, 255, 140, 240), width=3)
+    d.line([(1104, 638), (96, 638)], fill=(0, 255, 140, 240), width=3)
+    d.line([(82, 624), (82, 136)], fill=(0, 255, 140, 240), width=3)
+    for gx in range(120, 1100, 60): d.line([(gx, 124), (gx, 636)], fill=(0, 255, 100, 22), width=1)
+    for gy in range(150, 620, 50): d.line([(84, gy), (1116, gy)], fill=(0, 255, 100, 22), width=1)
+    for col_x in range(100, 1100, 35):
+        start_y = 135 + ((col_x * 7) % 200)
+        length = 180 + ((col_x * 13) % 250)
+        for seg_y in range(start_y, min(625, start_y + length), 18):
+            brightness = int(40 + (math.sin(seg_y * 0.05 + col_x) + 1.0) * 80)
+            d.line([(col_x, seg_y), (col_x, seg_y + 8)], fill=(0, 255, 110, brightness), width=2)
+            if (seg_y // 18) % 3 == 0: d.rectangle([col_x - 3, seg_y - 2, col_x + 3, seg_y + 2], fill=(0, 255, 130, brightness))
+    d.line([(95, 135), (145, 135)], fill=(50, 255, 150, 255), width=3)
+    d.line([(95, 135), (95, 185)], fill=(50, 255, 150, 255), width=3)
+    d.line([(1105, 625), (1055, 625)], fill=(50, 255, 150, 255), width=3)
+    d.line([(1105, 625), (1105, 575)], fill=(50, 255, 150, 255), width=3)
+    im.save(os.path.join(sprites_dir, "spr_desk_mat_matrix.png"))
+    print("Created spr_desk_mat_matrix.png")
+
+# 36. Rubber Duck Sprites (160 x 140)
+def draw_base_duck(body_color, shadow_color, wing_color, beak_color, eye_color=(20, 20, 25, 255)):
+    im = Image.new("RGBA", (160, 140), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.ellipse([18, 112, 142, 134], fill=(0, 0, 0, 65))
+    d.polygon([(20, 72), (48, 85), (38, 102)], fill=shadow_color)
+    d.polygon([(22, 70), (46, 82), (36, 98)], fill=body_color)
+    d.ellipse([26, 60, 136, 122], fill=shadow_color)
+    d.ellipse([28, 58, 134, 118], fill=body_color)
+    d.arc([32, 59, 130, 115], start=180, end=340, fill=(min(255, body_color[0]+30), min(255, body_color[1]+30), min(255, body_color[2]+30), 160), width=3)
+    d.ellipse([50, 72, 106, 110], fill=shadow_color)
+    d.ellipse([52, 70, 104, 106], fill=wing_color)
+    d.arc([55, 74, 98, 102], start=210, end=330, fill=shadow_color, width=2)
+    d.polygon([(82, 65), (115, 45), (124, 75), (96, 90)], fill=body_color)
+    d.ellipse([80, 22, 136, 76], fill=shadow_color)
+    d.ellipse([82, 20, 134, 74], fill=body_color)
+    d.ellipse([88, 24, 116, 46], fill=(min(255, body_color[0]+35), min(255, body_color[1]+35), min(255, body_color[2]+35), 180))
+    d.polygon([(122, 42), (154, 48), (148, 56), (120, 54)], fill=beak_color)
+    d.polygon([(122, 54), (144, 56), (140, 62), (122, 60)], fill=(max(0, beak_color[0]-35), max(0, beak_color[1]-25), max(0, beak_color[2]-15), 255))
+    d.line([(122, 54), (146, 56)], fill=(120, 35, 5, 255), width=2)
+    d.ellipse([128, 46, 131, 49], fill=(130, 40, 10, 255))
+    d.ellipse([104, 34, 118, 48], fill=eye_color)
+    d.ellipse([107, 36, 112, 41], fill=(255, 255, 255, 255))
+    d.ellipse([113, 42, 115, 44], fill=(255, 255, 255, 220))
+    d.ellipse([98, 52, 114, 62], fill=(255, 140, 140, 75))
+    return im, d
+
+def make_duck_yellow():
+    im, d = draw_base_duck(body_color=(255, 218, 24, 255), shadow_color=(225, 172, 12, 255), wing_color=(255, 230, 48, 255), beak_color=(255, 112, 16, 255))
+    im.save(os.path.join(sprites_dir, "spr_duck_yellow.png"))
+    print("Created spr_duck_yellow.png")
+
+def make_duck_coder():
+    im, d = draw_base_duck(body_color=(255, 218, 24, 255), shadow_color=(225, 172, 12, 255), wing_color=(255, 230, 48, 255), beak_color=(255, 112, 16, 255))
+    create_rounded_rect(d, (56, 75, 78, 92), 3, fill=(104, 33, 122, 240))
+    d.line([(62, 79), (62, 88)], fill=(255, 255, 255, 255), width=2)
+    d.line([(62, 79), (70, 79)], fill=(255, 255, 255, 255), width=2)
+    d.line([(62, 88), (70, 88)], fill=(255, 255, 255, 255), width=2)
+    create_rounded_rect(d, (80, 86, 102, 103), 3, fill=(240, 215, 40, 250), outline=(180, 150, 10, 255), width=1)
+    create_rounded_rect(d, (26, 72, 45, 87), 2, fill=(45, 110, 165, 240))
+    d.ellipse([30, 75, 34, 79], fill=(255, 215, 50, 255))
+    create_rounded_rect(d, (44, 58, 64, 71), 2, fill=(180, 70, 30, 240))
+    d.line([(36, 92), (48, 102)], fill=(240, 80, 50, 255), width=2)
+    d.ellipse([33, 90, 38, 95], fill=(240, 80, 50, 255))
+    create_rounded_rect(d, (94, 30, 126, 48), 4, fill=(24, 26, 34, 255), outline=(45, 52, 70, 255), width=2)
+    d.rectangle([98, 33, 122, 45], fill=(25, 95, 180, 240))
+    d.line([(102, 43), (108, 34)], fill=(255, 255, 255, 220), width=2)
+    create_rounded_rect(d, (96, 100, 146, 116), 3, fill=(60, 66, 78, 255), outline=(90, 98, 115, 255), width=1)
+    create_rounded_rect(d, (120, 68, 154, 103), 3, fill=(35, 40, 50, 255), outline=(80, 88, 105, 255), width=2)
+    d.rectangle([123, 71, 151, 99], fill=(10, 18, 14, 255))
+    d.line([(126, 76), (145, 76)], fill=(0, 255, 120, 255), width=2)
+    d.line([(126, 82), (140, 82)], fill=(0, 220, 255, 255), width=1)
+    im.save(os.path.join(sprites_dir, "spr_duck_coder.png"))
+    print("Created spr_duck_coder.png")
+
+def make_duck_cyber():
+    im, d = draw_base_duck(body_color=(38, 44, 56, 255), shadow_color=(24, 28, 38, 255), wing_color=(48, 56, 72, 255), beak_color=(175, 190, 210, 255), eye_color=(0, 240, 255, 255))
+    create_rounded_rect(d, (92, 28, 128, 48), 4, fill=(0, 230, 255, 220), outline=(255, 0, 140, 255), width=2)
+    d.line([(95, 38), (125, 38)], fill=(255, 255, 255, 240), width=2)
+    d.line([(40, 75), (70, 75), (85, 90), (110, 90)], fill=(255, 0, 140, 240), width=2)
+    im.save(os.path.join(sprites_dir, "spr_duck_cyber.png"))
+    print("Created spr_duck_cyber.png")
+
 make_desk()
 make_monitor_frame()
 make_monitor_screen()
@@ -1337,4 +1479,9 @@ make_robo_pet()
 make_streak_sprites()
 make_wheel_sprites()
 make_desk_mat_skins()
+make_wallpaper_server()
+make_desk_mat_matrix()
+make_duck_yellow()
+make_duck_coder()
+make_duck_cyber()
 print("All sprites successfully generated!")
