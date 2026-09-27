@@ -81,8 +81,9 @@ GUID_PROJECT_BUILD_MINIGAME = "8a100000000000000000000000000004"
 GUID_LOFI_PLAYER_UI = "8a100000000000000000000000000005"
 GUID_SESSION_ANALYTICS_UI = "8a100000000000000000000000000006"
 GUID_DAILY_QUESTS_UI = "8a100000000000000000000000000007"
+GUID_DAILY_STREAK_UI = "8a100000000000000000000000000008"
 
-# Keyboard Variant Sprites, LoFi Player, Wallpapers & Quest Icon
+# Keyboard Variant Sprites, LoFi Player, Wallpapers, Quest Icon, Pets & Streak
 GUID_SPR_KEYBOARD_RETRO = "7b300000000000000000000000000020"
 GUID_SPR_KEYBOARD_NEON = "7b300000000000000000000000000021"
 GUID_SPR_LOFI_PLAYER = "7b300000000000000000000000000022"
@@ -90,6 +91,12 @@ GUID_SPR_WALLPAPER_COZY = "7b300000000000000000000000000023"
 GUID_SPR_WALLPAPER_CYBER = "7b300000000000000000000000000024"
 GUID_SPR_WALLPAPER_MINIMAL = "7b300000000000000000000000000025"
 GUID_SPR_QUEST_ICON = "7b300000000000000000000000000026"
+GUID_SPR_CORGI_SLEEP = "7b300000000000000000000000000027"
+GUID_SPR_CORGI_AWAKE = "7b300000000000000000000000000028"
+GUID_SPR_ROBO_SLEEP = "7b300000000000000000000000000029"
+GUID_SPR_ROBO_AWAKE = "7b30000000000000000000000000002a"
+GUID_SPR_STREAK_FLAME = "7b30000000000000000000000000002b"
+GUID_SPR_CROWN_BADGE = "7b30000000000000000000000000002c"
 
 # Audio SFX & Music Loops
 GUID_SFX_CASSETTE_CLICK = "9a200000000000000000000000000016"
@@ -98,6 +105,12 @@ GUID_SFX_SYNTHWAVE_TRACK = "9a200000000000000000000000000018"
 GUID_SFX_RAIN_AMBIENCE = "9a200000000000000000000000000019"
 GUID_SFX_NIGHT_AMBIENCE = "9a200000000000000000000000000020"
 GUID_SFX_QUEST_COMPLETE = "9a200000000000000000000000000021"
+GUID_SFX_MOUSE_CLASSIC = "9a200000000000000000000000000022"
+GUID_SFX_MOUSE_OPTICAL = "9a200000000000000000000000000023"
+GUID_SFX_MOUSE_SILENT = "9a200000000000000000000000000024"
+GUID_SFX_CORGI_BARK = "9a200000000000000000000000000025"
+GUID_SFX_ROBO_BEEP = "9a200000000000000000000000000026"
+GUID_SFX_STREAK_CLAIM = "9a200000000000000000000000000027"
 
 out = []
 def add(s=""):
@@ -823,6 +836,13 @@ add("  boostSound: {fileID: 8300000, guid: " + GUID_SFX_BOOST + ", type: 3}")
 add("  catPurrSound: {fileID: 8300000, guid: " + GUID_SFX_PURR + ", type: 3}")
 add("  sipSound: {fileID: 8300000, guid: " + GUID_SFX_SIP + ", type: 3}")
 add("  mouseClickSound: {fileID: 8300000, guid: " + GUID_SFX_MOUSE_CLICK + ", type: 3}")
+add("  mouseClickSounds:")
+add("  - {fileID: 8300000, guid: " + GUID_SFX_MOUSE_CLASSIC + ", type: 3}")
+add("  - {fileID: 8300000, guid: " + GUID_SFX_MOUSE_OPTICAL + ", type: 3}")
+add("  - {fileID: 8300000, guid: " + GUID_SFX_MOUSE_SILENT + ", type: 3}")
+add("  dogBarkSound: {fileID: 8300000, guid: " + GUID_SFX_CORGI_BARK + ", type: 3}")
+add("  roboBeepSound: {fileID: 8300000, guid: " + GUID_SFX_ROBO_BEEP + ", type: 3}")
+add("  streakClaimSound: {fileID: 8300000, guid: " + GUID_SFX_STREAK_CLAIM + ", type: 3}")
 add("  lampSwitchSound: {fileID: 8300000, guid: " + GUID_SFX_LAMP_SWITCH + ", type: 3}")
 add("  bugSquashSound: {fileID: 8300000, guid: " + GUID_SFX_BUG_SQUASH + ", type: 3}")
 add("  crateCollectSound: {fileID: 8300000, guid: " + GUID_SFX_CRATE_COLLECT + ", type: 3}")
@@ -939,7 +959,7 @@ add_image(1400002, 1400000, None, color=(0.03, 0.035, 0.05, 1.0), raycast=0)
 
 # MobileFrame (Full Responsive Stretch Canvas Container)
 add_go(1500000, "MobileFrame", [1500001, 1500003, 1500002])
-add_rect(1500001, 1500000, 1442568835, [1502001, 3000001, 3090001, 2010001, 2080001, 4000001, 5000001, 6000001, 7000001, 1501001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(1500001, 1500000, 1442568835, [1502001, 3000001, 3090001, 2010001, 2080001, 1501001, 4000001, 5000001, 6000001, 7000001, 8000001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(1500003, 1500000)
 add_image(1500002, 1500000, None, color=(0.055, 0.065, 0.09, 1.0), raycast=0)
 
@@ -973,9 +993,9 @@ add_rect(2010001, 2010000, 1500001, [2011001, 2020001, 2030001], amin=(0,1), ama
 add_cr(2010003, 2010000)
 add_image(2010002, 2010000, None, color=(0.07, 0.086, 0.12, 0.95), raycast=0)
 
-# Row 1: Top mini-controls (Reset, Mute, TimeOfDay, Analytics, Quests, Boost)
+# Row 1: Top mini-controls (Reset, Mute, TimeOfDay, Analytics, Quests, Streak, Boost)
 add_go(2011000, "TopControlsRow", [2011001])
-add_rect(2011001, 2011000, 2010001, [2060001, 2050001, 2070001, 2090001, 2100001, 2040001], amin=(0, 1), amax=(1, 1), pos=(0, -40), size=(-40, 60), pivot=(0.5, 0.5))
+add_rect(2011001, 2011000, 2010001, [2060001, 2050001, 2070001, 2090001, 2100001, 2110001, 2040001], amin=(0, 1), amax=(1, 1), pos=(0, -40), size=(-40, 60), pivot=(0.5, 0.5))
 
 # ResetButton (Lab requirement)
 add_go(2060000, "ResetButton", [2060001, 2060004, 2060002, 2060003])
@@ -1037,6 +1057,25 @@ add_go(2102000, "QuestBadgeDot", [2102001, 2102003, 2102002], active=0)
 add_rect(2102001, 2102000, 2100001, [], amin=(1, 1), amax=(1, 1), pos=(-10, -10), size=(18, 18), pivot=(0.5, 0.5))
 add_cr(2102003, 2102000)
 add_image(2102002, 2102000, GUID_SPR_BTN_ORANGE, img_type=1)
+
+# StreakButton (Daily login streak reward modal button)
+add_go(2110000, "StreakButton", [2110001, 2110004, 2110002, 2110003])
+add_rect(2110001, 2110000, 2011001, [2111001, 2112001], amin=(0, 0.5), amax=(0, 0.5), pos=(605, 0), size=(115, 56), pivot=(0.5, 0.5))
+add_cr(2110004, 2110000)
+add_image(2110002, 2110000, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(2110003, 2110000, 2110002)
+
+add_go(2111000, "StreakBtnTxt", [2111001, 2111003, 2111002])
+add_rect(2111001, 2111000, 2110001, [], amin=(0,0), amax=(1,1))
+add_cr(2111003, 2111000)
+add_tmp(2111002, 2111000, "🔥 1 ДН.", fsize=13, fstyle=1, color=(1, 0.85, 0.3, 1), align=514, autosize=1, fmin=9, fmax=15)
+
+# StreakBadgeDot (Notification indicator when today's streak reward is available)
+add_go(2112000, "StreakBadgeDot", [2112001, 2112003, 2112002], active=0)
+add_rect(2112001, 2112000, 2110001, [], amin=(1, 1), amax=(1, 1), pos=(-10, -10), size=(18, 18), pivot=(0.5, 0.5))
+add_cr(2112003, 2112000)
+add_image(2112002, 2112000, GUID_SPR_BTN_ORANGE, img_type=1)
+
 # AudioToggleButton
 add(f"--- !u!114 &2050005")
 add("MonoBehaviour:")
@@ -1097,7 +1136,7 @@ add_rect(3000001, 3000000, 1500001, [3010001, 3080001, 3011001], amin=(0, 0), am
 
 # DeskMat (Background desk surface)
 add_go(3010000, "DeskMat", [3010001, 3010003, 3010002])
-add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001, 3015001, 3016001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
+add_rect(3010001, 3010000, 3000001, [3012001, 3020001, 3030001, 3040001, 3050001, 3060001, 3070001, 3013001, 3014001, 3015001, 3016001, 3042001], amin=(0, 0), amax=(1, 1), pos=(0, 0), size=(0, 0), pivot=(0.5, 0.5))
 add_cr(3010003, 3010000)
 add_image(3010002, 3010000, GUID_SPR_DESK, raycast=0, preserve=0)
 
@@ -1321,7 +1360,7 @@ add_tmp(3015512, 3015510, "🔇 ЭМБИЕНТ", fsize=9, fstyle=1, color=(0.6, 
 
 # MonitorFrame (Upper half of workstation - 840x420 with 756x306 bezel cutout)
 add_go(3020000, "MonitorFrame", [3020001, 3020003, 3020002])
-add_rect(3020001, 3020000, 3010001, [3021001, 3022101, 3022201, 3022301, 3022401], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -250), size=(840, 420), pivot=(0.5, 1))
+add_rect(3020001, 3020000, 3010001, [3021001, 3022101, 3022201, 3022301, 3022401, 3022501], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -250), size=(840, 420), pivot=(0.5, 1))
 add_cr(3020003, 3020000)
 add_image(3020002, 3020000, GUID_SPR_MON_FRAME, raycast=0)
 
@@ -1353,6 +1392,13 @@ add_rect(3022401, 3022400, 3020001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(330, 
 add_cr(3022404, 3022400)
 add_image(3022402, 3022400, GUID_SPR_STICKER_WORKS, raycast=1)
 add_button(3022403, 3022400, 3022402)
+
+# 5. Streak Master Crown Badge (top-center frame, unlocked after Day 7 streak)
+add_go(3022500, "StickerCrown", [3022501, 3022504, 3022502, 3022503], active=0)
+add_rect(3022501, 3022500, 3020001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(0, -32), size=(60, 60), pivot=(0.5, 0.5))
+add_cr(3022504, 3022500)
+add_image(3022502, 3022500, GUID_SPR_CROWN_BADGE, raycast=1)
+add_button(3022503, 3022500, 3022502)
 
 # MonitorScreen (Exact 756x306 fit inside MonitorFrame cutout, perfectly centered)
 add_go(3021000, "MonitorScreen", [3021001, 3021003, 3021002])
@@ -1418,7 +1464,7 @@ add_tmp(3012202, 3012200, "ТЕМП ПЕЧАТИ: x1.0 (тапай быстре�
 
 # Cat Mascot (curled up sleeping peacefully under the keyboard on desk mat)
 add_go(3070000, "CatMascot", [3070001, 3070003, 3070002, 3070004])
-add_rect(3070001, 3070000, 3010001, [3071001, 3072001, 3073001], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -1210), size=(180, 125), pivot=(0.5, 0.5))
+add_rect(3070001, 3070000, 3010001, [3071001, 3072001, 3073001, 3074001], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -1210), size=(180, 125), pivot=(0.5, 0.5))
 add_cr(3070003, 3070000)
 add_image(3070002, 3070000, GUID_SPR_CAT, raycast=1)
 add_button(3070004, 3070000, 3070002)
@@ -1439,6 +1485,17 @@ add_go(3073100, "CatAccTxt", [3073101, 3073103, 3073102])
 add_rect(3073101, 3073100, 3073001, [], amin=(0,0), amax=(1,1))
 add_cr(3073103, 3073100)
 add_tmp(3073102, 3073100, "🎀", fsize=16, fstyle=0, color=(1,1,1,1), align=514)
+
+# PetSelectorBtn (Mini button on left of pet to cycle Cat / Corgi / Robo companion)
+add_go(3074000, "PetSelectorBtn", [3074001, 3074004, 3074002, 3074003])
+add_rect(3074001, 3074000, 3070001, [3074011], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(-65, 40), size=(36, 36), pivot=(0.5, 0.5))
+add_cr(3074004, 3074000)
+add_image(3074002, 3074000, GUID_SPR_BTN_GOLD, img_type=1)
+add_button(3074003, 3074000, 3074002)
+add_go(3074010, "PetSelTxt", [3074011, 3074013, 3074012])
+add_rect(3074011, 3074010, 3074001, [], amin=(0,0), amax=(1,1))
+add_cr(3074013, 3074010)
+add_tmp(3074012, 3074010, "🐾", fsize=16, fstyle=0, color=(1,1,1,1), align=514)
 
 # CatHeartEmote (Pops up with floating heart when cat purrs / woke up)
 add_go(3071000, "CatHeartEmote", [3071001, 3071003, 3071002], active=0)
@@ -1510,6 +1567,17 @@ add_go(3041000, "GamingMouseGlow", [3041001, 3041003, 3041002])
 add_rect(3041001, 3041000, 3040001, [], amin=(0,0), amax=(1,1))
 add_cr(3041003, 3041000)
 add_image(3041002, 3041000, GUID_SPR_MOUSE_GLOW, color=(0, 0.9, 1, 0.5), raycast=0)
+
+# MouseSwitchBtn (Cycle mouse switch sound profiles: Omron / Optical / Silent)
+add_go(3042000, "MouseSwitchBtn", [3042001, 3042004, 3042002, 3042003])
+add_rect(3042001, 3042000, 3010001, [3042011], amin=(0.5, 1), amax=(0.5, 1), pos=(465, -1075), size=(115, 30), pivot=(0.5, 0.5))
+add_cr(3042004, 3042000)
+add_image(3042002, 3042000, GUID_SPR_CARD_BG, color=(0.08, 0.12, 0.18, 0.92), img_type=1)
+add_button(3042003, 3042000, 3042002)
+add_go(3042010, "MouseSwitchTxt", [3042011, 3042013, 3042012])
+add_rect(3042011, 3042010, 3042001, [], amin=(0,0), amax=(1,1))
+add_cr(3042013, 3042010)
+add_tmp(3042012, 3042010, "🖱️ OMRON", fsize=10, fstyle=1, color=(0.4, 0.9, 1, 1), align=514, autosize=1, fmin=8, fmax=12)
 
 # KeyboardGroup (Lower half of workstation - Main tap zone, shifted right by +35px)
 add_go(3030000, "KeyboardGroup", [3030001])
@@ -1702,6 +1770,15 @@ add("  sprWallpaperCyberpunk: {fileID: 21300000, guid: " + GUID_SPR_WALLPAPER_CY
 add("  sprWallpaperMinimal: {fileID: 21300000, guid: " + GUID_SPR_WALLPAPER_MINIMAL + ", type: 3}")
 add("  roomThemeButton: {fileID: 3016003}")
 add("  roomThemeText: {fileID: 3016012}")
+add("  mouseSwitchButton: {fileID: 3042003}")
+add("  mouseSwitchText: {fileID: 3042012}")
+add("  sprCorgiSleep: {fileID: 21300000, guid: " + GUID_SPR_CORGI_SLEEP + ", type: 3}")
+add("  sprCorgiAwake: {fileID: 21300000, guid: " + GUID_SPR_CORGI_AWAKE + ", type: 3}")
+add("  sprRoboSleep: {fileID: 21300000, guid: " + GUID_SPR_ROBO_SLEEP + ", type: 3}")
+add("  sprRoboAwake: {fileID: 21300000, guid: " + GUID_SPR_ROBO_AWAKE + ", type: 3}")
+add("  petSelectorButton: {fileID: 3074003}")
+add("  petSelectorText: {fileID: 3074012}")
+add("  stickerCrown: {fileID: 3022500}")
 
 # ClickJuice component
 add(f"--- !u!114 &3000003")
@@ -2557,6 +2634,193 @@ add("  quest3Fill: {fileID: 7004322}")
 add("  quest3ProgressText: {fileID: 7004332}")
 add("  quest3ClaimBtn: {fileID: 7004343}")
 add("  quest3ClaimText: {fileID: 7004352}")
+
+# ==============================================================
+# 5.5 DAILY STREAK MODAL (7-Day Login Streak & Rewards)
+# ==============================================================
+add_go(8000000, "DailyStreakModalRoot", [8000001, 8000004], active=0)
+add_rect(8000001, 8000000, 1500001, [8001001, 8002001], amin=(0,0), amax=(1,1))
+
+# Dim Backdrop
+add_go(8001000, "StreakBackdrop", [8001001, 8001004, 8001002, 8001003])
+add_rect(8001001, 8001000, 8000001, [], amin=(0,0), amax=(1,1))
+add_cr(8001004, 8001000)
+add_image(8001002, 8001000, None, color=(0.02, 0.03, 0.05, 0.85), raycast=1)
+add_button(8001003, 8001000, 8001002)
+
+# Modal Card Container
+add_go(8002000, "StreakCard", [8002001, 8002004, 8002002])
+add_rect(8002001, 8002000, 8000001, [8003001, 8004101, 8004201, 8004301, 8004401, 8004501, 8004601, 8004701, 8005001, 8006001], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 0), size=(940, 1200), pivot=(0.5, 0.5))
+add_cr(8002004, 8002000)
+add_image(8002002, 8002000, GUID_SPR_CARD_BG, color=(0.09, 0.11, 0.16, 0.98), img_type=1)
+
+# Modal Header (Title + Close X Button + Streak Days + Desc)
+add_go(8003000, "StreakHeader", [8003001])
+add_rect(8003001, 8003000, 8002001, [8003101, 8003201, 8003301, 8003401], amin=(0, 1), amax=(1, 1), pos=(0, -45), size=(0, 140), pivot=(0.5, 1))
+
+add_go(8003100, "StreakHeaderTitle", [8003101, 8003103, 8003102])
+add_rect(8003101, 8003100, 8003001, [], amin=(0, 1), amax=(1, 1), pos=(-30, -25), size=(0, 42), pivot=(0.5, 0.5))
+add_cr(8003103, 8003100)
+add_tmp(8003102, 8003100, "🔥 ЕЖЕДНЕВНЫЙ СТРИК", fsize=26, fstyle=1, color=(1, 0.85, 0.3, 1), align=514, autosize=1, fmin=18, fmax=28)
+
+add_go(8003200, "StreakCloseXBtn", [8003201, 8003204, 8003202, 8003203])
+add_rect(8003201, 8003200, 8003001, [8003211], amin=(1, 1), amax=(1, 1), pos=(-45, -25), size=(56, 56), pivot=(0.5, 0.5))
+add_cr(8003204, 8003200)
+add_image(8003202, 8003200, GUID_SPR_BTN_ORANGE, img_type=1)
+add_button(8003203, 8003200, 8003202)
+add_go(8003210, "CloseTxt", [8003211, 8003213, 8003212])
+add_rect(8003211, 8003210, 8003201, [], amin=(0,0), amax=(1,1))
+add_cr(8003213, 8003210)
+add_tmp(8003212, 8003210, "✕", fsize=24, fstyle=1, color=(1,1,1,1), align=514)
+
+add_go(8003300, "StreakDaysText", [8003301, 8003303, 8003302])
+add_rect(8003301, 8003300, 8003001, [], amin=(0, 1), amax=(1, 1), pos=(0, -68), size=(0, 36), pivot=(0.5, 0.5))
+add_cr(8003303, 8003300)
+add_tmp(8003302, 8003300, "🔥 СЕРИЯ: 1 ДЕНЬ ПОДРЯД", fsize=19, fstyle=1, color=(1, 0.65, 0.25, 1), align=514, autosize=1, fmin=14, fmax=22)
+
+add_go(8003400, "StreakDescText", [8003401, 8003403, 8003402])
+add_rect(8003401, 8003400, 8003001, [], amin=(0, 1), amax=(1, 1), pos=(0, -102), size=(0, 26), pivot=(0.5, 0.5))
+add_cr(8003403, 8003400)
+add_tmp(8003402, 8003400, "Заходи каждый день без пропусков за бонусами!", fsize=13, fstyle=0, color=(0.7, 0.8, 0.9, 1), align=514, autosize=1, fmin=10, fmax=15)
+
+# 7 Day Cards
+streak_rewards_desc = [
+    "+500 руб.\\n+200 строк",
+    "+1 500 руб.\\n+500 строк",
+    "+3 000 руб. | +1K кода\\n⚡ БУСТ x2 (30с)",
+    "+6 000 руб.\\n+2.5K строк",
+    "+10 000 руб. | +5K кода\\n⚡ БУСТ x2 (45с)",
+    "+20 000 руб.\\n+10K строк",
+    "👑 STREAK MASTER! Золотая корона на монитор\\n+50 000 руб. | +25 000 строк кода | ⚡ БУСТ x2 (60с)"
+]
+
+for i in range(7):
+    card_fid = 8004100 + i * 100
+    r_fid = card_fid + 1
+    cr_fid = card_fid + 4
+    img_fid = card_fid + 2
+    
+    num_fid = card_fid + 10
+    rew_fid = card_fid + 20
+    chk_fid = card_fid + 30
+    hli_fid = card_fid + 40
+    
+    if i < 6:
+        col = i % 3
+        row = i // 3
+        cx = -290 + col * 290
+        cy = -290 - row * 205
+        cw, ch = 270, 185
+        num_str = f"ДЕНЬ {i + 1}"
+        num_fsize = 16
+        num_col = (0.4, 0.9, 1, 1)
+        rew_fsize = 13
+    else:
+        cx = 0
+        cy = -710
+        cw, ch = 850, 195
+        num_str = "👑 ДЕНЬ 7: STREAK MASTER"
+        num_fsize = 20
+        num_col = (1, 0.85, 0.25, 1)
+        rew_fsize = 15
+
+    add_go(card_fid, f"DayCard_{i+1}", [r_fid, cr_fid, img_fid])
+    add_rect(r_fid, card_fid, 8002001, [num_fid + 1, rew_fid + 1, chk_fid + 1, hli_fid + 1], amin=(0.5, 1), amax=(0.5, 1), pos=(cx, cy), size=(cw, ch), pivot=(0.5, 1))
+    add_cr(cr_fid, card_fid)
+    add_image(img_fid, card_fid, GUID_SPR_CARD_BG, color=(0.06, 0.08, 0.13, 0.95), img_type=1)
+
+    # Number
+    add_go(num_fid, "DayNum", [num_fid + 1, num_fid + 3, num_fid + 2])
+    add_rect(num_fid + 1, num_fid, r_fid, [], amin=(0, 1), amax=(1, 1), pos=(0, -24), size=(0, 32), pivot=(0.5, 0.5))
+    add_cr(num_fid + 3, num_fid)
+    add_tmp(num_fid + 2, num_fid, num_str, fsize=num_fsize, fstyle=1, color=num_col, align=514, autosize=1, fmin=12, fmax=20)
+
+    # Reward Text
+    add_go(rew_fid, "DayReward", [rew_fid + 1, rew_fid + 3, rew_fid + 2])
+    add_rect(rew_fid + 1, rew_fid, r_fid, [], amin=(0, 0), amax=(1, 1), pos=(0, -15), size=(-20, -50), pivot=(0.5, 0.5))
+    add_cr(rew_fid + 3, rew_fid)
+    add_tmp(rew_fid + 2, rew_fid, streak_rewards_desc[i], fsize=rew_fsize, fstyle=0, color=(1, 1, 1, 1), align=514, autosize=1, fmin=10, fmax=16)
+
+    # Checkmark Badge
+    add_go(chk_fid, "DayCheckmark", [chk_fid + 1, chk_fid + 3, chk_fid + 2], active=0)
+    add_rect(chk_fid + 1, chk_fid, r_fid, [chk_fid + 11], amin=(1, 1), amax=(1, 1), pos=(-24, -24), size=(32, 32), pivot=(0.5, 0.5))
+    add_cr(chk_fid + 3, chk_fid)
+    add_image(chk_fid + 2, chk_fid, GUID_SPR_BTN_CYAN, img_type=1)
+    add_go(chk_fid + 10, "CheckTxt", [chk_fid + 11, chk_fid + 13, chk_fid + 12])
+    add_rect(chk_fid + 11, chk_fid + 10, chk_fid + 1, [], amin=(0,0), amax=(1,1))
+    add_cr(chk_fid + 13, chk_fid + 10)
+    add_tmp(chk_fid + 12, chk_fid + 10, "✓", fsize=18, fstyle=1, color=(1,1,1,1), align=514)
+
+    # Highlight Frame
+    add_go(hli_fid, "DayHighlight", [hli_fid + 1, hli_fid + 3, hli_fid + 2], active=0)
+    add_rect(hli_fid + 1, hli_fid, r_fid, [], amin=(0,0), amax=(1,1))
+    add_cr(hli_fid + 3, hli_fid)
+    add_image(hli_fid + 2, hli_fid, GUID_SPR_BTN_GOLD, color=(1, 0.85, 0.2, 0.45), img_type=1, raycast=0)
+
+# StreakClaimTodayBtn
+add_go(8005000, "StreakClaimTodayBtn", [8005001, 8005004, 8005002, 8005003])
+add_rect(8005001, 8005000, 8002001, [8005011], amin=(0.5, 0), amax=(0.5, 0), pos=(0, 150), size=(620, 76), pivot=(0.5, 0.5))
+add_cr(8005004, 8005000)
+add_image(8005002, 8005000, GUID_SPR_BTN_GOLD, img_type=1)
+add_button(8005003, 8005000, 8005002)
+add_go(8005010, "ClaimTxt", [8005011, 8005013, 8005012])
+add_rect(8005011, 8005010, 8005001, [], amin=(0,0), amax=(1,1))
+add_cr(8005013, 8005010)
+add_tmp(8005012, 8005010, "ЗАБРАТЬ НАГРАДУ ДНЯ! 🎁", fsize=22, fstyle=1, color=(1,1,1,1), align=514)
+
+# StreakConfirmCloseBtn
+add_go(8006000, "StreakConfirmCloseBtn", [8006001, 8006004, 8006002, 8006003])
+add_rect(8006001, 8006000, 8002001, [8006101], amin=(0.5, 0), amax=(0.5, 0), pos=(0, 65), size=(560, 64), pivot=(0.5, 0.5))
+add_cr(8006004, 8006000)
+add_image(8006002, 8006000, GUID_SPR_BTN_CYAN, img_type=1)
+add_button(8006003, 8006000, 8006002)
+add_go(8006100, "BtnTxt", [8006101, 8006103, 8006102])
+add_rect(8006101, 8006100, 8006001, [], amin=(0,0), amax=(1,1))
+add_cr(8006103, 8006100)
+add_tmp(8006102, 8006100, "ЗАКРЫТЬ", fsize=20, fstyle=1, color=(1,1,1,1), align=514)
+
+# DailyStreakUI component
+add(f"--- !u!114 &8000004")
+add("MonoBehaviour:")
+add("  m_ObjectHideFlags: 0")
+add("  m_CorrespondingSourceObject: {fileID: 0}")
+add("  m_PrefabInstance: {fileID: 0}")
+add("  m_PrefabAsset: {fileID: 0}")
+add("  m_GameObject: {fileID: 8000000}")
+add("  m_Enabled: 1")
+add("  m_EditorHideFlags: 0")
+add("  m_Script: {fileID: 11500000, guid: " + GUID_DAILY_STREAK_UI + ", type: 3}")
+add("  m_Name: ")
+add("  m_EditorClassIdentifier: Assembly-CSharp::DailyStreakUI")
+add("  openStreakBtn: {fileID: 2110003}")
+add("  openStreakBtnText: {fileID: 2111002}")
+add("  streakBadgeDot: {fileID: 2112000}")
+add("  closeStreakBtn: {fileID: 8006003}")
+add("  closeXBtn: {fileID: 8003203}")
+add("  backdropBtn: {fileID: 8001003}")
+add("  modalRoot: {fileID: 8000000}")
+add("  modalCardTransform: {fileID: 8002001}")
+add("  streakDaysText: {fileID: 8003302}")
+add("  streakStatusDescText: {fileID: 8003402}")
+add("  dayCardRoots:")
+for i in range(7):
+    add(f"  - {{fileID: {8004100 + i * 100}}}")
+add("  dayNumberTexts:")
+for i in range(7):
+    add(f"  - {{fileID: {8004112 + i * 100}}}")
+add("  dayRewardTexts:")
+for i in range(7):
+    add(f"  - {{fileID: {8004122 + i * 100}}}")
+add("  dayCheckmarkIcons:")
+for i in range(7):
+    add(f"  - {{fileID: {8004132 + i * 100}}}")
+add("  dayHighlightFrames:")
+for i in range(7):
+    add(f"  - {{fileID: {8004140 + i * 100}}}")
+add("  claimTodayBtn: {fileID: 8005003}")
+add("  claimTodayBtnText: {fileID: 8005012}")
+add("  crownStickerObj: {fileID: 3022500}")
+add("  streakClaimSound: {fileID: 8300000, guid: " + GUID_SFX_STREAK_CLAIM + ", type: 3}")
 
 # ==============================================================
 # 6. COUNTERSCRIPT (TapCounter)

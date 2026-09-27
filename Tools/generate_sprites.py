@@ -812,6 +812,267 @@ def make_quest_icon():
     im.save(os.path.join(sprites_dir, "spr_quest_icon.png"))
     print("Created spr_quest_icon.png")
 
+# 26. Corgi Pet Companion (Sleep & Awake) (256 x 180)
+def make_corgi_pet():
+    # Sleep Corgi (curled up sleeping peacefully)
+    im_sleep = Image.new("RGBA", (256, 180), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im_sleep)
+    
+    # Shadow underneath
+    d.ellipse([30, 130, 226, 172], fill=(12, 14, 20, 130))
+    
+    # Body (Warm golden-tan corgi coat)
+    body_col = (228, 148, 64, 255)
+    shadow_col = (195, 120, 48, 255)
+    white_fur = (248, 246, 242, 255)
+    
+    # Curled Body
+    d.ellipse([50, 60, 210, 155], fill=body_col, outline=shadow_col, width=3)
+    # Stubby corgi rump & tiny fluffy tail
+    d.ellipse([180, 75, 230, 125], fill=body_col)
+    d.ellipse([215, 88, 236, 108], fill=white_fur) # White fluffy tail tip
+    
+    # White belly & chest patch
+    d.ellipse([70, 95, 170, 155], fill=white_fur)
+    
+    # Head resting on paws
+    d.ellipse([40, 68, 135, 150], fill=body_col, outline=shadow_col, width=3)
+    # White blaze on forehead down to snout
+    d.polygon([(82, 70), (92, 70), (98, 115), (76, 115)], fill=white_fur)
+    # White muzzle
+    d.ellipse([60, 105, 115, 145], fill=white_fur)
+    
+    # Cute black button nose
+    d.ellipse([82, 110, 94, 122], fill=(28, 28, 34, 255))
+    
+    # Closed sleeping eyes (curved peaceful crescents)
+    d.arc([56, 92, 74, 108], start=20, end=160, fill=(45, 30, 20, 255), width=3)
+    d.arc([100, 92, 118, 108], start=20, end=160, fill=(45, 30, 20, 255), width=3)
+    
+    # Big expressive corgi ears (folded back softly)
+    # Left ear
+    d.polygon([(45, 78), (20, 40), (62, 58)], fill=body_col, outline=shadow_col)
+    d.polygon([(43, 72), (25, 46), (56, 60)], fill=(245, 175, 170, 255)) # Pink inner ear
+    # Right ear
+    d.polygon([(115, 68), (145, 32), (138, 72)], fill=body_col, outline=shadow_col)
+    d.polygon([(118, 66), (140, 38), (134, 69)], fill=(245, 175, 170, 255))
+    
+    # Folded front paws
+    d.ellipse([65, 135, 95, 158], fill=white_fur, outline=shadow_col, width=2)
+    d.ellipse([98, 135, 128, 158], fill=white_fur, outline=shadow_col, width=2)
+    # Toe lines
+    d.line([(75, 146), (75, 156)], fill=(180, 160, 150, 255), width=2)
+    d.line([(85, 146), (85, 156)], fill=(180, 160, 150, 255), width=2)
+    d.line([(108, 146), (108, 156)], fill=(180, 160, 150, 255), width=2)
+    d.line([(118, 146), (118, 156)], fill=(180, 160, 150, 255), width=2)
+    
+    im_sleep.save(os.path.join(sprites_dir, "spr_corgi_sleep.png"))
+    print("Created spr_corgi_sleep.png")
+    
+    # Awake Corgi (Perky ears, big sparkly eyes, happy open mouth with pink tongue!)
+    im_awake = Image.new("RGBA", (256, 180), (0, 0, 0, 0))
+    d2 = ImageDraw.Draw(im_awake)
+    
+    d2.ellipse([30, 130, 226, 172], fill=(12, 14, 20, 130))
+    # Body
+    d2.ellipse([50, 65, 210, 155], fill=body_col, outline=shadow_col, width=3)
+    d2.ellipse([180, 78, 230, 128], fill=body_col)
+    # Tail wagging up
+    d2.ellipse([216, 75, 240, 98], fill=white_fur)
+    d2.ellipse([70, 100, 170, 155], fill=white_fur)
+    
+    # Head held higher
+    d2.ellipse([45, 50, 142, 142], fill=body_col, outline=shadow_col, width=3)
+    d2.polygon([(86, 52), (98, 52), (104, 98), (80, 98)], fill=white_fur)
+    d2.ellipse([64, 90, 122, 138], fill=white_fur)
+    
+    # Perky big erect corgi ears!
+    # Left ear erect
+    d2.polygon([(52, 65), (32, 12), (78, 48)], fill=body_col, outline=shadow_col, width=2)
+    d2.polygon([(52, 60), (37, 20), (72, 48)], fill=(248, 178, 174, 255))
+    # Right ear erect
+    d2.polygon([(110, 48), (145, 12), (130, 68)], fill=body_col, outline=shadow_col, width=2)
+    d2.polygon([(114, 48), (140, 20), (128, 64)], fill=(248, 178, 174, 255))
+    
+    # Big sparkling black eyes
+    d2.ellipse([60, 74, 78, 92], fill=(24, 20, 26, 255))
+    d2.ellipse([64, 76, 70, 82], fill=(255, 255, 255, 255)) # Glint
+    d2.ellipse([72, 84, 75, 87], fill=(255, 255, 255, 200))
+    
+    d2.ellipse([106, 74, 124, 92], fill=(24, 20, 26, 255))
+    d2.ellipse([110, 76, 116, 82], fill=(255, 255, 255, 255)) # Glint
+    d2.ellipse([118, 84, 121, 87], fill=(255, 255, 255, 200))
+    
+    # Nose
+    d2.ellipse([86, 96, 98, 108], fill=(28, 28, 34, 255))
+    
+    # Open happy smiling mouth & tongue!
+    d2.ellipse([82, 108, 102, 128], fill=(160, 40, 50, 255))
+    d2.ellipse([84, 114, 100, 134], fill=(255, 120, 140, 255)) # Tongue out!
+    
+    # Front paws
+    d2.ellipse([68, 132, 98, 156], fill=white_fur, outline=shadow_col, width=2)
+    d2.ellipse([102, 132, 132, 156], fill=white_fur, outline=shadow_col, width=2)
+    
+    im_awake.save(os.path.join(sprites_dir, "spr_corgi_awake.png"))
+    print("Created spr_corgi_awake.png")
+
+# 27. Cyber Robot Assistant (Sleep & Awake) (256 x 180)
+def make_robo_pet():
+    # Robo Sleep (Standby Low-Power Mode)
+    im_sleep = Image.new("RGBA", (256, 180), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im_sleep)
+    
+    # Shadow
+    d.ellipse([30, 132, 226, 172], fill=(8, 12, 18, 140))
+    
+    # Chassis colors (Sleek white / dark graphite / neon teal)
+    armor_white = (225, 232, 242, 255)
+    armor_dark = (42, 48, 62, 255)
+    armor_stroke = (28, 32, 42, 255)
+    neon_cyan = (0, 229, 255, 255)
+    dim_cyan = (0, 120, 140, 180)
+    
+    # Body shell
+    create_rounded_rect(d, (60, 65, 205, 148), 24, fill=armor_white, outline=armor_stroke, width=3)
+    # Dark belly plate
+    create_rounded_rect(d, (80, 95, 185, 142), 14, fill=armor_dark, outline=armor_stroke, width=2)
+    
+    # Mechanical rear thruster / tail antenna
+    d.line([(200, 90), (228, 70)], fill=armor_dark, width=5)
+    d.ellipse([224, 64, 236, 76], fill=dim_cyan)
+    
+    # Robot Head unit
+    create_rounded_rect(d, (42, 60, 138, 142), 20, fill=armor_white, outline=armor_stroke, width=3)
+    
+    # Dark glass visor screen
+    create_rounded_rect(d, (50, 78, 130, 120), 12, fill=(16, 20, 28, 255), outline=armor_stroke, width=2)
+    # Standby visor status (dim cyan pulsing dot / sleep line)
+    d.line([(70, 99), (110, 99)], fill=dim_cyan, width=3)
+    
+    # Antennae
+    d.line([(58, 60), (45, 34)], fill=armor_dark, width=4)
+    d.ellipse([41, 28, 51, 38], fill=dim_cyan)
+    d.line([(118, 60), (135, 34)], fill=armor_dark, width=4)
+    d.ellipse([131, 28, 141, 38], fill=dim_cyan)
+    
+    # Metallic articulated paws
+    create_rounded_rect(d, (65, 134, 96, 156), 6, fill=armor_dark, outline=armor_stroke, width=2)
+    create_rounded_rect(d, (102, 134, 133, 156), 6, fill=armor_dark, outline=armor_stroke, width=2)
+    # Paw status LEDs
+    d.ellipse([76, 142, 84, 148], fill=dim_cyan)
+    d.ellipse([113, 142, 121, 148], fill=dim_cyan)
+    
+    im_sleep.save(os.path.join(sprites_dir, "spr_robo_sleep.png"))
+    print("Created spr_robo_sleep.png")
+    
+    # Robo Awake (Active Online Mode: glowing neon eyes, active antennae, energized circuits)
+    im_awake = Image.new("RGBA", (256, 180), (0, 0, 0, 0))
+    d2 = ImageDraw.Draw(im_awake)
+    
+    d2.ellipse([30, 132, 226, 172], fill=(8, 12, 18, 140))
+    # Body
+    create_rounded_rect(d2, (60, 60, 205, 148), 24, fill=armor_white, outline=armor_stroke, width=3)
+    create_rounded_rect(d2, (80, 90, 185, 142), 14, fill=armor_dark, outline=armor_stroke, width=2)
+    
+    # Active glowing power core on chest
+    d2.ellipse([124, 106, 142, 124], fill=neon_cyan)
+    d2.ellipse([128, 110, 138, 120], fill=(255, 255, 255, 255))
+    
+    # Tail antenna with glowing neon orb
+    d2.line([(200, 85), (232, 58)], fill=armor_dark, width=5)
+    d2.ellipse([226, 50, 242, 66], fill=neon_cyan)
+    d2.ellipse([230, 54, 238, 62], fill=(255, 255, 255, 255))
+    
+    # Robot Head
+    create_rounded_rect(d2, (40, 52, 140, 140), 20, fill=armor_white, outline=armor_stroke, width=3)
+    create_rounded_rect(d2, (48, 70, 132, 118), 12, fill=(10, 14, 22, 255), outline=armor_stroke, width=2)
+    
+    # Bright glowing digital expressive LED eyes (happy curved wedges / arches: ^_^)
+    # Left eye arch
+    d2.arc([58, 80, 84, 104], start=180, end=360, fill=neon_cyan, width=4)
+    # Right eye arch
+    d2.arc([96, 80, 122, 104], start=180, end=360, fill=neon_cyan, width=4)
+    
+    # Antennae glowing bright
+    d2.line([(55, 52), (40, 24)], fill=armor_dark, width=4)
+    d2.ellipse([34, 16, 48, 30], fill=neon_cyan)
+    d2.ellipse([38, 20, 44, 26], fill=(255, 255, 255, 255))
+    
+    d2.line([(122, 52), (142, 24)], fill=armor_dark, width=4)
+    d2.ellipse([136, 16, 150, 30], fill=neon_cyan)
+    d2.ellipse([140, 20, 146, 26], fill=(255, 255, 255, 255))
+    
+    # Paws energized
+    create_rounded_rect(d2, (65, 134, 96, 156), 6, fill=armor_dark, outline=armor_stroke, width=2)
+    create_rounded_rect(d2, (102, 134, 133, 156), 6, fill=armor_dark, outline=armor_stroke, width=2)
+    d2.ellipse([74, 140, 86, 150], fill=neon_cyan)
+    d2.ellipse([111, 140, 123, 150], fill=neon_cyan)
+    
+    im_awake.save(os.path.join(sprites_dir, "spr_robo_awake.png"))
+    print("Created spr_robo_awake.png")
+
+# 28. Streak Flame & Crown Badge (128 x 128)
+def make_streak_sprites():
+    # Streak Flame Icon (Vibrant Fire)
+    im_flame = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im_flame)
+    
+    # Outer orange glow
+    d.ellipse([24, 30, 104, 116], fill=(255, 100, 0, 120))
+    
+    # Stylized Flame Silhouette (Outer Orange/Red)
+    flame_pts = [
+        (64, 10), (78, 36), (96, 48), (88, 70), (102, 85), 
+        (96, 112), (64, 120), (32, 112), (26, 85), (40, 70),
+        (32, 48), (50, 36)
+    ]
+    d.polygon(flame_pts, fill=(255, 75, 20, 255), outline=(255, 140, 0, 255))
+    
+    # Mid-layer Bright Gold/Yellow
+    mid_flame = [
+        (64, 26), (75, 48), (86, 68), (82, 94), (64, 108), 
+        (46, 94), (42, 68), (53, 48)
+    ]
+    d.polygon(mid_flame, fill=(255, 185, 0, 255))
+    
+    # Core Pure White/Cyan Hot Spark
+    core_flame = [
+        (64, 46), (72, 66), (70, 92), (64, 100), (58, 92), (56, 66)
+    ]
+    d.polygon(core_flame, fill=(255, 255, 220, 255))
+    
+    im_flame.save(os.path.join(sprites_dir, "spr_streak_flame.png"))
+    print("Created spr_streak_flame.png")
+    
+    # Crown Badge for Day 7 Streak Master
+    im_crown = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
+    dc = ImageDraw.Draw(im_crown)
+    
+    # Outer glow
+    dc.ellipse([14, 26, 114, 112], fill=(255, 215, 0, 90))
+    
+    # Royal Golden Crown Silhouette
+    crown_pts = [
+        (20, 48), (38, 86), (64, 32), (90, 86), (108, 48),
+        (102, 104), (26, 104)
+    ]
+    dc.polygon(crown_pts, fill=(255, 195, 30, 255), outline=(255, 240, 120, 255))
+    
+    # Bottom Crown Band
+    create_rounded_rect(dc, (22, 96, 106, 114), 4, fill=(230, 160, 15, 255), outline=(255, 230, 80, 255), width=2)
+    
+    # Crown Jewels / Rubies / Sapphires
+    dc.ellipse([60, 46, 68, 54], fill=(255, 255, 255, 255)) # Center peak diamond
+    dc.ellipse([16, 44, 24, 52], fill=(0, 229, 255, 255)) # Left sapphire
+    dc.ellipse([104, 44, 112, 52], fill=(0, 229, 255, 255)) # Right sapphire
+    # Band rubies
+    for bx in [36, 64, 92]:
+        dc.ellipse([bx - 4, 102, bx + 4, 110], fill=(255, 50, 80, 255))
+        
+    im_crown.save(os.path.join(sprites_dir, "spr_crown_badge.png"))
+    print("Created spr_crown_badge.png")
+
 make_desk()
 make_monitor_frame()
 make_monitor_screen()
@@ -838,4 +1099,7 @@ make_keyboard_neon()
 make_lofi_player()
 make_wallpapers()
 make_quest_icon()
+make_corgi_pet()
+make_robo_pet()
+make_streak_sprites()
 print("All sprites successfully generated!")

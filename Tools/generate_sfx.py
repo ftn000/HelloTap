@@ -267,27 +267,151 @@ def make_drink_sip():
     return samples
 
 def make_mouse_click():
-    duration = 0.055
+    return make_mouse_switch("classic")
+
+def make_mouse_switch(switch_type="classic"):
+    if switch_type == "classic":
+        # Classic Omron Mechanical Microswitch (Crisp, sharp snap, clean body, distinct release tick)
+        duration = 0.055
+        total_samples = int(SAMPLE_RATE * duration)
+        samples = []
+        for i in range(total_samples):
+            t = i / SAMPLE_RATE
+            env_snap = math.exp(-t * 320.0)
+            noise = (random.random() * 2.0 - 1.0)
+            snap = (math.sin(2.0 * math.pi * 5200.0 * t) + 0.4 * noise) * env_snap * 1.3
+            env_body = math.exp(-t * 160.0)
+            body = (math.sin(2.0 * math.pi * 850.0 * t) * 0.5 + 
+                    math.sin(2.0 * math.pi * 340.0 * t) * 0.4) * env_body
+            tick = 0.0
+            if t >= 0.022:
+                t_tick = t - 0.022
+                env_tick = math.exp(-t_tick * 400.0)
+                tick = math.sin(2.0 * math.pi * 4800.0 * t_tick) * env_tick * 0.45
+            samples.append(snap + body + tick)
+        return samples
+
+    elif switch_type == "optical":
+        # Optical Gaming Switch (Ultra snappy, instant metallic crisp snap, fast decay)
+        duration = 0.048
+        total_samples = int(SAMPLE_RATE * duration)
+        samples = []
+        for i in range(total_samples):
+            t = i / SAMPLE_RATE
+            env_snap = math.exp(-t * 380.0)
+            noise = (random.random() * 2.0 - 1.0)
+            snap = (math.sin(2.0 * math.pi * 6800.0 * t) * 0.8 + 
+                    math.sin(2.0 * math.pi * 4200.0 * t) * 0.5 + 
+                    0.5 * noise) * env_snap * 1.4
+            # Metallic spring ring
+            env_ring = math.exp(-t * 190.0)
+            ring = math.sin(2.0 * math.pi * 2100.0 * t) * env_ring * 0.35
+            # Crisp reset click
+            tick = 0.0
+            if t >= 0.018:
+                t_tick = t - 0.018
+                tick = math.sin(2.0 * math.pi * 5900.0 * t_tick) * math.exp(-t_tick * 450.0) * 0.5
+            samples.append(snap + ring + tick)
+        return samples
+
+    else: # "silent"
+        # Mute Dampened Office Switch (Subtle soft rubberized thud, no high-pitch click)
+        duration = 0.065
+        total_samples = int(SAMPLE_RATE * duration)
+        samples = []
+        for i in range(total_samples):
+            t = i / SAMPLE_RATE
+            env_thud = math.exp(-t * 140.0)
+            noise = (random.random() * 2.0 - 1.0) * 0.15
+            thud = (math.sin(2.0 * math.pi * 380.0 * t) * 0.8 + 
+                    math.sin(2.0 * math.pi * 210.0 * t) * 0.6 + noise) * env_thud * 0.75
+            samples.append(thud)
+        return samples
+
+def make_corgi_bark():
+    # Cute, friendly double corgi woof ("Arf-arf!")
+    duration = 0.36
     total_samples = int(SAMPLE_RATE * duration)
-    samples = []
+    samples = [0.0] * total_samples
+    
+    # Two rapid cheerful barks at 0.0s and 0.16s
+    barks = [(0.0, 0.12, 420.0), (0.16, 0.14, 460.0)]
+    for start_t, bark_len, base_pitch in barks:
+        start_idx = int(start_t * SAMPLE_RATE)
+        b_samples = int(bark_len * SAMPLE_RATE)
+        for i in range(b_samples):
+            if start_idx + i >= total_samples: break
+            t = i / SAMPLE_RATE
+            t_norm = t / bark_len
+            
+            # Formant envelope (rapid attack, quick decay)
+            env = math.sin(t_norm * math.pi) * math.exp(-t_norm * 2.8) * 0.85
+            # Pitch drop
+            pitch = base_pitch * (1.15 - t_norm * 0.35)
+            # Canine formant harmonics + slight rasp
+            noise = (random.random() * 2.0 - 1.0) * 0.18
+            vocal = (math.sin(2.0 * math.pi * pitch * t) + 
+                     0.55 * math.sin(4.0 * math.pi * pitch * t) + 
+                     0.30 * math.sin(6.0 * math.pi * pitch * t) + noise)
+            samples[start_idx + i] += vocal * env
+            
+    return samples
+
+def make_robo_beep():
+    # Cheerful electronic sci-fi companion chirp (triple rising beep arpeggio)
+    duration = 0.38
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+    
+    beeps = [(0.0, 0.08, 880.0), (0.09, 0.09, 1320.0), (0.19, 0.16, 1760.0)]
+    for start_t, b_dur, freq in beeps:
+        start_idx = int(start_t * SAMPLE_RATE)
+        b_len = int(b_dur * SAMPLE_RATE)
+        for i in range(b_len):
+            if start_idx + i >= total_samples: break
+            t = i / SAMPLE_RATE
+            env = math.sin((t / b_dur) * math.pi) * math.exp(-(t / b_dur) * 1.5) * 0.42
+            # Retro digital synth square/sine hybrid
+            sig = (math.sin(2.0 * math.pi * freq * t) * 0.7 + 
+                   (1.0 if math.sin(2.0 * math.pi * freq * t) > 0 else -1.0) * 0.25)
+            samples[start_idx + i] += sig * env
+            
+    return samples
+
+def make_streak_claim():
+    # Triumphant streak fanfare: bright fanfare chords + sparkling coin jingle
+    duration = 0.95
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+    
+    # Golden fanfare chords: F4, A4, C5, F5, A5
+    fanfare = [
+        (0.00, 349.23, 0.22),
+        (0.10, 440.00, 0.22),
+        (0.20, 523.25, 0.25),
+        (0.32, 698.46, 0.35),
+        (0.44, 880.00, 0.50),
+        (0.44, 1046.50, 0.45)
+    ]
+    for start_t, freq, note_dur in fanfare:
+        start_idx = int(start_t * SAMPLE_RATE)
+        n_len = min(int(note_dur * SAMPLE_RATE), total_samples - start_idx)
+        for i in range(n_len):
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 5.0) * 0.35
+            sig = (math.sin(2.0 * math.pi * freq * t) + 
+                   0.4 * math.sin(4.0 * math.pi * freq * t) + 
+                   0.15 * math.sin(6.0 * math.pi * freq * t))
+            samples[start_idx + i] += sig * env
+            
+    # Sparkle shimmer layer
     for i in range(total_samples):
         t = i / SAMPLE_RATE
-        env_snap = math.exp(-t * 320.0)
-        noise = (random.random() * 2.0 - 1.0)
-        snap = (math.sin(2.0 * math.pi * 5200.0 * t) + 0.4 * noise) * env_snap * 1.3
-        
-        env_body = math.exp(-t * 160.0)
-        body = (math.sin(2.0 * math.pi * 850.0 * t) * 0.5 + 
-                math.sin(2.0 * math.pi * 340.0 * t) * 0.4) * env_body
-                
-        tick = 0.0
-        if t >= 0.022:
-            t_tick = t - 0.022
-            env_tick = math.exp(-t_tick * 400.0)
-            tick = math.sin(2.0 * math.pi * 4800.0 * t_tick) * env_tick * 0.45
+        if t >= 0.44:
+            t_shimmer = t - 0.44
+            shimmer = math.sin(2.0 * math.pi * (2400.0 + 400.0 * math.sin(2.0 * math.pi * 12.0 * t)) * t)
+            samples[i] += shimmer * math.exp(-t_shimmer * 4.5) * 0.15
             
-        s = snap + body + tick
-        samples.append(s)
     return samples
 
 def make_lamp_switch():
@@ -592,7 +716,13 @@ save_wav(os.path.join(out_dir, "project_release.wav"), make_cash_release())
 save_wav(os.path.join(out_dir, "boost_activate.wav"), make_boost_sound())
 save_wav(os.path.join(out_dir, "cat_purr.wav"), make_cat_purr())
 save_wav(os.path.join(out_dir, "drink_sip.wav"), make_drink_sip())
-save_wav(os.path.join(out_dir, "mouse_click.wav"), make_mouse_click())
+save_wav(os.path.join(out_dir, "mouse_click.wav"), make_mouse_switch("classic"))
+save_wav(os.path.join(out_dir, "mouse_click_classic.wav"), make_mouse_switch("classic"))
+save_wav(os.path.join(out_dir, "mouse_click_optical.wav"), make_mouse_switch("optical"))
+save_wav(os.path.join(out_dir, "mouse_click_silent.wav"), make_mouse_switch("silent"))
+save_wav(os.path.join(out_dir, "pet_corgi_bark.wav"), make_corgi_bark())
+save_wav(os.path.join(out_dir, "pet_robo_beep.wav"), make_robo_beep())
+save_wav(os.path.join(out_dir, "streak_claim.wav"), make_streak_claim())
 save_wav(os.path.join(out_dir, "lamp_switch.wav"), make_lamp_switch())
 save_wav(os.path.join(out_dir, "bug_squash.wav"), make_bug_squash())
 save_wav(os.path.join(out_dir, "crate_collect.wav"), make_crate_collect())

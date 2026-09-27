@@ -44,6 +44,8 @@ public class WorkplaceVisuals : MonoBehaviour
     [Header("Предметы на столе (Визуальная прогрессия)")]
     [SerializeField] private Transform mouseTransform;
     [SerializeField] private Graphic mouseGlowGraphic;
+    [SerializeField] private Button mouseSwitchButton;
+    [SerializeField] private TMP_Text mouseSwitchText;
     [SerializeField] private Transform coffeeMugTransform;
     [SerializeField] private Transform energyCanTransform;
     [SerializeField] private Transform catTransform;
@@ -51,6 +53,12 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Sprite catSleepingSprite;
     [SerializeField] private Sprite catAwakeSprite;
     [SerializeField] private Sprite catStretchSprite;
+    [SerializeField] private Sprite sprCorgiSleep;
+    [SerializeField] private Sprite sprCorgiAwake;
+    [SerializeField] private Sprite sprRoboSleep;
+    [SerializeField] private Sprite sprRoboAwake;
+    [SerializeField] private Button petSelectorButton;
+    [SerializeField] private TMP_Text petSelectorText;
     [SerializeField] private Image catAccessoryImage;
     [SerializeField] private Sprite catGlassesSprite;
     [SerializeField] private Sprite catBowtieSprite;
@@ -83,6 +91,7 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private GameObject stickerCSharp;
     [SerializeField] private GameObject stickerGit;
     [SerializeField] private GameObject stickerWorks;
+    [SerializeField] private GameObject stickerCrown;
 
     [Header("Хоткеи и Подсказки IDE")]
     [SerializeField] private GameObject hotkeyBadgeObj;
@@ -304,7 +313,9 @@ public class WorkplaceVisuals : MonoBehaviour
         InitCatInteraction();
         InitCatCustomization();
         InitKeyboardCustomization();
+        InitMouseSwitchCustomization();
         InitRoomThemeCustomization();
+        InitPetCompanionCustomization();
         InitLighting();
         InitDrinksInteraction();
         InitMouseInteraction();
@@ -927,9 +938,14 @@ public class WorkplaceVisuals : MonoBehaviour
     public void OnCatClickedDirectly()
     {
         TriggerCatTapReaction(true);
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayCatPurr();
+        if (AudioManager.Instance != null)
+        {
+            if (currentPetType == 0) AudioManager.Instance.PlayCatPurr();
+            else if (currentPetType == 1) AudioManager.Instance.PlayDogBark();
+            else AudioManager.Instance.PlayRoboBeep();
+        }
 
-        // Поглаживание кота увеличивает уровень счастья ("Мурчалометр")
+        // Поглаживание питомца увеличивает уровень счастья ("Мурчалометр / Настроение")
         catHappiness = Mathf.Min(1.0f, catHappiness + 0.25f);
         if (catHappiness >= 0.99f)
         {
@@ -940,7 +956,9 @@ public class WorkplaceVisuals : MonoBehaviour
             }
             if (ClickJuice.Instance != null && catTransform != null)
             {
-                ClickJuice.Instance.SpawnCustomPopup("😻 МУРЧАЛОМЕТР 100%! +35% ПОТОКА!", catTransform.position + Vector3.up * 55f, new Color(1f, 0.4f, 0.85f, 1f), true);
+                string happyMsg = currentPetType == 0 ? "😻 МУРЧАЛОМЕТР 100%! +35% ПОТОКА!" :
+                                 (currentPetType == 1 ? "🐶 КОРГИ СЧАСТЛИВ! +35% ПОТОКА!" : "🤖 СИСТЕМЫ ПЕРЕГРУЖЕНЫ РАДОСТЬЮ! +35% ПОТОКА!");
+                ClickJuice.Instance.SpawnCustomPopup(happyMsg, catTransform.position + Vector3.up * 55f, new Color(1f, 0.4f, 0.85f, 1f), true);
             }
         }
 
@@ -954,7 +972,8 @@ public class WorkplaceVisuals : MonoBehaviour
         }
         else if (ClickJuice.Instance != null && catTransform != null)
         {
-            ClickJuice.Instance.SpawnCustomPopup("💖 Муррр~", catTransform.position + Vector3.up * 45f, new Color(1f, 0.40f, 0.70f, 1f), false);
+            string heartMsg = currentPetType == 0 ? "💖 Муррр~" : (currentPetType == 1 ? "💖 Гав!" : "⚡ Бип-боп!");
+            ClickJuice.Instance.SpawnCustomPopup(heartMsg, catTransform.position + Vector3.up * 45f, new Color(1f, 0.40f, 0.70f, 1f), false);
         }
 
         if (GameManager.Instance != null)
@@ -965,35 +984,45 @@ public class WorkplaceVisuals : MonoBehaviour
 
     private IEnumerator CatPetReactionRoutine()
     {
-        // 1. Потягивание с выгнутой спинкой и лапками вперед
-        if (catImage != null && catStretchSprite != null)
+        Sprite awakeSpr = catAwakeSprite;
+        Sprite sleepSpr = catSleepingSprite;
+        Sprite stretchSpr = catStretchSprite;
+
+        if (currentPetType == 1)
         {
-            catImage.sprite = catStretchSprite;
+            awakeSpr = sprCorgiAwake != null ? sprCorgiAwake : catAwakeSprite;
+            sleepSpr = sprCorgiSleep != null ? sprCorgiSleep : catSleepingSprite;
+            stretchSpr = sprCorgiAwake;
+        }
+        else if (currentPetType == 2)
+        {
+            awakeSpr = sprRoboAwake != null ? sprRoboAwake : catAwakeSprite;
+            sleepSpr = sprRoboSleep != null ? sprRoboSleep : catSleepingSprite;
+            stretchSpr = sprRoboAwake;
+        }
+
+        // 1. Потягивание / анимация радости
+        if (catImage != null && stretchSpr != null)
+        {
+            catImage.sprite = stretchSpr;
             Vector3 baseScale = catTransform.localScale;
             catTransform.localScale = new Vector3(1.10f, 0.92f, 1f);
-            yield return new WaitForSecondsRealtime(0.95f);
+            yield return new WaitForSecondsRealtime(0.75f);
             catTransform.localScale = baseScale;
         }
 
-        // 2. Довольная пробужденная мордочка с прищуренными глазками
-        if (catImage != null && catAwakeSprite != null)
+        // 2. Довольная пробужденная мордочка
+        if (catImage != null && awakeSpr != null)
         {
-            catImage.sprite = catAwakeSprite;
+            catImage.sprite = awakeSpr;
         }
 
-        yield return new WaitForSecondsRealtime(2.2f);
+        yield return new WaitForSecondsRealtime(2.0f);
 
-        // 3. Мягкое моргание перед возвращением в уютный клубок
-        if (catImage != null && catSleepingSprite != null)
+        // 3. Возвращение в спящий режим
+        if (catImage != null && sleepSpr != null)
         {
-            catImage.sprite = catSleepingSprite;
-            yield return new WaitForSecondsRealtime(0.12f);
-            if (catAwakeSprite != null)
-            {
-                catImage.sprite = catAwakeSprite;
-                yield return new WaitForSecondsRealtime(0.15f);
-            }
-            catImage.sprite = catSleepingSprite;
+            catImage.sprite = sleepSpr;
         }
         catAwakeCoroutine = null;
     }
@@ -1583,7 +1612,7 @@ public class WorkplaceVisuals : MonoBehaviour
 
     public void OnMouseClickedDirectly()
     {
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayMouseClick();
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayMouseClickWithSwitch(currentMouseSwitchType);
         if (mouseTransform != null) StartCoroutine(MouseDirectClickRoutine());
 
         // Нажатие на игровую мышь кликает код
@@ -1723,6 +1752,12 @@ public class WorkplaceVisuals : MonoBehaviour
             if (animateNew && hasWorks && !wasStickerWorks) StartCoroutine(PopInRoutine(stickerWorks.transform));
         }
         wasStickerWorks = hasWorks;
+
+        bool hasCrown = PlayerPrefs.GetInt("Streak_HasCrownUnlocked", 0) == 1;
+        if (stickerCrown != null)
+        {
+            stickerCrown.SetActive(hasCrown);
+        }
     }
 
     #endregion
@@ -1972,6 +2007,121 @@ public class WorkplaceVisuals : MonoBehaviour
         if (animate)
         {
             StartCoroutine(PopInRoutine(roomWallpaperImage.transform));
+        }
+    }
+
+    #endregion
+
+    #region Звуковые профили свитчей мыши (Mouse Switch Sound Profiles)
+
+    private int currentMouseSwitchType = 0; // 0=Omron Classic, 1=Optical Gaming, 2=Silent Office
+    private static readonly string[] MouseSwitchNames = new string[]
+    {
+        "ОМРОН КЛИК",
+        "ОПТИКА ГЕЙМ",
+        "ТИХИЙ ОФИС"
+    };
+
+    private void InitMouseSwitchCustomization()
+    {
+        currentMouseSwitchType = PlayerPrefs.GetInt("SelectedMouseSwitch", 0);
+        if (mouseSwitchButton != null)
+        {
+            mouseSwitchButton.onClick.RemoveAllListeners();
+            mouseSwitchButton.onClick.AddListener(CycleMouseSwitchType);
+        }
+        UpdateMouseSwitchLabel();
+    }
+
+    public void CycleMouseSwitchType()
+    {
+        currentMouseSwitchType = (currentMouseSwitchType + 1) % 3;
+        PlayerPrefs.SetInt("SelectedMouseSwitch", currentMouseSwitchType);
+        PlayerPrefs.Save();
+        UpdateMouseSwitchLabel();
+
+        HapticFeedback.Vibrate(25);
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayMouseClickWithSwitch(currentMouseSwitchType);
+        }
+        if (ClickJuice.Instance != null && mouseSwitchButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"🖱 МЫШЬ: {MouseSwitchNames[currentMouseSwitchType]}", mouseSwitchButton.transform.position, new Color(0.2f, 0.9f, 1f), true);
+        }
+    }
+
+    private void UpdateMouseSwitchLabel()
+    {
+        if (mouseSwitchText != null)
+        {
+            mouseSwitchText.text = $"🖱 {MouseSwitchNames[currentMouseSwitchType]}";
+        }
+    }
+
+    #endregion
+
+    #region Интерактивные Питомцы и Компаньоны (Pets: Cat, Corgi, Robo)
+
+    private int currentPetType = 0; // 0=Coder Cat, 1=Dev Corgi, 2=Robo-Dog
+    private static readonly string[] PetTypeNames = new string[]
+    {
+        "КОТ-КОДЕР",
+        "КОРГИ ДЕВ",
+        "РОБО-ПЕС"
+    };
+
+    private void InitPetCompanionCustomization()
+    {
+        currentPetType = PlayerPrefs.GetInt("SelectedPetType", 0);
+        ApplyPetType(currentPetType, false);
+
+        if (petSelectorButton != null)
+        {
+            petSelectorButton.onClick.RemoveAllListeners();
+            petSelectorButton.onClick.AddListener(CyclePetType);
+        }
+    }
+
+    public void CyclePetType()
+    {
+        currentPetType = (currentPetType + 1) % 3;
+        PlayerPrefs.SetInt("SelectedPetType", currentPetType);
+        PlayerPrefs.Save();
+        ApplyPetType(currentPetType, true);
+
+        HapticFeedback.Vibrate(35);
+        if (AudioManager.Instance != null)
+        {
+            if (currentPetType == 0) AudioManager.Instance.PlayCatPurr();
+            else if (currentPetType == 1) AudioManager.Instance.PlayDogBark();
+            else AudioManager.Instance.PlayRoboBeep();
+        }
+
+        if (ClickJuice.Instance != null && petSelectorButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"🐾 ПИТОМЕЦ: {PetTypeNames[currentPetType]}", petSelectorButton.transform.position, new Color(1f, 0.85f, 0.3f), true);
+        }
+    }
+
+    private void ApplyPetType(int petType, bool animate)
+    {
+        if (catImage == null) return;
+
+        Sprite sleepSpr = catSleepingSprite;
+        if (petType == 1 && sprCorgiSleep != null) sleepSpr = sprCorgiSleep;
+        else if (petType == 2 && sprRoboSleep != null) sleepSpr = sprRoboSleep;
+
+        if (sleepSpr != null) catImage.sprite = sleepSpr;
+
+        if (petSelectorText != null)
+        {
+            petSelectorText.text = $"🐾 {PetTypeNames[currentPetType]}";
+        }
+
+        if (animate && catTransform != null)
+        {
+            StartCoroutine(PopInRoutine(catTransform));
         }
     }
 
