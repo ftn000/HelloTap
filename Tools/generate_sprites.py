@@ -251,6 +251,62 @@ def make_cat():
     im.save(os.path.join(sprites_dir, "spr_cat.png"))
     print("Created spr_cat.png")
 
+def make_cat_awake():
+    im = Image.new("RGBA", (160, 110), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Cat body ball
+    d.ellipse([30, 30, 140, 95], fill=(235, 140, 50, 255), outline=(190, 100, 30, 255), width=2)
+    # Cat head
+    d.ellipse([15, 38, 75, 88], fill=(245, 150, 60, 255), outline=(190, 100, 30, 255), width=2)
+    # Outer Ears
+    d.polygon([(22, 45), (14, 18), (38, 33)], fill=(245, 150, 60, 255))
+    d.polygon([(48, 33), (68, 16), (62, 45)], fill=(245, 150, 60, 255))
+    # Inner pink ears
+    d.polygon([(22, 40), (16, 22), (34, 34)], fill=(255, 185, 195, 255))
+    d.polygon([(50, 34), (64, 20), (59, 41)], fill=(255, 185, 195, 255))
+    
+    # Big sparkling open eyes!
+    # Left eye
+    d.ellipse([25, 52, 41, 72], fill=(20, 30, 48, 255), outline=(15, 20, 35, 255), width=1)
+    d.ellipse([27, 54, 34, 62], fill=(255, 255, 255, 255))
+    d.ellipse([34, 64, 39, 69], fill=(255, 255, 255, 255))
+    # Right eye
+    d.ellipse([47, 52, 63, 72], fill=(20, 30, 48, 255), outline=(15, 20, 35, 255), width=1)
+    d.ellipse([49, 54, 56, 62], fill=(255, 255, 255, 255))
+    d.ellipse([56, 64, 61, 69], fill=(255, 255, 255, 255))
+    
+    # Cheerful pink blush
+    d.ellipse([18, 68, 28, 75], fill=(255, 120, 150, 160))
+    d.ellipse([60, 68, 70, 75], fill=(255, 120, 150, 160))
+    
+    # Cute nose & w mouth
+    d.polygon([(43, 67), (47, 67), (45, 70)], fill=(255, 130, 150, 255))
+    d.arc([39, 68, 45, 75], start=0, end=180, fill=(60, 30, 10, 255), width=2)
+    d.arc([45, 68, 51, 75], start=0, end=180, fill=(60, 30, 10, 255), width=2)
+    
+    # Whiskers
+    d.line([(9, 64), (22, 66)], fill=(80, 40, 15, 220), width=1)
+    d.line([(8, 70), (22, 69)], fill=(80, 40, 15, 220), width=1)
+    d.line([(65, 66), (79, 64)], fill=(80, 40, 15, 220), width=1)
+    d.line([(65, 69), (80, 70)], fill=(80, 40, 15, 220), width=1)
+    
+    # Tail curled around
+    d.arc([80, 45, 150, 102], start=280, end=120, fill=(220, 125, 40, 255), width=9)
+    # White paws
+    d.ellipse([25, 78, 45, 96], fill=(255, 250, 240, 255))
+    im.save(os.path.join(sprites_dir, "spr_cat_awake.png"))
+    print("Created spr_cat_awake.png")
+
+def make_heart():
+    im = Image.new("RGBA", (48, 48), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.ellipse([6, 6, 26, 26], fill=(255, 55, 105, 255))
+    d.ellipse([22, 6, 42, 26], fill=(255, 55, 105, 255))
+    d.polygon([(7, 18), (41, 18), (24, 43)], fill=(255, 55, 105, 255))
+    d.ellipse([10, 10, 18, 18], fill=(255, 190, 210, 220))
+    im.save(os.path.join(sprites_dir, "spr_heart.png"))
+    print("Created spr_heart.png")
+
 # 9. Rounded UI Card Background (400 x 120, 9-sliceable)
 def make_card_bg():
     im = Image.new("RGBA", (400, 120), (0, 0, 0, 0))
@@ -312,6 +368,8 @@ make_mouse_glow()
 make_coffee_mug()
 make_energy_can()
 make_cat()
+make_cat_awake()
+make_heart()
 make_card_bg()
 make_button_sprites()
 make_steam_particle()

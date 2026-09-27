@@ -29,6 +29,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip releaseSound;
     [SerializeField] private AudioClip boostSound;
     [SerializeField] private AudioClip catPurrSound;
+    [SerializeField] private AudioClip sipSound;
 
     [Header("Источники звука")]
     [SerializeField] private AudioSource sfxSource;
@@ -96,6 +97,53 @@ public class AudioManager : MonoBehaviour
         {
             catPurrSound = CreateProceduralPurrClip();
         }
+
+        if (sipSound == null)
+        {
+            sipSound = CreateProceduralSipClip();
+        }
+    }
+
+    private AudioClip CreateProceduralSipClip()
+    {
+        int sampleRate = 44100;
+        int sampleCount = (int)(sampleRate * 0.36f);
+        float[] data = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float slurp = 0f;
+            if (t < 0.14f)
+            {
+                float tSlurp = t / 0.14f;
+                float env = Mathf.Sin(tSlurp * Mathf.PI) * (0.8f + 0.2f * Mathf.Sin(2f * Mathf.PI * 32f * t));
+                float noise = Random.value * 2f - 1f;
+                float carrier = Mathf.Sin(2f * Mathf.PI * (1800f + 800f * tSlurp) * t) * 0.6f + noise * 0.4f;
+                slurp = carrier * env * 0.55f;
+            }
+
+            float gulp = 0f;
+            if (t >= 0.10f && t < 0.32f)
+            {
+                float tGulp = (t - 0.10f) / 0.22f;
+                float env = Mathf.Sin(tGulp * Mathf.PI) * Mathf.Exp(-tGulp * 3.5f);
+                float curFreq = 520f * (1f - tGulp * 0.60f);
+                float sine = Mathf.Sin(2f * Mathf.PI * curFreq * t) + 0.4f * Mathf.Sin(4f * Mathf.PI * curFreq * t);
+                gulp = sine * env * 0.85f;
+            }
+
+            float droplet = 0f;
+            if (t >= 0.24f)
+            {
+                float tDrop = (t - 0.24f) / 0.12f;
+                droplet = Mathf.Sin(2f * Mathf.PI * (1400f - tDrop * 400f) * t) * Mathf.Exp(-tDrop * 18f) * 0.28f;
+            }
+
+            data[i] = Mathf.Clamp((slurp + gulp + droplet) * 0.85f, -1f, 1f);
+        }
+        AudioClip clip = AudioClip.Create("Procedural_Sip", sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
     }
 
     private AudioClip CreateProceduralPurrClip()
@@ -255,6 +303,16 @@ public class AudioManager : MonoBehaviour
         {
             sfxSource.pitch = Random.Range(0.96f, 1.05f);
             sfxSource.PlayOneShot(catPurrSound, 0.75f);
+        }
+    }
+
+    public void PlaySipSound()
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (sipSound != null)
+        {
+            sfxSource.pitch = Random.Range(0.95f, 1.08f);
+            sfxSource.PlayOneShot(sipSound, 0.85f);
         }
     }
 

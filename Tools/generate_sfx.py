@@ -224,6 +224,48 @@ def make_cat_purr():
         samples.append(val)
     return samples
 
+def make_drink_sip():
+    duration = 0.36
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = []
+    
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        
+        # 1. Slurp / Sip suction (0.0s - 0.14s)
+        slurp = 0.0
+        if t < 0.14:
+            t_slurp = t / 0.14
+            slurp_env = math.sin(t_slurp * math.pi) * (0.8 + 0.2 * math.sin(2.0 * math.pi * 32.0 * t))
+            # Resonant filtered noise
+            noise = (random.random() * 2.0 - 1.0)
+            slurp_carrier = (math.sin(2.0 * math.pi * (1800.0 + 800.0 * t_slurp) * t) * 0.6 + noise * 0.4)
+            slurp = slurp_carrier * slurp_env * 0.55
+            
+        # 2. Resonant swallow / gulp (0.10s - 0.30s)
+        gulp = 0.0
+        if t >= 0.10 and t < 0.32:
+            t_gulp = (t - 0.10) / 0.22
+            gulp_env = math.sin(t_gulp * math.pi) * math.exp(-t_gulp * 3.5)
+            # Pitch drops from 520Hz down to 210Hz
+            cur_freq = 520.0 * (1.0 - t_gulp * 0.60)
+            gulp_sine = (math.sin(2.0 * math.pi * cur_freq * t) + 
+                         0.4 * math.sin(4.0 * math.pi * cur_freq * t) +
+                         0.15 * math.sin(6.0 * math.pi * cur_freq * t))
+            gulp = gulp_sine * gulp_env * 0.85
+            
+        # 3. Refreshing fizz / droplet pop (0.24s - 0.36s)
+        droplet = 0.0
+        if t >= 0.24:
+            t_drop = (t - 0.24) / 0.12
+            drop_env = math.exp(-t_drop * 18.0)
+            drop_freq = 1400.0 - t_drop * 400.0
+            droplet = math.sin(2.0 * math.pi * drop_freq * t) * drop_env * 0.28
+            
+        val = slurp + gulp + droplet
+        samples.append(val)
+    return samples
+
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
@@ -236,4 +278,5 @@ save_wav(os.path.join(out_dir, "upgrade_buy.wav"), make_upgrade_chime())
 save_wav(os.path.join(out_dir, "project_release.wav"), make_cash_release())
 save_wav(os.path.join(out_dir, "boost_activate.wav"), make_boost_sound())
 save_wav(os.path.join(out_dir, "cat_purr.wav"), make_cat_purr())
+save_wav(os.path.join(out_dir, "drink_sip.wav"), make_drink_sip())
 print("All sound effects generated successfully!")

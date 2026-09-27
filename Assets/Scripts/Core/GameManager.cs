@@ -350,6 +350,16 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Прямое добавление энергии комбо (при отхлебывании кофе или энергетика)
+    /// </summary>
+    public void AddComboEnergy(float amount)
+    {
+        comboEnergy = Mathf.Clamp01(comboEnergy + amount);
+        CheckAchievements();
+        OnCurrenciesChanged?.Invoke();
+    }
+
+    /// <summary>
     /// Награда за обезвреживание бага на мониторе
     /// </summary>
     public void ClaimBugFixReward(Vector2 screenPos, out double bonusCode, out double bonusMoney)

@@ -47,6 +47,8 @@ GUID_SPR_BTN_GOLD = "7b300000000000000000000000000012"
 GUID_SPR_STEAM = "7b30000000000000000000000000000d"
 GUID_SPR_BUBBLE = "7b30000000000000000000000000000e"
 GUID_SPR_MOUSE_GLOW = "7b30000000000000000000000000000f"
+GUID_SPR_CAT_AWAKE = "7b300000000000000000000000000013"
+GUID_SPR_HEART = "7b300000000000000000000000000014"
 
 # Audio SFX Clips
 GUID_SFX_KEY1 = "9a200000000000000000000000000001"
@@ -58,6 +60,7 @@ GUID_SFX_UPG = "9a200000000000000000000000000006"
 GUID_SFX_REL = "9a200000000000000000000000000007"
 GUID_SFX_BOOST = "9a200000000000000000000000000008"
 GUID_SFX_PURR = "9a200000000000000000000000000009"
+GUID_SFX_SIP = "9a200000000000000000000000000010"
 
 out = []
 def add(s=""):
@@ -781,6 +784,7 @@ add("  upgradeSound: {fileID: 8300000, guid: " + GUID_SFX_UPG + ", type: 3}")
 add("  releaseSound: {fileID: 8300000, guid: " + GUID_SFX_REL + ", type: 3}")
 add("  boostSound: {fileID: 8300000, guid: " + GUID_SFX_BOOST + ", type: 3}")
 add("  catPurrSound: {fileID: 8300000, guid: " + GUID_SFX_PURR + ", type: 3}")
+add("  sipSound: {fileID: 8300000, guid: " + GUID_SFX_SIP + ", type: 3}")
 add("  sfxSource: {fileID: 1002003}")
 add("  typingSource: {fileID: 1002004}")
 add("  minTypingPitch: 0.94")
@@ -1061,16 +1065,23 @@ add_tmp(3012202, 3012200, "ТЕМП ПЕЧАТИ: x1.0 (тапай быстре�
 
 # Cat Mascot (curled up sleeping peacefully under the keyboard on desk mat)
 add_go(3070000, "CatMascot", [3070001, 3070003, 3070002, 3070004])
-add_rect(3070001, 3070000, 3010001, [], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -1210), size=(180, 125), pivot=(0.5, 0.5))
+add_rect(3070001, 3070000, 3010001, [3071001], amin=(0.5, 1), amax=(0.5, 1), pos=(35, -1210), size=(180, 125), pivot=(0.5, 0.5))
 add_cr(3070003, 3070000)
 add_image(3070002, 3070000, GUID_SPR_CAT, raycast=1)
 add_button(3070004, 3070000, 3070002)
 
-# Energy Can (placed on the desk mat above mouse)
-add_go(3060000, "EnergyCan", [3060001, 3060003, 3060002])
+# CatHeartEmote (Pops up with floating heart when cat purrs / woke up)
+add_go(3071000, "CatHeartEmote", [3071001, 3071003, 3071002], active=0)
+add_rect(3071001, 3071000, 3070001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(0, 65), size=(48, 48), pivot=(0.5, 0.5))
+add_cr(3071003, 3071000)
+add_image(3071002, 3071000, GUID_SPR_HEART, raycast=0)
+
+# Energy Can (placed on the desk mat above mouse, interactive sip)
+add_go(3060000, "EnergyCan", [3060001, 3060003, 3060002, 3060004])
 add_rect(3060001, 3060000, 3010001, [3061001], amin=(0.5, 1), amax=(0.5, 1), pos=(455, -780), size=(80, 140), pivot=(0.5, 0.5))
 add_cr(3060003, 3060000)
-add_image(3060002, 3060000, GUID_SPR_ENERGY, raycast=0)
+add_image(3060002, 3060000, GUID_SPR_ENERGY, raycast=1)
+add_button(3060004, 3060000, 3060002)
 
 # EnergyFizzGroup (Fizzy neon carbonation bubbles)
 add_go(3061000, "EnergyFizzGroup", [3061001])
@@ -1091,11 +1102,12 @@ add_rect(3061301, 3061300, 3061001, [], amin=(0.5, 0.5), amax=(0.5, 0.5), pos=(9
 add_cr(3061303, 3061300)
 add_image(3061302, 3061300, GUID_SPR_BUBBLE, color=(0, 1, 0.7, 0.70), raycast=0)
 
-# Coffee Mug (shifted right onto desk mat)
-add_go(3050000, "CoffeeMug", [3050001, 3050003, 3050002])
+# Coffee Mug (shifted right onto desk mat, interactive sip)
+add_go(3050000, "CoffeeMug", [3050001, 3050003, 3050002, 3050004])
 add_rect(3050001, 3050000, 3010001, [3051001], amin=(0.5, 1), amax=(0.5, 1), pos=(-380, -960), size=(120, 140), pivot=(0.5, 0.5))
 add_cr(3050003, 3050000)
-add_image(3050002, 3050000, GUID_SPR_COFFEE, raycast=0)
+add_image(3050002, 3050000, GUID_SPR_COFFEE, raycast=1)
+add_button(3050004, 3050000, 3050002)
 
 # CoffeeSteamGroup (Soft warm steam wisps rising from cup)
 add_go(3051000, "CoffeeSteamGroup", [3051001])
@@ -1238,6 +1250,12 @@ add("  mouseGlowGraphic: {fileID: 3041002}")
 add("  coffeeMugTransform: {fileID: 3050001}")
 add("  energyCanTransform: {fileID: 3060001}")
 add("  catTransform: {fileID: 3070001}")
+add("  catImage: {fileID: 3070002}")
+add("  catSleepingSprite: {fileID: 21300000, guid: " + GUID_SPR_CAT + ", type: 3}")
+add("  catAwakeSprite: {fileID: 21300000, guid: " + GUID_SPR_CAT_AWAKE + ", type: 3}")
+add("  catHeartEmote: {fileID: 3071001}")
+add("  coffeeButton: {fileID: 3050004}")
+add("  energyButton: {fileID: 3060004}")
 add("  coffeeSteamWisps:")
 add("  - {fileID: 3051101}")
 add("  - {fileID: 3051201}")

@@ -39,6 +39,14 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Transform coffeeMugTransform;
     [SerializeField] private Transform energyCanTransform;
     [SerializeField] private Transform catTransform;
+    [SerializeField] private Image catImage;
+    [SerializeField] private Sprite catSleepingSprite;
+    [SerializeField] private Sprite catAwakeSprite;
+    [SerializeField] private RectTransform catHeartEmote;
+
+    [Header("Интерактивные напитки")]
+    [SerializeField] private Button coffeeButton;
+    [SerializeField] private Button energyButton;
 
     [Header("Партиклы пара и пузырьков")]
     [SerializeField] private RectTransform[] coffeeSteamWisps;
@@ -220,6 +228,7 @@ public class WorkplaceVisuals : MonoBehaviour
         }
         InitSteamAndFizz();
         InitCatInteraction();
+        InitDrinksInteraction();
         RefreshDeskUnlockables(false);
         RefreshProgressAndComboUI();
     }
@@ -280,6 +289,9 @@ public class WorkplaceVisuals : MonoBehaviour
 
         // 8. Таймер спавна и жизни Бага на мониторе
         UpdateBugHunt(dt);
+
+        // 9. RGB радужный перелив клавиатуры при комбо x3.0
+        UpdateKeyboardRgb(dt);
     }
 
     #region Визуальная эволюция стола
@@ -725,18 +737,23 @@ public class WorkplaceVisuals : MonoBehaviour
 
     #endregion
 
-    #region Анимация Кота (Cat Reactions & Idle)
+    #region Анимация Кота (Cat Reactions, Idle Sleep & Awake Emote)
+
+    private float catDreamTimer = 0f;
+    private Coroutine catAwakeCoroutine;
+    private Coroutine catHeartCoroutine;
 
     private void InitCatInteraction()
     {
         if (catTransform != null)
         {
+            if (catImage == null) catImage = catTransform.GetComponent<Image>();
+            if (catSleepingSprite == null && catImage != null) catSleepingSprite = catImage.sprite;
+
             Button catBtn = catTransform.GetComponent<Button>();
-            if (catBtn != null)
-            {
-                catBtn.onClick.RemoveAllListeners();
-                catBtn.onClick.AddListener(OnCatClickedDirectly);
-            }
+            if (catBtn == null) catBtn = catTransform.gameObject.AddComponent<Button>();
+            catBtn.onClick.RemoveAllListeners();
+            catBtn.onClick.AddListener(OnCatClickedDirectly);
         }
     }
 
@@ -744,13 +761,34 @@ public class WorkplaceVisuals : MonoBehaviour
     {
         if (catTransform == null || !catTransform.gameObject.activeSelf) return;
 
-        // Если кот не занят реакцией на тап, он плавно дышит и изредка шевелит хвостиком
+        // Если кот не занят реакцией на тап, он плавно дышит и изредка покачивает хвостиком
         if (catWiggleCoroutine == null)
         {
             float breath = 1f + Mathf.Sin(Time.time * 2.2f) * 0.025f;
-            float idleTail = Mathf.Sin(Time.time * 1.5f) * 1.8f;
+            float idleTail = Mathf.Sin(Time.time * 1.5f) * 2.2f;
             catTransform.localScale = new Vector3(breath, 2f - breath, 1f);
             catTransform.localRotation = Quaternion.Euler(0, 0, idleTail);
+
+            // Редкое сонное подергивание ушком во сне раз в 4-5 секунд
+            catDreamTimer += dt;
+            if (catDreamTimer > 4.5f)
+            {
+                catDreamTimer = 0f;
+                StartCoroutine(CatSleepTwitchRoutine());
+            }
+        }
+    }
+
+    private IEnumerator CatSleepTwitchRoutine()
+    {
+        if (catWiggleCoroutine != null) yield break;
+        float elapsed = 0f;
+        while (elapsed < 0.22f && catWiggleCoroutine == null)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float twitch = Mathf.Sin(elapsed * 45f) * 2.0f;
+            catTransform.localRotation = Quaternion.Euler(0, 0, twitch);
+            yield return null;
         }
     }
 
@@ -794,9 +832,236 @@ public class WorkplaceVisuals : MonoBehaviour
     {
         TriggerCatTapReaction(true);
         if (AudioManager.Instance != null) AudioManager.Instance.PlayCatPurr();
-        if (ClickJuice.Instance != null && catTransform != null)
+
+        if (catAwakeCoroutine != null) StopCoroutine(catAwakeCoroutine);
+        catAwakeCoroutine = StartCoroutine(CatAwakeRoutine());
+
+        if (catHeartEmote != null)
         {
-            ClickJuice.Instance.SpawnCustomPopup("Муррр~ 💕", catTransform.position, new Color(1f, 0.45f, 0.75f, 1f), false);
+            if (catHeartCoroutine != null) StopCoroutine(catHeartCoroutine);
+            catHeartCoroutine = StartCoroutine(CatHeartEmoteRoutine());
+        }
+        else if (ClickJuice.Instance != null && catTransform != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup("💖 Муррр~", catTransform.position + Vector3.up * 45f, new Color(1f, 0.40f, 0.70f, 1f), false);
+        }
+
+        // Приятный мини-бонус от поглаживания котика
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddComboEnergy(0.08f);
+        }
+    }
+
+    private IEnumerator CatAwakeRoutine()
+    {
+        if (catImage != null && catAwakeSprite != null)
+        {
+            catImage.sprite = catAwakeSprite;
+        }
+
+        // Кот бодрствует с открытыми сверкающими глазками 1.8 секунды
+        yield return new WaitForSecondsRealtime(1.8f);
+
+        // Мягкое моргание перед сном
+        if (catImage != null && catSleepingSprite != null)
+        {
+            catImage.sprite = catSleepingSprite;
+            yield return new WaitForSecondsRealtime(0.12f);
+            if (catAwakeSprite != null)
+            {
+                catImage.sprite = catAwakeSprite;
+                yield return new WaitForSecondsRealtime(0.15f);
+            }
+            catImage.sprite = catSleepingSprite;
+        }
+        catAwakeCoroutine = null;
+    }
+
+    private IEnumerator CatHeartEmoteRoutine()
+    {
+        if (catHeartEmote == null) yield break;
+        catHeartEmote.gameObject.SetActive(true);
+        CanvasGroup cg = catHeartEmote.GetComponent<CanvasGroup>();
+        if (cg == null) cg = catHeartEmote.gameObject.AddComponent<CanvasGroup>();
+
+        Vector2 startPos = new Vector2(0, 65);
+        Vector2 targetPos = new Vector2(0, 125);
+        catHeartEmote.anchoredPosition = startPos;
+        catHeartEmote.localScale = Vector3.zero;
+        cg.alpha = 1f;
+
+        float duration = 1.0f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+
+            float sway = Mathf.Sin(t * Mathf.PI * 4f) * 10f;
+            catHeartEmote.anchoredPosition = Vector2.Lerp(startPos, targetPos, t) + new Vector2(sway, 0);
+
+            if (t < 0.25f)
+            {
+                catHeartEmote.localScale = Vector3.Lerp(Vector3.zero, Vector3.one * 1.35f, t / 0.25f);
+            }
+            else if (t < 0.45f)
+            {
+                catHeartEmote.localScale = Vector3.Lerp(Vector3.one * 1.35f, Vector3.one, (t - 0.25f) / 0.20f);
+            }
+
+            if (t > 0.65f)
+            {
+                cg.alpha = 1f - (t - 0.65f) / 0.35f;
+            }
+
+            yield return null;
+        }
+
+        catHeartEmote.gameObject.SetActive(false);
+        catHeartCoroutine = null;
+    }
+
+    #endregion
+
+    #region Интерактивные Напитки (Coffee & Energy Can Click / Sip)
+
+    private void InitDrinksInteraction()
+    {
+        if (coffeeMugTransform != null)
+        {
+            if (coffeeButton == null) coffeeButton = coffeeMugTransform.GetComponent<Button>();
+            if (coffeeButton == null) coffeeButton = coffeeMugTransform.gameObject.AddComponent<Button>();
+            coffeeButton.onClick.RemoveAllListeners();
+            coffeeButton.onClick.AddListener(OnCoffeeClicked);
+        }
+
+        if (energyCanTransform != null)
+        {
+            if (energyButton == null) energyButton = energyCanTransform.GetComponent<Button>();
+            if (energyButton == null) energyButton = energyCanTransform.gameObject.AddComponent<Button>();
+            energyButton.onClick.RemoveAllListeners();
+            energyButton.onClick.AddListener(OnEnergyClicked);
+        }
+    }
+
+    public void OnCoffeeClicked()
+    {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySipSound();
+        if (coffeeMugTransform != null) StartCoroutine(DrinkPunchRoutine(coffeeMugTransform));
+        coffeeJostleBoost = 3.2f;
+
+        if (ClickJuice.Instance != null && coffeeMugTransform != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup("Глоток кофе! ☕ (+бодрость)", coffeeMugTransform.position, new Color(0.95f, 0.70f, 0.40f, 1f), false);
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddComboEnergy(0.12f);
+        }
+    }
+
+    public void OnEnergyClicked()
+    {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySipSound();
+        if (energyCanTransform != null) StartCoroutine(DrinkPunchRoutine(energyCanTransform));
+        energyJostleBoost = 3.2f;
+
+        if (ClickJuice.Instance != null && energyCanTransform != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup("Энергетик! ⚡ (В ПОТОКЕ)", energyCanTransform.position, new Color(0.1f, 1f, 0.85f, 1f), false);
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddComboEnergy(0.20f);
+        }
+    }
+
+    private IEnumerator DrinkPunchRoutine(Transform tr)
+    {
+        if (tr == null) yield break;
+        Vector3 baseScale = Vector3.one;
+        Quaternion baseRot = tr.localRotation;
+
+        tr.localScale = new Vector3(1.18f, 0.82f, 1f);
+        tr.localRotation = Quaternion.Euler(0, 0, Random.Range(-6f, 6f));
+
+        float duration = 0.22f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            tr.localScale = Vector3.Lerp(new Vector3(1.18f, 0.82f, 1f), baseScale, t);
+            tr.localRotation = Quaternion.Slerp(tr.localRotation, baseRot, t);
+            yield return null;
+        }
+
+        tr.localScale = baseScale;
+        tr.localRotation = baseRot;
+    }
+
+    #endregion
+
+    #region Радужный перелив клавиатуры при комбо x3.0
+
+    private bool wasMaxCombo = false;
+
+    private void UpdateKeyboardRgb(float dt)
+    {
+        if (keyboardTransform == null || !keyboardTransform.gameObject.activeSelf) return;
+
+        double combo = GameManager.Instance != null ? GameManager.Instance.GetComboMultiplier() : 1.0;
+        bool isMaxCombo = combo >= 2.85;
+
+        if (activeKeyGlows == null || activeKeyGlows.Length == 0)
+        {
+            var list = new List<Graphic>();
+            if (keyGlowW != null) list.Add(keyGlowW);
+            if (keyGlowA != null) list.Add(keyGlowA);
+            if (keyGlowS != null) list.Add(keyGlowS);
+            if (keyGlowD != null) list.Add(keyGlowD);
+            if (keyGlowSpace != null) list.Add(keyGlowSpace);
+            if (keyGlowEsc != null) list.Add(keyGlowEsc);
+            activeKeyGlows = list.ToArray();
+        }
+
+        if (isMaxCombo)
+        {
+            wasMaxCombo = true;
+            float waveSpeed = 2.2f;
+            float baseHue = Mathf.Repeat(Time.time * waveSpeed, 1f);
+            float pulse = (Mathf.Sin(Time.time * 8.5f) + 1f) * 0.5f;
+
+            if (keyboardGlowImage != null)
+            {
+                Color kbColor = Color.HSVToRGB(baseHue, 0.95f, 1f);
+                kbColor.a = 0.50f + pulse * 0.35f;
+                keyboardGlowImage.color = kbColor;
+            }
+
+            for (int i = 0; i < activeKeyGlows.Length; i++)
+            {
+                if (activeKeyGlows[i] == null) continue;
+                float keyHue = Mathf.Repeat(baseHue + i * 0.14f, 1f);
+                Color kColor = Color.HSVToRGB(keyHue, 0.92f, 1f);
+                kColor.a = 0.65f + pulse * 0.35f;
+                activeKeyGlows[i].color = kColor;
+            }
+        }
+        else if (wasMaxCombo)
+        {
+            wasMaxCombo = false;
+            if (keyboardGlowImage != null) keyboardGlowImage.color = keyGlowNormal;
+            if (activeKeyGlows != null)
+            {
+                for (int i = 0; i < activeKeyGlows.Length; i++)
+                {
+                    if (activeKeyGlows[i] != null) activeKeyGlows[i].color = keyGlowNormal;
+                }
+            }
         }
     }
 
