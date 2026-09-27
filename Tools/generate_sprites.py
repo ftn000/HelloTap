@@ -702,6 +702,116 @@ def make_lofi_player():
     im.save(os.path.join(sprites_dir, "spr_lofi_player.png"))
     print("Created spr_lofi_player.png")
 
+# 24. Wallpapers for Room Backdrop (Cozy Indie Studio, Cyberpunk Loft, Minimal Dark Tech)
+def make_wallpapers():
+    # 1. Cozy Indie Studio (Warm dark cedar, fairy lights, bookshelf)
+    im_cozy = Image.new("RGBA", (540, 960), (28, 24, 22, 255))
+    dc = ImageDraw.Draw(im_cozy)
+    # Horizontal cedar plank seams
+    for y in range(0, 960, 48):
+        dc.line([(0, y), (540, y)], fill=(20, 17, 15, 255), width=2)
+        dc.line([(0, y+1), (540, y+1)], fill=(38, 32, 28, 180), width=1)
+    # Wooden wall shelf at top
+    create_rounded_rect(dc, (40, 150, 500, 168), 4, fill=(45, 36, 30, 255), outline=(65, 52, 42, 255), width=2)
+    # Books on shelf
+    colors = [(180, 50, 60), (45, 120, 170), (50, 150, 90), (200, 150, 40), (140, 70, 150)]
+    for i, col in enumerate(colors):
+        bx = 70 + i * 22
+        dc.rectangle([bx, 110, bx + 18, 150], fill=(*col, 255))
+        dc.rectangle([bx + 3, 114, bx + 15, 146], fill=(*col, 200))
+    # Plant succulent pot
+    create_rounded_rect(dc, (430, 130, 470, 150), 3, fill=(160, 90, 60, 255))
+    dc.ellipse([435, 115, 465, 132], fill=(60, 160, 80, 255))
+    # Hanging fairy lights garland
+    for i in range(12):
+        lx = 30 + i * 42
+        ly = 65 + int(math.sin(i * 0.6) * 14)
+        # Glow halo
+        dc.ellipse([lx - 12, ly - 12, lx + 12, ly + 12], fill=(255, 220, 120, 45))
+        dc.ellipse([lx - 6, ly - 6, lx + 6, ly + 6], fill=(255, 240, 160, 120))
+        # Bulb
+        dc.ellipse([lx - 3, ly - 3, lx + 3, ly + 3], fill=(255, 255, 220, 255))
+    im_cozy.save(os.path.join(sprites_dir, "spr_wallpaper_cozy.png"))
+    print("Created spr_wallpaper_cozy.png")
+
+    # 2. Cyberpunk Loft (Dark brick, glowing neon kanji/signs, neon grid)
+    im_cyber = Image.new("RGBA", (540, 960), (16, 14, 24, 255))
+    dcy = ImageDraw.Draw(im_cyber)
+    # Subtle dark brick texture
+    for row in range(0, 960, 32):
+        shift = 30 if (row // 32) % 2 == 1 else 0
+        dcy.line([(0, row), (540, row)], fill=(22, 19, 32, 255), width=2)
+        for col in range(-30 + shift, 570, 60):
+            dcy.line([(col, row), (col, row + 32)], fill=(22, 19, 32, 255), width=2)
+    # Glowing neon signs on wall
+    # "DEV" sign box
+    create_rounded_rect(dcy, (70, 90, 210, 145), 8, fill=(24, 18, 42, 200), outline=(0, 229, 255, 180), width=3)
+    # Outer neon glow
+    create_rounded_rect(dcy, (66, 86, 214, 149), 10, fill=(0, 0, 0, 0), outline=(0, 229, 255, 60), width=4)
+    # Neon letters "DEV"
+    dcy.line([(95, 105), (95, 130)], fill=(0, 255, 255, 255), width=3)
+    dcy.line([(95, 105), (115, 105)], fill=(0, 255, 255, 255), width=3)
+    dcy.line([(115, 105), (115, 117)], fill=(0, 255, 255, 255), width=3)
+    dcy.line([(95, 117), (115, 117)], fill=(0, 255, 255, 255), width=3)
+    dcy.line([(95, 130), (115, 117)], fill=(0, 255, 255, 255), width=3)
+    # E
+    dcy.line([(130, 105), (130, 130)], fill=(0, 255, 255, 255), width=3)
+    dcy.line([(130, 105), (148, 105)], fill=(0, 255, 255, 255), width=3)
+    dcy.line([(130, 117), (144, 117)], fill=(0, 255, 255, 255), width=3)
+    dcy.line([(130, 130), (148, 130)], fill=(0, 255, 255, 255), width=3)
+    # V
+    dcy.line([(160, 105), (170, 130)], fill=(0, 255, 255, 255), width=3)
+    dcy.line([(180, 105), (170, 130)], fill=(0, 255, 255, 255), width=3)
+
+    # Magenta Neon "< / >" sign on right
+    create_rounded_rect(dcy, (330, 95, 470, 145), 8, fill=(35, 14, 38, 200), outline=(255, 40, 150, 180), width=3)
+    create_rounded_rect(dcy, (326, 91, 474, 149), 10, fill=(0, 0, 0, 0), outline=(255, 40, 150, 60), width=4)
+    # <
+    dcy.line([(370, 108), (355, 120)], fill=(255, 60, 180, 255), width=3)
+    dcy.line([(355, 120), (370, 132)], fill=(255, 60, 180, 255), width=3)
+    # /
+    dcy.line([(405, 106), (395, 134)], fill=(255, 200, 240, 255), width=3)
+    # >
+    dcy.line([(430, 108), (445, 120)], fill=(255, 60, 180, 255), width=3)
+    dcy.line([(445, 120), (430, 132)], fill=(255, 60, 180, 255), width=3)
+    im_cyber.save(os.path.join(sprites_dir, "spr_wallpaper_cyberpunk.png"))
+    print("Created spr_wallpaper_cyberpunk.png")
+
+    # 3. Minimal Dark Tech (Clean slate, geometric circuit accents, subtle carbon lines)
+    im_min = Image.new("RGBA", (540, 960), (14, 16, 21, 255))
+    dm = ImageDraw.Draw(im_min)
+    # Subtle diagonal carbon stripe pattern
+    for diag in range(-500, 1500, 36):
+        dm.line([(diag, 0), (diag + 960, 960)], fill=(18, 21, 28, 255), width=6)
+    # Tech circuit nodes on wall
+    for cy in [110, 180, 250]:
+        dm.line([(60, cy), (480, cy)], fill=(28, 34, 46, 200), width=1)
+        dm.ellipse([140 - 4, cy - 4, 140 + 4, cy + 4], fill=(0, 229, 255, 140))
+        dm.ellipse([380 - 4, cy - 4, 380 + 4, cy + 4], fill=(0, 229, 255, 140))
+    # Elegant glowing line accent
+    dm.line([(100, 145), (440, 145)], fill=(0, 229, 255, 90), width=2)
+    im_min.save(os.path.join(sprites_dir, "spr_wallpaper_minimal.png"))
+    print("Created spr_wallpaper_minimal.png")
+
+# 25. Daily Quest Icon (128 x 128 Badge)
+def make_quest_icon():
+    im = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    # Outer golden hex / circle shield
+    d.ellipse([10, 10, 118, 118], fill=(24, 28, 38, 255), outline=(255, 200, 60, 255), width=4)
+    d.ellipse([18, 18, 110, 110], fill=(0, 0, 0, 0), outline=(0, 229, 255, 140), width=2)
+    # Target concentric rings
+    d.ellipse([34, 34, 94, 94], fill=(32, 38, 52, 255), outline=(255, 210, 80, 255), width=3)
+    d.ellipse([48, 48, 80, 80], fill=(255, 180, 40, 255))
+    d.ellipse([58, 58, 70, 70], fill=(255, 250, 200, 255))
+    # Crosshair ticks
+    d.line([(64, 22), (64, 34)], fill=(255, 210, 80, 255), width=3)
+    d.line([(64, 94), (64, 106)], fill=(255, 210, 80, 255), width=3)
+    d.line([(22, 64), (34, 64)], fill=(255, 210, 80, 255), width=3)
+    d.line([(94, 64), (106, 64)], fill=(255, 210, 80, 255), width=3)
+    im.save(os.path.join(sprites_dir, "spr_quest_icon.png"))
+    print("Created spr_quest_icon.png")
+
 make_desk()
 make_monitor_frame()
 make_monitor_screen()
@@ -726,4 +836,6 @@ make_minigame_sprites()
 make_keyboard_retro()
 make_keyboard_neon()
 make_lofi_player()
+make_wallpapers()
+make_quest_icon()
 print("All sprites successfully generated!")

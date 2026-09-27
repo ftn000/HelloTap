@@ -496,6 +496,89 @@ def make_synthwave_track():
 
     return samples
 
+def make_rain_ambience(duration=4.0):
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+    # 1. Pink-filtered rain bed
+    b0, b1, b2 = 0.0, 0.0, 0.0
+    for i in range(total_samples):
+        white = (random.random() * 2.0 - 1.0)
+        b0 = 0.99765 * b0 + white * 0.0990460
+        b1 = 0.96300 * b1 + white * 0.1384000
+        b2 = 0.57000 * b2 + white * 0.3029590
+        pink = b0 + b1 + b2 + white * 0.5362
+        samples[i] = pink * 0.055
+
+    # 2. Individual rain drops hitting window pane
+    num_drops = int(duration * 28)
+    for _ in range(num_drops):
+        start_idx = random.randint(0, total_samples - int(0.04 * SAMPLE_RATE))
+        freq = random.uniform(1900.0, 3600.0)
+        d_len = int(random.uniform(0.015, 0.035) * SAMPLE_RATE)
+        amp = random.uniform(0.08, 0.22)
+        for i in range(d_len):
+            idx = (start_idx + i) % total_samples
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 180.0)
+            samples[idx] += math.sin(2.0 * math.pi * freq * t) * env * amp
+
+    # Crossfade loop boundaries (0.1s)
+    xfade = int(0.1 * SAMPLE_RATE)
+    for i in range(xfade):
+        frac = i / float(xfade)
+        samples[i] = samples[i] * frac + samples[total_samples - xfade + i] * (1.0 - frac)
+        samples[total_samples - xfade + i] = samples[i]
+
+    return samples
+
+def make_night_ambience(duration=4.0):
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+    # 1. Warm low nocturnal hum (distant city resonance)
+    for i in range(total_samples):
+        t = i / SAMPLE_RATE
+        lfo = 1.0 + 0.18 * math.sin(2.0 * math.pi * 0.35 * t)
+        hum = (math.sin(2.0 * math.pi * 86.0 * t) * 0.06 +
+               math.sin(2.0 * math.pi * 128.0 * t) * 0.04) * lfo
+        samples[i] = hum
+
+    # 2. Vinyl crackle & gentle pops
+    for i in range(total_samples):
+        if random.random() < 0.0018: # crackle pop
+            pop_len = min(int(SAMPLE_RATE * 0.004), total_samples - i)
+            pop_amp = random.uniform(0.08, 0.25)
+            for p in range(pop_len):
+                pt = p / SAMPLE_RATE
+                samples[i + p] += (random.random() * 2.0 - 1.0) * math.exp(-pt * 900.0) * pop_amp
+
+    # Crossfade loop boundaries (0.1s)
+    xfade = int(0.1 * SAMPLE_RATE)
+    for i in range(xfade):
+        frac = i / float(xfade)
+        samples[i] = samples[i] * frac + samples[total_samples - xfade + i] * (1.0 - frac)
+        samples[total_samples - xfade + i] = samples[i]
+
+    return samples
+
+def make_quest_complete(duration=0.85):
+    total_samples = int(SAMPLE_RATE * duration)
+    samples = [0.0] * total_samples
+    # Triumphant 4-note retro arpeggio: C5 (523Hz), E5 (659Hz), G5 (784Hz), C6 (1046Hz)
+    notes = [(0.0, 523.25), (0.11, 659.25), (0.22, 783.99), (0.33, 1046.50)]
+    for n_start, freq in notes:
+        s_idx = int(n_start * SAMPLE_RATE)
+        n_len = min(int((duration - n_start) * SAMPLE_RATE), total_samples - s_idx)
+        for i in range(n_len):
+            t = i / SAMPLE_RATE
+            env = math.exp(-t * 6.5) * 0.32
+            # Bright retro bell/chime harmonics
+            sig = (math.sin(2.0 * math.pi * freq * t) +
+                   0.45 * math.sin(2.0 * math.pi * freq * 2.0 * t) +
+                   0.20 * math.sin(2.0 * math.pi * freq * 3.0 * t))
+            samples[s_idx + i] += sig * env
+
+    return samples
+
 out_dir = r"C:\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
@@ -517,4 +600,7 @@ save_wav(os.path.join(out_dir, "build_complete.wav"), make_build_complete())
 save_wav(os.path.join(out_dir, "cassette_click.wav"), make_cassette_click())
 save_wav(os.path.join(out_dir, "lofi_chill_loop.wav"), make_lofi_track())
 save_wav(os.path.join(out_dir, "synthwave_night_loop.wav"), make_synthwave_track())
+save_wav(os.path.join(out_dir, "rain_ambience_loop.wav"), make_rain_ambience())
+save_wav(os.path.join(out_dir, "night_ambience_loop.wav"), make_night_ambience())
+save_wav(os.path.join(out_dir, "quest_complete.wav"), make_quest_complete())
 print("All sound effects generated successfully!")

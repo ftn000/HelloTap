@@ -28,6 +28,13 @@ public class LoFiPlayerUI : MonoBehaviour
     [SerializeField] private AudioClip lofiTrack;
     [SerializeField] private AudioClip synthwaveTrack;
 
+    [Header("Эмбиент-слои окружения")]
+    [SerializeField] private AudioSource ambienceSource;
+    [SerializeField] private AudioClip rainAmbience;
+    [SerializeField] private AudioClip nightAmbience;
+    [SerializeField] private Button ambienceButton;
+    [SerializeField] private TMP_Text ambienceButtonText;
+
     [Header("Элементы управления")]
     [SerializeField] private Button playPauseButton;
     [SerializeField] private Button nextTrackButton;
@@ -38,11 +45,22 @@ public class LoFiPlayerUI : MonoBehaviour
     [SerializeField] private RectTransform[] eqBars;
 
     private int currentTrackIndex = 0; // 0 = Lo-Fi, 1 = Synthwave
+    private int currentAmbienceMode = 0; // 0 = Off, 1 = Rain, 2 = Night
     private bool isPlaying = false;
+
+    public bool IsMusicOrAmbienceActive => isPlaying || (currentAmbienceMode > 0);
+
     private readonly string[] TrackNames = new string[]
     {
         "☕ Lo-Fi Chill Beats",
         "🌆 Synthwave Night"
+    };
+
+    private readonly string[] AmbienceNames = new string[]
+    {
+        "🔇 ЭМБИЕНТ: ВЫКЛ",
+        "🌧 ДОЖДЬ ЗА ОКНОМ",
+        "🌙 НОЧНОЙ ГОРОД"
     };
 
     private void Awake()
@@ -62,6 +80,14 @@ public class LoFiPlayerUI : MonoBehaviour
             musicSource.volume = 0.45f;
         }
 
+        if (ambienceSource == null)
+        {
+            ambienceSource = gameObject.AddComponent<AudioSource>();
+            ambienceSource.loop = true;
+            ambienceSource.playOnAwake = false;
+            ambienceSource.volume = 0.35f;
+        }
+
         BindButtons();
     }
 
@@ -69,9 +95,11 @@ public class LoFiPlayerUI : MonoBehaviour
     {
         currentTrackIndex = PlayerPrefs.GetInt("Dev_LoFiTrackIndex", 0);
         isPlaying = PlayerPrefs.GetInt("Dev_LoFiIsPlaying", 1) == 1;
+        currentAmbienceMode = PlayerPrefs.GetInt("Dev_AmbienceMode", 0);
 
         BindButtons();
         ApplyTrack(isPlaying);
+        ApplyAmbience(currentAmbienceMode, false);
     }
 
     private void BindButtons()
@@ -86,6 +114,53 @@ public class LoFiPlayerUI : MonoBehaviour
         {
             nextTrackButton.onClick.RemoveAllListeners();
             nextTrackButton.onClick.AddListener(OnNextTrackClicked);
+        }
+
+        if (ambienceButton != null)
+        {
+            ambienceButton.onClick.RemoveAllListeners();
+            ambienceButton.onClick.AddListener(OnAmbienceClicked);
+        }
+    }
+
+    public void OnAmbienceClicked()
+    {
+        currentAmbienceMode = (currentAmbienceMode + 1) % 3;
+        PlayerPrefs.SetInt("Dev_AmbienceMode", currentAmbienceMode);
+        PlayerPrefs.Save();
+
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCassetteClick();
+        HapticFeedback.Vibrate(25);
+
+        ApplyAmbience(currentAmbienceMode, true);
+
+        if (ClickJuice.Instance != null && ambienceButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup(AmbienceNames[currentAmbienceMode], ambienceButton.transform.position + Vector3.up * 35f, new Color(0.35f, 0.85f, 1f), false);
+        }
+    }
+
+    private void ApplyAmbience(int mode, bool animate)
+    {
+        if (ambienceSource == null) return;
+
+        AudioClip targetClip = null;
+        if (mode == 1) targetClip = rainAmbience;
+        else if (mode == 2) targetClip = nightAmbience;
+
+        if (targetClip != null)
+        {
+            ambienceSource.clip = targetClip;
+            ambienceSource.Play();
+        }
+        else
+        {
+            ambienceSource.Stop();
+        }
+
+        if (ambienceButtonText != null)
+        {
+            ambienceButtonText.text = mode == 1 ? "🌧 ДОЖДЬ" : (mode == 2 ? "🌙 НОЧЬ" : "🔇 ЭМБИЕНТ");
         }
     }
 

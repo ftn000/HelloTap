@@ -65,6 +65,14 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Button timeOfDayButton;
     [SerializeField] private TMP_Text timeOfDayText;
 
+    [Header("Обои и Окружение Комнаты")]
+    [SerializeField] private Image roomWallpaperImage;
+    [SerializeField] private Sprite sprWallpaperCozy;
+    [SerializeField] private Sprite sprWallpaperCyberpunk;
+    [SerializeField] private Sprite sprWallpaperMinimal;
+    [SerializeField] private Button roomThemeButton;
+    [SerializeField] private TMP_Text roomThemeText;
+
     [Header("Интерактивные напитки и мышь")]
     [SerializeField] private Button mouseButton;
     [SerializeField] private Button coffeeButton;
@@ -266,6 +274,18 @@ public class WorkplaceVisuals : MonoBehaviour
         {
             keyboardSwitchText = keyboardSwitchButton.GetComponentInChildren<TMP_Text>();
         }
+        if (roomWallpaperImage == null)
+        {
+            roomWallpaperImage = transform.root.Find("Canvas/MobileFrame/RoomWallpaper")?.GetComponent<Image>();
+        }
+        if (roomThemeButton == null)
+        {
+            roomThemeButton = transform.Find("DeskMat/RoomThemeBtn")?.GetComponent<Button>();
+        }
+        if (roomThemeText == null && roomThemeButton != null)
+        {
+            roomThemeText = roomThemeButton.GetComponentInChildren<TMP_Text>();
+        }
     }
 
     private void OnEnable()
@@ -284,6 +304,7 @@ public class WorkplaceVisuals : MonoBehaviour
         InitCatInteraction();
         InitCatCustomization();
         InitKeyboardCustomization();
+        InitRoomThemeCustomization();
         InitLighting();
         InitDrinksInteraction();
         InitMouseInteraction();
@@ -642,6 +663,7 @@ public class WorkplaceVisuals : MonoBehaviour
 
             if (AudioManager.Instance != null) AudioManager.Instance.PlayBugHit(true);
             GameManager.Instance.ClaimBugFixReward(pos, out double bonusCode, out double bonusMoney);
+            if (DailyQuestsUI.Instance != null) DailyQuestsUI.Instance.OnBugSquashed();
 
             if (ClickJuice.Instance != null)
             {
@@ -664,7 +686,7 @@ public class WorkplaceVisuals : MonoBehaviour
         terminalHistory.Add(nextLine);
 
         // Храним до 28 строк для непрерывного плавного вертикального скролла
-        if (terminalHistory.Count > 28)
+        if (terminalHistory.Count > Mathf.Max(28, maxVisibleLines * 2))
         {
             terminalHistory.RemoveAt(0);
             currentScrollY = Mathf.Max(0f, currentScrollY - TerminalLineHeight);
@@ -1886,6 +1908,70 @@ public class WorkplaceVisuals : MonoBehaviour
         if (keyboardSwitchText != null)
         {
             keyboardSwitchText.text = $"🔊 {SwitchTypeNames[currentSwitchType]}";
+        }
+    }
+
+    #endregion
+
+    #region Кастомизация обоев и атмосферы комнаты
+
+    private int currentRoomTheme = 0; // 0=Cozy Indie, 1=Cyberpunk, 2=Minimal
+    private static readonly string[] RoomThemeNames = new string[]
+    {
+        "COZY INDIE",
+        "CYBER LOFT",
+        "MINIMAL TECH"
+    };
+
+    private void InitRoomThemeCustomization()
+    {
+        currentRoomTheme = PlayerPrefs.GetInt("SelectedRoomTheme", 0);
+        ApplyRoomTheme(currentRoomTheme, false);
+
+        if (roomThemeButton != null)
+        {
+            roomThemeButton.onClick.RemoveAllListeners();
+            roomThemeButton.onClick.AddListener(CycleRoomTheme);
+        }
+    }
+
+    public void CycleRoomTheme()
+    {
+        currentRoomTheme = (currentRoomTheme + 1) % 3;
+        PlayerPrefs.SetInt("SelectedRoomTheme", currentRoomTheme);
+        PlayerPrefs.Save();
+        ApplyRoomTheme(currentRoomTheme, true);
+
+        HapticFeedback.Vibrate(25);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCassetteClick();
+        if (ClickJuice.Instance != null && roomThemeButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"🏠 КОМНАТА: {RoomThemeNames[currentRoomTheme]}", roomThemeButton.transform.position, new Color(0.4f, 0.9f, 1f), true);
+        }
+    }
+
+    private void ApplyRoomTheme(int theme, bool animate)
+    {
+        if (roomWallpaperImage == null) return;
+
+        Sprite targetSprite = sprWallpaperCozy;
+        if (theme == 1 && sprWallpaperCyberpunk != null) targetSprite = sprWallpaperCyberpunk;
+        else if (theme == 2 && sprWallpaperMinimal != null) targetSprite = sprWallpaperMinimal;
+
+        if (targetSprite != null)
+        {
+            roomWallpaperImage.sprite = targetSprite;
+            roomWallpaperImage.color = Color.white;
+        }
+
+        if (roomThemeText != null)
+        {
+            roomThemeText.text = $"🏠 {RoomThemeNames[currentRoomTheme]}";
+        }
+
+        if (animate)
+        {
+            StartCoroutine(PopInRoutine(roomWallpaperImage.transform));
         }
     }
 

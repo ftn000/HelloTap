@@ -60,6 +60,8 @@ public class SessionAnalyticsUI : MonoBehaviour
     private float currentMinuteCode = 0f;
 
     public bool IsModalOpen => modalRoot != null && modalRoot.activeInHierarchy;
+    public float PeakCpm => peakCpm;
+    public float CurrentCpm => currentCpm;
 
     private void Awake()
     {
