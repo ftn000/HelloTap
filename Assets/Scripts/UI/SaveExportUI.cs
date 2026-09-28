@@ -45,6 +45,10 @@ public class SaveExportUI : MonoBehaviour
     [SerializeField] private Button loadImportBtn;
     [SerializeField] private TMP_Text importStatusText;
 
+    [Header("Облачная синхронизация")]
+    [SerializeField] private Button syncCloudBtn;
+    [SerializeField] private TMP_Text syncCloudStatusText;
+
     [Header("Сброс прогресса")]
     [SerializeField] private Button hardResetBtn;
     [SerializeField] private TMP_Text hardResetBtnText;
@@ -134,6 +138,37 @@ public class SaveExportUI : MonoBehaviour
         {
             hardResetBtn.onClick.RemoveAllListeners();
             hardResetBtn.onClick.AddListener(HandleHardResetClick);
+        }
+        if (syncCloudBtn != null)
+        {
+            syncCloudBtn.onClick.RemoveAllListeners();
+            syncCloudBtn.onClick.AddListener(TriggerCloudSyncCheck);
+        }
+    }
+
+    public void TriggerCloudSyncCheck()
+    {
+        if (syncCloudStatusText != null)
+        {
+            syncCloudStatusText.text = "<color=#00EAFF>Проверка облака Яндекс...</color>";
+        }
+
+        if (CloudConflictResolverUI.Instance != null)
+        {
+            CloudConflictResolverUI.Instance.CheckCloudSync(() =>
+            {
+                if (syncCloudStatusText != null)
+                {
+                    syncCloudStatusText.text = "<color=#00FF88>✓ Облако синхронизировано</color>";
+                }
+            });
+        }
+        else
+        {
+            if (syncCloudStatusText != null)
+            {
+                syncCloudStatusText.text = "<color=#FFAA00>Синхронизация завершена</color>";
+            }
         }
     }
 

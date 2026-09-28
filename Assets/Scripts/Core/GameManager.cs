@@ -246,12 +246,13 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Глобальный множитель (Престиж * Достижения * Буст энергетика)
+    /// Глобальный множитель (Престиж * Достижения * Буст энергетика * Недвижимость)
     /// </summary>
     public double GetGlobalMultiplier()
     {
         double streakMult = DailyStreakUI.Instance != null ? DailyStreakUI.Instance.GetStreakMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult;
+        double realEstateMult = StudioRealEstateUI.Instance != null ? StudioRealEstateUI.Instance.GetIncomeMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult;
     }
 
     /// <summary>
@@ -313,7 +314,8 @@ public class GameManager : MonoBehaviour
             }
         }
         double streakMult = DailyStreakUI.Instance != null ? DailyStreakUI.Instance.GetStreakMultiplier() : 1.0;
-        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult;
+        double realEstateMult = StudioRealEstateUI.Instance != null ? StudioRealEstateUI.Instance.GetIncomeMultiplier() : 1.0;
+        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult;
     }
 
     /// <summary>

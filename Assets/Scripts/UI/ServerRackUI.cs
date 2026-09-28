@@ -265,6 +265,20 @@ public class ServerRackUI : MonoBehaviour
         if (index < 0 || index >= blades.Count) return;
         var b = blades[index];
 
+        int installedCount = 0;
+        for (int i = 0; i < blades.Count; i++) if (blades[i].isInstalled) installedCount++;
+
+        int maxAllowed = StudioRealEstateUI.Instance != null ? StudioRealEstateUI.Instance.GetMaxServerBlades() : 4;
+        if (!b.isInstalled && installedCount >= maxAllowed)
+        {
+            HapticFeedback.LightImpact();
+            if (ClickJuice.Instance != null)
+            {
+                ClickJuice.Instance.SpawnCustomPopup($"⚠️ Лимит серверной ({maxAllowed} шт.)! Переедьте в новый офис в меню «Недвижимость».", transform.position, new Color(1f, 0.45f, 0.2f), false);
+            }
+            return;
+        }
+
         double upgradeCost = b.cost * Math.Pow(1.5, b.level - 1);
         if (GameManager.Instance != null && GameManager.Instance.Money >= upgradeCost)
         {
