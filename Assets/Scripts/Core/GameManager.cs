@@ -254,7 +254,8 @@ public class GameManager : MonoBehaviour
         double realEstateMult = StudioRealEstateUI.Instance != null ? StudioRealEstateUI.Instance.GetIncomeMultiplier() : 1.0;
         double steamBadgeMult = SteamTradingCardsUI.Instance != null ? SteamTradingCardsUI.Instance.GetBadgeMultiplier() : 1.0;
         double techLabMult = TechLabResearchUI.Instance != null ? TechLabResearchUI.Instance.GetGlobalTechMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult;
+        double catHavenMult = StudioCatHavenUI.Instance != null ? StudioCatHavenUI.Instance.GetCatHavenMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult;
     }
 
     /// <summary>
@@ -319,7 +320,8 @@ public class GameManager : MonoBehaviour
         double realEstateMult = StudioRealEstateUI.Instance != null ? StudioRealEstateUI.Instance.GetIncomeMultiplier() : 1.0;
         double steamBadgeMult = SteamTradingCardsUI.Instance != null ? SteamTradingCardsUI.Instance.GetBadgeMultiplier() : 1.0;
         double techLabMult = TechLabResearchUI.Instance != null ? TechLabResearchUI.Instance.GetGlobalTechMultiplier() : 1.0;
-        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult * techLabMult;
+        double catHavenMult = StudioCatHavenUI.Instance != null ? StudioCatHavenUI.Instance.GetCatHavenMultiplier() : 1.0;
+        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult;
     }
 
     /// <summary>
