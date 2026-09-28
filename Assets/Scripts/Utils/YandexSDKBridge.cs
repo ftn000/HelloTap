@@ -50,6 +50,15 @@ public class YandexSDKBridge : MonoBehaviour
 
     [DllImport("__Internal")]
     private static extern void YandexSDK_SetLeaderboardScore(string lbName, int score);
+
+    [DllImport("__Internal")]
+    private static extern void YandexSDK_CanCreateShortcut();
+
+    [DllImport("__Internal")]
+    private static extern void YandexSDK_CreateShortcut();
+
+    [DllImport("__Internal")]
+    private static extern void YandexSDK_RequestNotification(string title, string text);
 #endif
 
     public bool IsInitialized { get; private set; } = false;
@@ -306,6 +315,85 @@ public class YandexSDKBridge : MonoBehaviour
 #else
         Debug.Log($"[YandexSDKBridge (Editor Mock)] SetLeaderboardScore: {leaderboardName} = {score}");
 #endif
+    }
+
+    #endregion
+
+    #region Shortcuts and Notifications
+
+    private Action<bool> currentCanShortcutCallback;
+    private Action<bool> currentCreateShortcutCallback;
+
+    public void CheckCanCreateShortcut(Action<bool> callback)
+    {
+        currentCanShortcutCallback = callback;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        try
+        {
+            YandexSDK_CanCreateShortcut();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[YandexSDKBridge] CanCreateShortcut failed: {e.Message}");
+            currentCanShortcutCallback?.Invoke(false);
+            currentCanShortcutCallback = null;
+        }
+#else
+        Debug.Log("[YandexSDKBridge (Editor Mock)] CanCreateShortcut: true");
+        currentCanShortcutCallback?.Invoke(true);
+        currentCanShortcutCallback = null;
+#endif
+    }
+
+    public void CreateShortcut(Action<bool> callback = null)
+    {
+        currentCreateShortcutCallback = callback;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        try
+        {
+            YandexSDK_CreateShortcut();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[YandexSDKBridge] CreateShortcut failed: {e.Message}");
+            currentCreateShortcutCallback?.Invoke(false);
+            currentCreateShortcutCallback = null;
+        }
+#else
+        Debug.Log("[YandexSDKBridge (Editor Mock)] CreateShortcut: true");
+        currentCreateShortcutCallback?.Invoke(true);
+        currentCreateShortcutCallback = null;
+#endif
+    }
+
+    public void SendLocalNotification(string title, string text)
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        try
+        {
+            YandexSDK_RequestNotification(title, text);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[YandexSDKBridge] RequestNotification failed: {e.Message}");
+        }
+#else
+        Debug.Log($"[YandexSDKBridge (Editor Mock)] Notification: '{title}' - {text}");
+#endif
+    }
+
+    public void OnCanCreateShortcutCallback(string canStr)
+    {
+        bool can = canStr == "true";
+        currentCanShortcutCallback?.Invoke(can);
+        currentCanShortcutCallback = null;
+    }
+
+    public void OnCreateShortcutCallback(string outcomeStr)
+    {
+        bool success = outcomeStr == "true";
+        currentCreateShortcutCallback?.Invoke(success);
+        currentCreateShortcutCallback = null;
     }
 
     #endregion

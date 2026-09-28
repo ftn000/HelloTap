@@ -170,5 +170,65 @@ mergeInto(LibraryManager.library, {
         } else {
             console.log('[YandexSDK JS Mock] SetLeaderboardScore: ' + lbName + ' = ' + score);
         }
+    },
+
+    YandexSDK_CanCreateShortcut: function() {
+        if (typeof window.ysdk !== 'undefined' && window.ysdk.shortcut) {
+            window.ysdk.shortcut.canShowPrompt().then(function(prompt) {
+                var can = prompt.canShow ? 'true' : 'false';
+                if (window.unityInstance) {
+                    window.unityInstance.SendMessage('YandexSDKBridge', 'OnCanCreateShortcutCallback', can);
+                }
+            }).catch(function(e) {
+                if (window.unityInstance) {
+                    window.unityInstance.SendMessage('YandexSDKBridge', 'OnCanCreateShortcutCallback', 'false');
+                }
+            });
+        } else {
+            if (window.unityInstance) {
+                window.unityInstance.SendMessage('YandexSDKBridge', 'OnCanCreateShortcutCallback', 'true');
+            }
+        }
+    },
+
+    YandexSDK_CreateShortcut: function() {
+        if (typeof window.ysdk !== 'undefined' && window.ysdk.shortcut) {
+            window.ysdk.shortcut.showPrompt().then(function(result) {
+                var outcome = result.outcome === 'accepted' ? 'true' : 'false';
+                if (window.unityInstance) {
+                    window.unityInstance.SendMessage('YandexSDKBridge', 'OnCreateShortcutCallback', outcome);
+                }
+            }).catch(function(err) {
+                if (window.unityInstance) {
+                    window.unityInstance.SendMessage('YandexSDKBridge', 'OnCreateShortcutCallback', 'false');
+                }
+            });
+        } else {
+            console.log('[YandexSDK JS Mock] CreateShortcut accepted.');
+            if (window.unityInstance) {
+                window.unityInstance.SendMessage('YandexSDKBridge', 'OnCreateShortcutCallback', 'true');
+            }
+        }
+    },
+
+    YandexSDK_RequestNotification: function(titlePtr, textPtr) {
+        var title = UTF8ToString(titlePtr) || 'HelloTap';
+        var text = UTF8ToString(textPtr) || 'Ваша инди-студия скучает!';
+        try {
+            if (typeof window !== 'undefined' && 'Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    new Notification(title, { body: text, icon: 'favicon.ico' });
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission().then(function(permission) {
+                        if (permission === 'granted') {
+                            new Notification(title, { body: text, icon: 'favicon.ico' });
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('[YandexSDK JS] Notification error:', e);
+        }
     }
 });
+
