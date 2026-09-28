@@ -2539,8 +2539,24 @@ public class WorkplaceVisuals : MonoBehaviour
         if (duckSkinButton != null)
         {
             duckSkinButton.onClick.RemoveAllListeners();
-            duckSkinButton.onClick.AddListener(CycleDuckSkin);
+            duckSkinButton.onClick.AddListener(() =>
+            {
+                if (DuckCustomizationUI.Instance != null)
+                {
+                    DuckCustomizationUI.Instance.OpenModal();
+                }
+                else
+                {
+                    CycleDuckSkin();
+                }
+            });
         }
+    }
+
+    public void ApplyDuckSkinExternal(int skinIdx)
+    {
+        currentDuckSkin = skinIdx;
+        ApplyDuckSkin(skinIdx, true);
     }
 
     public void OnRubberDuckClicked()

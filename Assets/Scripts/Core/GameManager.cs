@@ -259,7 +259,10 @@ public class GameManager : MonoBehaviour
         double engineIncomeMult = CustomGameEngineUI.Instance != null ? CustomGameEngineUI.Instance.GetEngineIncomeMultiplier() : 1.0;
         double trophyMult = StudioTrophyCabinetUI.Instance != null ? StudioTrophyCabinetUI.Instance.GetTrophyMultiplier() : 1.0;
         double securityMult = CyberSecurityDefenseUI.Instance != null ? CyberSecurityDefenseUI.Instance.GetSecurityIncomeMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult;
+        double duckMult = DuckCustomizationUI.Instance != null ? DuckCustomizationUI.Instance.GetDuckMultiplier() : 1.0;
+        double platformDealsMult = ConsolePlatformDealsUI.Instance != null ? ConsolePlatformDealsUI.Instance.GetPlatformDealsMultiplier() : 1.0;
+        double syndicateMult = IndieDevSyndicateUI.Instance != null ? IndieDevSyndicateUI.Instance.GetSyndicateMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult;
     }
 
     /// <summary>
@@ -278,7 +281,9 @@ public class GameManager : MonoBehaviour
         double workshopClickMult = SteamWorkshopModdingUI.Instance != null ? SteamWorkshopModdingUI.Instance.GetWorkshopClickMultiplier() : 1.0;
         double speedrunMult = GlobalSpeedrunRecordsUI.Instance != null ? GlobalSpeedrunRecordsUI.Instance.GetSpeedrunMultiplier() : 1.0;
         double engineClickMult = CustomGameEngineUI.Instance != null ? CustomGameEngineUI.Instance.GetEngineClickMultiplier() : 1.0;
-        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult;
+        double duckClickMult = DuckCustomizationUI.Instance != null ? DuckCustomizationUI.Instance.GetDuckClickMultiplier() : 1.0;
+        double syndicateClickMult = IndieDevSyndicateUI.Instance != null ? IndieDevSyndicateUI.Instance.GetSyndicateClickMultiplier() : 1.0;
+        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult;
     }
 
     private double screensaverMultiplier = 1.0;
