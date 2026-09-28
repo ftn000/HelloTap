@@ -256,7 +256,10 @@ public class GameManager : MonoBehaviour
         double techLabMult = TechLabResearchUI.Instance != null ? TechLabResearchUI.Instance.GetGlobalTechMultiplier() : 1.0;
         double catHavenMult = StudioCatHavenUI.Instance != null ? StudioCatHavenUI.Instance.GetCatHavenMultiplier() : 1.0;
         double workshopIncomeMult = SteamWorkshopModdingUI.Instance != null ? SteamWorkshopModdingUI.Instance.GetWorkshopIncomeMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult;
+        double engineIncomeMult = CustomGameEngineUI.Instance != null ? CustomGameEngineUI.Instance.GetEngineIncomeMultiplier() : 1.0;
+        double trophyMult = StudioTrophyCabinetUI.Instance != null ? StudioTrophyCabinetUI.Instance.GetTrophyMultiplier() : 1.0;
+        double securityMult = CyberSecurityDefenseUI.Instance != null ? CyberSecurityDefenseUI.Instance.GetSecurityIncomeMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult;
     }
 
     /// <summary>
@@ -274,7 +277,8 @@ public class GameManager : MonoBehaviour
         }
         double workshopClickMult = SteamWorkshopModdingUI.Instance != null ? SteamWorkshopModdingUI.Instance.GetWorkshopClickMultiplier() : 1.0;
         double speedrunMult = GlobalSpeedrunRecordsUI.Instance != null ? GlobalSpeedrunRecordsUI.Instance.GetSpeedrunMultiplier() : 1.0;
-        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult;
+        double engineClickMult = CustomGameEngineUI.Instance != null ? CustomGameEngineUI.Instance.GetEngineClickMultiplier() : 1.0;
+        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult;
     }
 
     private double screensaverMultiplier = 1.0;
@@ -500,7 +504,9 @@ public class GameManager : MonoBehaviour
             codeLines -= prj.RequiredCodeLines;
             prj.IsCompleted = true;
 
-            double reward = Math.Floor(prj.RewardMoney * GetPrestigeMultiplier() * GetAchievementMultiplier());
+            double engineRewardMult = CustomGameEngineUI.Instance != null ? CustomGameEngineUI.Instance.GetProjectRewardMultiplier() : 1.0;
+            double trophyRewardMult = StudioTrophyCabinetUI.Instance != null ? StudioTrophyCabinetUI.Instance.GetTrophyMultiplier() : 1.0;
+            double reward = Math.Floor(prj.RewardMoney * GetPrestigeMultiplier() * GetAchievementMultiplier() * engineRewardMult * trophyRewardMult);
             money += reward;
             totalMoneyEarned += reward;
 
