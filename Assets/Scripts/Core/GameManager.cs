@@ -246,14 +246,15 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Глобальный множитель (Престиж * Достижения * Буст энергетика * Недвижимость * Значок Steam)
+    /// Глобальный множитель (Престиж * Достижения * Буст энергетика * Недвижимость * Значок Steam * Техно-лаборатория)
     /// </summary>
     public double GetGlobalMultiplier()
     {
         double streakMult = DailyStreakUI.Instance != null ? DailyStreakUI.Instance.GetStreakMultiplier() : 1.0;
         double realEstateMult = StudioRealEstateUI.Instance != null ? StudioRealEstateUI.Instance.GetIncomeMultiplier() : 1.0;
         double steamBadgeMult = SteamTradingCardsUI.Instance != null ? SteamTradingCardsUI.Instance.GetBadgeMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult;
+        double techLabMult = TechLabResearchUI.Instance != null ? TechLabResearchUI.Instance.GetGlobalTechMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult;
     }
 
     /// <summary>
@@ -317,7 +318,8 @@ public class GameManager : MonoBehaviour
         double streakMult = DailyStreakUI.Instance != null ? DailyStreakUI.Instance.GetStreakMultiplier() : 1.0;
         double realEstateMult = StudioRealEstateUI.Instance != null ? StudioRealEstateUI.Instance.GetIncomeMultiplier() : 1.0;
         double steamBadgeMult = SteamTradingCardsUI.Instance != null ? SteamTradingCardsUI.Instance.GetBadgeMultiplier() : 1.0;
-        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult;
+        double techLabMult = TechLabResearchUI.Instance != null ? TechLabResearchUI.Instance.GetGlobalTechMultiplier() : 1.0;
+        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult * techLabMult;
     }
 
     /// <summary>
