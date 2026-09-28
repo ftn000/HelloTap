@@ -255,7 +255,8 @@ public class GameManager : MonoBehaviour
         double steamBadgeMult = SteamTradingCardsUI.Instance != null ? SteamTradingCardsUI.Instance.GetBadgeMultiplier() : 1.0;
         double techLabMult = TechLabResearchUI.Instance != null ? TechLabResearchUI.Instance.GetGlobalTechMultiplier() : 1.0;
         double catHavenMult = StudioCatHavenUI.Instance != null ? StudioCatHavenUI.Instance.GetCatHavenMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult;
+        double workshopIncomeMult = SteamWorkshopModdingUI.Instance != null ? SteamWorkshopModdingUI.Instance.GetWorkshopIncomeMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult;
     }
 
     /// <summary>
@@ -271,7 +272,9 @@ public class GameManager : MonoBehaviour
                 hardwareBonus += upg.GetTotalPower();
             }
         }
-        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier();
+        double workshopClickMult = SteamWorkshopModdingUI.Instance != null ? SteamWorkshopModdingUI.Instance.GetWorkshopClickMultiplier() : 1.0;
+        double speedrunMult = GlobalSpeedrunRecordsUI.Instance != null ? GlobalSpeedrunRecordsUI.Instance.GetSpeedrunMultiplier() : 1.0;
+        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult;
     }
 
     private double screensaverMultiplier = 1.0;
@@ -321,7 +324,8 @@ public class GameManager : MonoBehaviour
         double steamBadgeMult = SteamTradingCardsUI.Instance != null ? SteamTradingCardsUI.Instance.GetBadgeMultiplier() : 1.0;
         double techLabMult = TechLabResearchUI.Instance != null ? TechLabResearchUI.Instance.GetGlobalTechMultiplier() : 1.0;
         double catHavenMult = StudioCatHavenUI.Instance != null ? StudioCatHavenUI.Instance.GetCatHavenMultiplier() : 1.0;
-        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult;
+        double workshopIncomeMult = SteamWorkshopModdingUI.Instance != null ? SteamWorkshopModdingUI.Instance.GetWorkshopIncomeMultiplier() : 1.0;
+        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult;
     }
 
     /// <summary>
