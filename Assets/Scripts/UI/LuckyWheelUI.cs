@@ -220,9 +220,26 @@ public class LuckyWheelUI : MonoBehaviour
 
         if (isFree)
         {
-            if (!CanFreeSpin()) return;
+            if (!CanFreeSpin())
+            {
+                // На кулдауне: предлагаем крутить за просмотр рекламы
+                YandexSDKBridge.Instance.ShowRewardedAd(
+                    "lucky_wheel_ad_spin",
+                    onRewarded: () =>
+                    {
+                        ExecuteSpinReward();
+                    },
+                    onClose: null,
+                    onError: (err) =>
+                    {
+                        ExecuteSpinReward();
+                    });
+                return;
+            }
+
             PlayerPrefs.SetString(PrefLastFreeSpin, DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
             PlayerPrefs.Save();
+            ExecuteSpinReward();
         }
         else
         {
@@ -232,11 +249,16 @@ public class LuckyWheelUI : MonoBehaviour
                 {
                     statusDescText.text = $"<color=#FF5555>Недостаточно средств! Требуется {PaidSpinCost:N0} руб.</color>";
                 }
+                HapticFeedback.WarningHaptic();
                 return;
             }
             GameManager.Instance.SpendMoney(PaidSpinCost);
+            ExecuteSpinReward();
         }
+    }
 
+    private void ExecuteSpinReward()
+    {
         // Выбираем сектор с учётом весов
         int targetSector = PickWeightedSector();
         if (spinCoroutine != null) StopCoroutine(spinCoroutine);
@@ -388,12 +410,12 @@ public class LuckyWheelUI : MonoBehaviour
             else
             {
                 TimeSpan rem = GetFreeSpinRemainingTime();
-                freeSpinBtnText.text = $"ЖДАТЬ ({rem.Hours:D2}:{rem.Minutes:D2}:{rem.Seconds:D2})";
+                freeSpinBtnText.text = $"🎬 СПИН ЗА РЕКЛАМУ ({rem.Hours:D2}:{rem.Minutes:D2}:{rem.Seconds:D2})";
             }
         }
         if (freeSpinBtn != null && !isSpinning)
         {
-            freeSpinBtn.interactable = canFree;
+            freeSpinBtn.interactable = true; // Можно крутить бесплатно по кулдауну или через рекламу
         }
 
         if (paidSpinBtnText != null)

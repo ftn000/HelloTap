@@ -211,56 +211,99 @@ public class TapCounter : MonoBehaviour
             return;
         }
 
-        // 2. Проверка клика мыши или касания экрана (Touch)
-        bool pointerPressed = false;
-        Vector2 pointerPos = Vector2.zero;
+        // 2. Мультитач поддержка (Touchscreen.current.touches / Input.touches - до 5 пальцев одновременно)
+        bool anyTouchProcessed = false;
 
-        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        if (Touchscreen.current != null)
         {
-            pointerPressed = true;
-            pointerPos = Touchscreen.current.primaryTouch.position.ReadValue();
+            var touches = Touchscreen.current.touches;
+            for (int i = 0; i < touches.Count; i++)
+            {
+                var touchControl = touches[i];
+                if (touchControl.press.wasPressedThisFrame)
+                {
+                    Vector2 touchPos = touchControl.position.ReadValue();
+                    if (IsValidTapPosition(touchPos))
+                    {
+                        IncrementWithPosition(touchPos);
+                        anyTouchProcessed = true;
+                    }
+                }
+            }
         }
-        else if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            pointerPressed = true;
-            pointerPos = Mouse.current.position.ReadValue();
-        }
+
 #if ENABLE_LEGACY_INPUT_MANAGER
-        if (!pointerPressed && Input.GetMouseButtonDown(0))
+        if (!anyTouchProcessed && Input.touchCount > 0)
         {
-            pointerPressed = true;
-            pointerPos = Input.mousePosition;
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                Touch t = Input.GetTouch(i);
+                if (t.phase == UnityEngine.TouchPhase.Began)
+                {
+                    if (IsValidTapPosition(t.position))
+                    {
+                        IncrementWithPosition(t.position);
+                        anyTouchProcessed = true;
+                    }
+                }
+            }
         }
 #endif
 
-        if (pointerPressed)
+        // 3. Обычный клик мыши (для десктопного режима)
+        if (!anyTouchProcessed)
         {
-            if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null)
-            {
-                GameObject selected = EventSystem.current.currentSelectedGameObject;
-                if (tapButton != null && selected != tapButton.gameObject && selected.GetComponent<Button>() != null)
-                {
-                    return;
-                }
-            }
+            bool mousePressed = false;
+            Vector2 mousePos = Vector2.zero;
 
-            if (tapButton != null)
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             {
-                RectTransform tapRt = tapButton.GetComponent<RectTransform>();
-                if (tapRt != null && RectTransformUtility.RectangleContainsScreenPoint(tapRt, pointerPos, null))
-                {
-                    IncrementWithPosition(pointerPos);
-                }
+                mousePressed = true;
+                mousePos = Mouse.current.position.ReadValue();
             }
-            else
+#if ENABLE_LEGACY_INPUT_MANAGER
+            else if (Input.GetMouseButtonDown(0))
             {
-                float normalizedY = Screen.height > 0 ? pointerPos.y / Screen.height : 0.5f;
-                if (normalizedY >= 0.10f && normalizedY <= 0.86f)
-                {
-                    IncrementWithPosition(pointerPos);
-                }
+                mousePressed = true;
+                mousePos = Input.mousePosition;
+            }
+#endif
+            if (mousePressed && IsValidTapPosition(mousePos))
+            {
+                IncrementWithPosition(mousePos);
             }
         }
+    }
+
+    private bool IsValidTapPosition(Vector2 screenPos)
+    {
+        if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null)
+        {
+            GameObject selected = EventSystem.current.currentSelectedGameObject;
+            if (tapButton != null && selected != tapButton.gameObject && selected.GetComponent<Button>() != null)
+            {
+                return false;
+            }
+        }
+
+        if (tapButton != null)
+        {
+            RectTransform tapRt = tapButton.GetComponent<RectTransform>();
+            if (tapRt != null && RectTransformUtility.RectangleContainsScreenPoint(tapRt, screenPos, null))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            float normalizedY = Screen.height > 0 ? screenPos.y / Screen.height : 0.5f;
+            if (normalizedY >= 0.10f && normalizedY <= 0.86f)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void IncrementWithPosition(Vector2 clickPos)
@@ -278,6 +321,7 @@ public class TapCounter : MonoBehaviour
             GameManager.Instance.ClickCode(clickPos);
         }
 
+        HapticFeedback.LightImpact();
         UpdateUI();
     }
 

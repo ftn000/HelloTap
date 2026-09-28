@@ -9,8 +9,9 @@
   <meta name="theme-color" content="#0f172a">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <title>{{{ PRODUCT_NAME }}} - GameDev Idle Clicker</title>
+  <!-- Yandex Games SDK v2 -->
+  <script src="https://yandex.ru/games/sdk/v2"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -203,6 +204,21 @@
         setTimeout(() => {
           loadingOverlay.style.display = "none";
         }, 500);
+
+        // Auto-initialize Yandex SDK if available
+        if (typeof YaGames !== 'undefined') {
+          YaGames.init().then(ysdk => {
+            window.ysdk = ysdk;
+            console.log('[YandexSDK] Initialized on page load.');
+            try {
+              unityInstance.SendMessage('YandexSDKBridge', 'OnSDKInitializedCallback', 'true');
+            } catch (e) {
+              console.log('[YandexSDK] Bridge receiver not ready yet.');
+            }
+          }).catch(err => {
+            console.warn('[YandexSDK] Init error:', err);
+          });
+        }
       }).catch((message) => {
         showBanner(message, 'error');
       });

@@ -196,6 +196,30 @@ public class GameOverlaysUI : MonoBehaviour
 
     private void OnClaimOfflineClicked(double multiplier)
     {
+        if (multiplier > 1.0)
+        {
+            // Показ Rewarded видеорекламы для получения x2 бонуса
+            YandexSDKBridge.Instance.ShowRewardedAd(
+                "offline_double",
+                onRewarded: () =>
+                {
+                    ClaimOfflineBonus(multiplier);
+                },
+                onClose: null,
+                onError: (err) =>
+                {
+                    // Fallback при блокировщиках рекламы или отсутствии интернета
+                    ClaimOfflineBonus(multiplier);
+                });
+        }
+        else
+        {
+            ClaimOfflineBonus(1.0);
+        }
+    }
+
+    private void ClaimOfflineBonus(double multiplier)
+    {
         if (GameManager.Instance != null)
         {
             GameManager.Instance.ClaimOfflineEarnings(multiplier);
@@ -203,6 +227,7 @@ public class GameOverlaysUI : MonoBehaviour
             {
                 AudioManager.Instance.PlayRelease();
             }
+            HapticFeedback.SuccessPattern();
         }
 
         if (offlineModalRoot != null)
@@ -252,6 +277,11 @@ public class GameOverlaysUI : MonoBehaviour
             {
                 AudioManager.Instance.PlayRelease();
             }
+            HapticFeedback.SuccessPattern();
+
+            // Показ полноэкранной рекламы при крупном достижении (IPO)
+            YandexSDKBridge.Instance.ShowFullscreenAd();
+
             if (ClickJuice.Instance != null && prestigeButton != null)
             {
                 ClickJuice.Instance.SpawnCustomPopup(

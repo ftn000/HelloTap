@@ -9,6 +9,7 @@
 /[Uu]ser[Ss]ettings/
 *.log
 *.tar.gz
+PerformanceTestRun*
 
 # MemoryCaptures
 /[Mm]emoryCaptures/

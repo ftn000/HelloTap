@@ -56,8 +56,35 @@ public class AudioManager : MonoBehaviour
 
     private bool isMuted = false;
     private bool isFocusLost = false;
+    private float masterVolume = 1.0f;
+    private float sfxVolume = 0.85f;
 
     public bool IsMuted => isMuted;
+
+    public float MasterVolume
+    {
+        get => masterVolume;
+        set
+        {
+            masterVolume = Mathf.Clamp01(value);
+            PlayerPrefs.SetFloat("Dev_MasterVolume", masterVolume);
+            PlayerPrefs.Save();
+            ApplyMute();
+        }
+    }
+
+    public float SfxVolume
+    {
+        get => sfxVolume;
+        set
+        {
+            sfxVolume = Mathf.Clamp01(value);
+            PlayerPrefs.SetFloat("Dev_SfxVolume", sfxVolume);
+            PlayerPrefs.Save();
+            if (sfxSource != null) sfxSource.volume = 0.70f * sfxVolume * masterVolume;
+            if (typingSource != null) typingSource.volume = 1.0f * sfxVolume * masterVolume;
+        }
+    }
 
     private void Awake()
     {
@@ -68,19 +95,22 @@ public class AudioManager : MonoBehaviour
         }
         instance = this;
 
+        masterVolume = PlayerPrefs.GetFloat("Dev_MasterVolume", 1.0f);
+        sfxVolume = PlayerPrefs.GetFloat("Dev_SfxVolume", 0.85f);
+
         if (sfxSource == null)
         {
             sfxSource = gameObject.AddComponent<AudioSource>();
             sfxSource.playOnAwake = false;
         }
-        sfxSource.volume = 0.70f;
+        sfxSource.volume = 0.70f * sfxVolume * masterVolume;
 
         if (typingSource == null)
         {
             typingSource = gameObject.AddComponent<AudioSource>();
             typingSource.playOnAwake = false;
         }
-        typingSource.volume = 1.0f;
+        typingSource.volume = 1.0f * sfxVolume * masterVolume;
 
         isMuted = PlayerPrefs.GetInt(MutePrefKey, 0) == 1;
         EnsureClips();
@@ -518,6 +548,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayDuckQuack()
     {
+        HapticFeedback.DuckQuackHaptic();
         if (isMuted || isFocusLost || sfxSource == null) return;
         if (duckQuackSound != null)
         {
