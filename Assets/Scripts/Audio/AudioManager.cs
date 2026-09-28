@@ -557,6 +557,11 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    public void PlayClick() => PlayMouseClick();
+    public void PlayCrit() => PlayTyping(true);
+    public void PlayCoin() => PlayUpgrade();
+    public void PlayPrestige() => PlayBuildComplete();
+
     private AudioClip CreateProceduralDuckQuackClip()
     {
         int sampleRate = 44100;

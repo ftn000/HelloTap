@@ -106,4 +106,9 @@ public static class HapticFeedback
         Vibrate(40);
 #endif
     }
+
+    public static void NotificationPattern()
+    {
+        SuccessPattern();
+    }
 }

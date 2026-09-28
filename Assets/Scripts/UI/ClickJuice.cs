@@ -109,6 +109,11 @@ public class ClickJuice : MonoBehaviour
         SpawnFloatingText(message, screenPos, isLarge, parent, color);
     }
 
+    public void SpawnTapParticle(Vector2 screenPos, bool isCrit = false)
+    {
+        SpawnCustomPopup(isCrit ? "⚡ КРИТ!" : "+1", screenPos, isCrit ? Color.yellow : Color.cyan, false);
+    }
+
     public void PlayPunchEffect()
     {
         if (punchCoroutine != null)

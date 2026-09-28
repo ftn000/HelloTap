@@ -436,6 +436,20 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Списание строк кода (на исследования в TechLab, компиляцию и т.д.)
+    /// </summary>
+    public bool SpendLinesOfCode(double amount)
+    {
+        if (amount <= 0) return true;
+        if (codeLines < amount) return false;
+
+        codeLines -= amount;
+        OnCurrenciesChanged?.Invoke();
+        SaveGame();
+        return true;
+    }
+
+    /// <summary>
     /// Награда за обезвреживание бага на мониторе
     /// </summary>
     public void ClaimBugFixReward(Vector2 screenPos, out double bonusCode, out double bonusMoney)
