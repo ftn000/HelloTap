@@ -3,7 +3,9 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// Переключатель звука (Mute/Unmute) с динамической иконкой 🔊 / 🔇.
+/// Кнопка управления звуком на главном экране:
+/// При клике открывает окно детальных настроек звука (AudioSettingsUI),
+/// а при отсутствии модального окна переключает Mute/Unmute.
 /// </summary>
 public class AudioToggleButton : MonoBehaviour
 {
@@ -32,7 +34,11 @@ public class AudioToggleButton : MonoBehaviour
 
     private void OnClick()
     {
-        if (AudioManager.Instance != null)
+        if (AudioSettingsUI.Instance != null)
+        {
+            AudioSettingsUI.Instance.OpenModal();
+        }
+        else if (AudioManager.Instance != null)
         {
             AudioManager.Instance.ToggleMute();
             UpdateVisual();

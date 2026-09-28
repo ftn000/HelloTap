@@ -103,6 +103,18 @@ public class WorkplaceVisuals : MonoBehaviour
     [SerializeField] private Button deskMatSkinButton;
     [SerializeField] private TMP_Text deskMatSkinText;
 
+    [Header("LED Подсветка стола (RGB Strip)")]
+    [SerializeField] private Graphic deskLedGlowImage;
+    [SerializeField] private Button deskLedButton;
+    [SerializeField] private TMP_Text deskLedText;
+
+    [Header("Неоновая вывеска на стене (Wall Neon Sign)")]
+    [SerializeField] private GameObject wallNeonSignObj;
+    [SerializeField] private TMP_Text wallNeonSignText;
+    [SerializeField] private Graphic wallNeonSignGlow;
+    [SerializeField] private Button wallNeonSignButton;
+    [SerializeField] private TMP_Text wallNeonSignBtnText;
+
     [Header("Резиновая Уточка (Rubber Duck Debugging)")]
     [SerializeField] private GameObject rubberDuckObj;
     [SerializeField] private Image rubberDuckImage;
@@ -327,6 +339,40 @@ public class WorkplaceVisuals : MonoBehaviour
         {
             roomThemeText = roomThemeButton.GetComponentInChildren<TMP_Text>();
         }
+
+        if (deskLedGlowImage == null)
+        {
+            deskLedGlowImage = transform.Find("DeskMat/DeskLedGlow")?.GetComponent<Graphic>();
+        }
+        if (deskLedButton == null)
+        {
+            deskLedButton = transform.Find("DeskMat/DeskLedBtn")?.GetComponent<Button>();
+        }
+        if (deskLedText == null && deskLedButton != null)
+        {
+            deskLedText = deskLedButton.GetComponentInChildren<TMP_Text>();
+        }
+
+        if (wallNeonSignObj == null)
+        {
+            wallNeonSignObj = transform.Find("WallNeonSign")?.gameObject;
+        }
+        if (wallNeonSignText == null && wallNeonSignObj != null)
+        {
+            wallNeonSignText = wallNeonSignObj.GetComponentInChildren<TMP_Text>();
+        }
+        if (wallNeonSignGlow == null && wallNeonSignObj != null)
+        {
+            wallNeonSignGlow = wallNeonSignObj.transform.Find("NeonGlow")?.GetComponent<Graphic>();
+        }
+        if (wallNeonSignButton == null)
+        {
+            wallNeonSignButton = transform.Find("WallNeonSignBtn")?.GetComponent<Button>();
+        }
+        if (wallNeonSignBtnText == null && wallNeonSignButton != null)
+        {
+            wallNeonSignBtnText = wallNeonSignButton.GetComponentInChildren<TMP_Text>();
+        }
     }
 
     private void OnEnable()
@@ -347,6 +393,8 @@ public class WorkplaceVisuals : MonoBehaviour
         InitKeyboardCustomization();
         InitMouseSwitchCustomization();
         InitRoomThemeCustomization();
+        InitDeskLedCustomization();
+        InitNeonSignCustomization();
         InitPetCompanionCustomization();
         InitDeskMatCustomization();
         InitScreensaver();
@@ -428,6 +476,12 @@ public class WorkplaceVisuals : MonoBehaviour
 
         // 12. Экранная заставка (Matrix Screensaver)
         UpdateScreensaver(dt);
+
+        // 13. LED RGB подсветка стола
+        UpdateDeskLed(dt);
+
+        // 14. Неоновая вывеска на стене (мерцание)
+        UpdateNeonSign(dt);
     }
 
     #region Визуальная эволюция стола
@@ -2067,6 +2121,198 @@ public class WorkplaceVisuals : MonoBehaviour
         if (animate)
         {
             StartCoroutine(PopInRoutine(roomWallpaperImage.transform));
+        }
+    }
+
+    #endregion
+
+    #region LED Подсветка стола (Desk RGB Strip)
+
+    private int currentDeskLedIndex = 1; // 0=Off, 1=Cyber Cyan, 2=Neon Purple, 3=Matrix Green, 4=Sunset Gold, 5=Rainbow Cycle
+    private static readonly string[] DeskLedNames = new string[]
+    {
+        "LED: ВЫКЛ",
+        "CYAN GLOW",
+        "NEON PURPLE",
+        "MATRIX GREEN",
+        "SUNSET GOLD",
+        "RGB CHROMA"
+    };
+
+    private static readonly Color[] DeskLedColors = new Color[]
+    {
+        new Color(0, 0, 0, 0f),
+        new Color(0f, 0.94f, 1f, 0.45f),
+        new Color(0.74f, 0f, 1f, 0.45f),
+        new Color(0f, 1f, 0.4f, 0.45f),
+        new Color(1f, 0.55f, 0.1f, 0.45f),
+        new Color(1f, 0.2f, 0.6f, 0.5f)
+    };
+
+    private void InitDeskLedCustomization()
+    {
+        currentDeskLedIndex = PlayerPrefs.GetInt("SelectedDeskLed", 1);
+        ApplyDeskLed(currentDeskLedIndex, false);
+
+        if (deskLedButton != null)
+        {
+            deskLedButton.onClick.RemoveAllListeners();
+            deskLedButton.onClick.AddListener(CycleDeskLed);
+        }
+    }
+
+    public void CycleDeskLed()
+    {
+        currentDeskLedIndex = (currentDeskLedIndex + 1) % DeskLedNames.Length;
+        PlayerPrefs.SetInt("SelectedDeskLed", currentDeskLedIndex);
+        PlayerPrefs.Save();
+        ApplyDeskLed(currentDeskLedIndex, true);
+
+        HapticFeedback.MediumImpact();
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCassetteClick();
+        if (ClickJuice.Instance != null && deskLedButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"💡 LED: {DeskLedNames[currentDeskLedIndex]}", deskLedButton.transform.position, new Color(0.3f, 1f, 0.9f), true);
+        }
+    }
+
+    private void ApplyDeskLed(int index, bool animate)
+    {
+        if (deskLedGlowImage != null)
+        {
+            if (index == 0)
+            {
+                deskLedGlowImage.gameObject.SetActive(false);
+            }
+            else
+            {
+                deskLedGlowImage.gameObject.SetActive(true);
+                deskLedGlowImage.color = DeskLedColors[index];
+            }
+        }
+
+        if (deskLedText != null)
+        {
+            deskLedText.text = $"💡 {DeskLedNames[index]}";
+        }
+    }
+
+    private void UpdateDeskLed(float dt)
+    {
+        if (currentDeskLedIndex == 5 && deskLedGlowImage != null && deskLedGlowImage.gameObject.activeSelf)
+        {
+            // Rainbow Chroma cycle
+            float hue = (Time.time * 0.25f) % 1.0f;
+            Color chroma = Color.HSVToRGB(hue, 0.85f, 1.0f);
+            chroma.a = 0.45f + Mathf.Sin(Time.time * 3f) * 0.10f;
+            deskLedGlowImage.color = chroma;
+        }
+        else if (currentDeskLedIndex > 0 && deskLedGlowImage != null && deskLedGlowImage.gameObject.activeSelf)
+        {
+            // Soft breathing pulse
+            Color baseColor = DeskLedColors[currentDeskLedIndex];
+            float pulse = 0.40f + Mathf.Sin(Time.time * 2.2f) * 0.08f;
+            baseColor.a = pulse;
+            deskLedGlowImage.color = baseColor;
+        }
+    }
+
+    #endregion
+
+    #region Неоновая вывеска на стене (Wall Neon Sign)
+
+    private int currentNeonSignIndex = 1; // 0=Off, 1=<CODE />, 2=HELLO WORLD, 3=COFFEE & BUGS, 4=KEEP CODING
+    private static readonly string[] NeonSignLabels = new string[]
+    {
+        "НЕОН: ВЫКЛ",
+        "<CODE />",
+        "HELLO WORLD",
+        "COFFEE & BUGS",
+        "KEEP CODING"
+    };
+
+    private static readonly string[] NeonSignHtmlTexts = new string[]
+    {
+        "",
+        "<color=#00F0FF><</color><color=#FF007F>CODE</color> <color=#00F0FF>/></color>",
+        "<color=#00FF66>HELLO WORLD</color>",
+        "<color=#FFB800>COFFEE</color> <color=#FF3366>&</color> <color=#00E5FF>BUGS</color>",
+        "<color=#A855F7>KEEP</color> <color=#38BDF8>CODING</color>"
+    };
+
+    private void InitNeonSignCustomization()
+    {
+        currentNeonSignIndex = PlayerPrefs.GetInt("SelectedNeonSign", 1);
+        ApplyNeonSign(currentNeonSignIndex, false);
+
+        if (wallNeonSignButton != null)
+        {
+            wallNeonSignButton.onClick.RemoveAllListeners();
+            wallNeonSignButton.onClick.AddListener(CycleNeonSign);
+        }
+    }
+
+    public void CycleNeonSign()
+    {
+        currentNeonSignIndex = (currentNeonSignIndex + 1) % NeonSignLabels.Length;
+        PlayerPrefs.SetInt("SelectedNeonSign", currentNeonSignIndex);
+        PlayerPrefs.Save();
+        ApplyNeonSign(currentNeonSignIndex, true);
+
+        HapticFeedback.MediumImpact();
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayLampSwitch();
+        if (ClickJuice.Instance != null && wallNeonSignButton != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"✨ НЕОН: {NeonSignLabels[currentNeonSignIndex]}", wallNeonSignButton.transform.position, new Color(1f, 0.3f, 0.8f), true);
+        }
+    }
+
+    private void ApplyNeonSign(int index, bool animate)
+    {
+        if (wallNeonSignObj != null)
+        {
+            wallNeonSignObj.SetActive(index > 0);
+        }
+
+        if (wallNeonSignText != null && index >= 0 && index < NeonSignHtmlTexts.Length)
+        {
+            wallNeonSignText.text = NeonSignHtmlTexts[index];
+        }
+
+        if (wallNeonSignBtnText != null)
+        {
+            wallNeonSignBtnText.text = $"✨ {NeonSignLabels[index]}";
+        }
+
+        if (animate && wallNeonSignObj != null && wallNeonSignObj.activeSelf)
+        {
+            StartCoroutine(NeonFlickerRoutine());
+        }
+    }
+
+    private IEnumerator NeonFlickerRoutine()
+    {
+        if (wallNeonSignObj == null) yield break;
+        // Забавный эффект включения неоновой трубки
+        wallNeonSignObj.SetActive(false);
+        yield return new WaitForSecondsRealtime(0.04f);
+        wallNeonSignObj.SetActive(true);
+        yield return new WaitForSecondsRealtime(0.06f);
+        wallNeonSignObj.SetActive(false);
+        yield return new WaitForSecondsRealtime(0.03f);
+        wallNeonSignObj.SetActive(true);
+    }
+
+    private void UpdateNeonSign(float dt)
+    {
+        if (currentNeonSignIndex > 0 && wallNeonSignGlow != null && wallNeonSignObj != null && wallNeonSignObj.activeSelf)
+        {
+            // Случайное микро-гудение/мерцание неона
+            float flicker = (Random.value < 0.02f) ? 0.4f : 1.0f;
+            float pulse = 0.75f + Mathf.Sin(Time.time * 5.5f) * 0.20f;
+            Color c = wallNeonSignGlow.color;
+            c.a = pulse * flicker;
+            wallNeonSignGlow.color = c;
         }
     }
 
