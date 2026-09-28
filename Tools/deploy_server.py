@@ -69,8 +69,9 @@ def main():
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            # Connect via SSH key or standard prompt
-            ssh.connect(SERVER_HOST, port=SERVER_PORT, username=SERVER_USER, timeout=15)
+            # Connect via SSH with credentials
+            password = os.environ.get("SERVER_PASSWORD", "k5bsGuDvo&WM")
+            ssh.connect(SERVER_HOST, port=SERVER_PORT, username=SERVER_USER, password=password, timeout=15)
             print("[+] Подключение к серверу установлено.")
 
             # Create remote directory
