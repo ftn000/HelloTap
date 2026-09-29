@@ -96,5 +96,49 @@ namespace HelloTap.Editor
                 return false;
             }
         }
+
+        [MenuItem("HelloTap/Build Windows Standalone", false, 102)]
+        public static void BuildWindows()
+        {
+            bool success = PerformStandaloneBuild();
+            if (!success)
+            {
+                EditorApplication.Exit(1);
+            }
+        }
+
+        public static bool PerformStandaloneBuild()
+        {
+            Debug.Log("[WebGLBuilder] Starting Windows Standalone Build pipeline...");
+            string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            string fullOutputPath = Path.Combine(projectRoot, "Builds/StandaloneWindows64/HelloTap.exe");
+            string dir = Path.GetDirectoryName(fullOutputPath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
+            {
+                scenes = new string[] { "Assets/Scenes/SampleScene.unity" },
+                locationPathName = fullOutputPath,
+                target = BuildTarget.StandaloneWindows64,
+                targetGroup = BuildTargetGroup.Standalone,
+                options = BuildOptions.None
+            };
+
+            BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            BuildSummary summary = report.summary;
+            if (summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log($"[WebGLBuilder] Windows Build Succeeded! Total size: {summary.totalSize / 1024 / 1024:F2} MB, Time: {summary.totalTime.TotalSeconds:F1}s");
+                return true;
+            }
+            else
+            {
+                Debug.LogError($"[WebGLBuilder] Windows Build Failed! Result: {summary.result}, Errors: {summary.totalErrors}");
+                return false;
+            }
+        }
     }
 }
