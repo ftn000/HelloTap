@@ -270,7 +270,10 @@ public class GameManager : MonoBehaviour
         double museumMult = HallOfFameMuseumUI.Instance != null ? HallOfFameMuseumUI.Instance.GetMuseumIncomeMultiplier() : 1.0;
         double cdnMult = CloudEdgeCdnUI.Instance != null ? CloudEdgeCdnUI.Instance.GetCdnIncomeMultiplier() : 1.0;
         double bpMult = StudioBattlePassUI.Instance != null ? StudioBattlePassUI.Instance.GetBattlePassIncomeMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult * cdnMult * bpMult;
+        double cryptoMult = StudioCryptoMiningUI.Instance != null ? StudioCryptoMiningUI.Instance.GetCryptoIncomeMultiplier() : 1.0;
+        double academyMult = JuniorDevAcademyUI.Instance != null ? JuniorDevAcademyUI.Instance.GetAcademyIncomeMultiplier() : 1.0;
+        double raidMult = OpenSourceCommunityRaidUI.Instance != null ? OpenSourceCommunityRaidUI.Instance.GetRaidIncomeMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult * cdnMult * bpMult * cryptoMult * academyMult * raidMult;
     }
 
     /// <summary>
@@ -298,7 +301,9 @@ public class GameManager : MonoBehaviour
         double museumClickMult = HallOfFameMuseumUI.Instance != null ? HallOfFameMuseumUI.Instance.GetMuseumClickMultiplier() : 1.0;
         double cdnClickMult = CloudEdgeCdnUI.Instance != null ? CloudEdgeCdnUI.Instance.GetCdnClickMultiplier() : 1.0;
         double bpClickMult = StudioBattlePassUI.Instance != null ? StudioBattlePassUI.Instance.GetBattlePassClickMultiplier() : 1.0;
-        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult * cdnClickMult * bpClickMult;
+        double academyClickMult = JuniorDevAcademyUI.Instance != null ? JuniorDevAcademyUI.Instance.GetAcademyClickMultiplier() : 1.0;
+        double raidClickMult = OpenSourceCommunityRaidUI.Instance != null ? OpenSourceCommunityRaidUI.Instance.GetRaidClickMultiplier() : 1.0;
+        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult * cdnClickMult * bpClickMult * academyClickMult * raidClickMult;
     }
 
     private double screensaverMultiplier = 1.0;
@@ -323,6 +328,9 @@ public class GameManager : MonoBehaviour
                 staffBonus += upg.GetTotalPower();
             }
         }
+        double academyBonus = JuniorDevAcademyUI.Instance != null ? JuniorDevAcademyUI.Instance.GetAcademyCodePerSec() : 0.0;
+        staffBonus += academyBonus;
+
         if (screensaverMultiplier > 1.0 && staffBonus < 1.0)
         {
             staffBonus = 1.0; // Базовый поток в режиме заставки даже без найма джунов
