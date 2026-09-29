@@ -273,7 +273,10 @@ public class GameManager : MonoBehaviour
         double cryptoMult = StudioCryptoMiningUI.Instance != null ? StudioCryptoMiningUI.Instance.GetCryptoIncomeMultiplier() : 1.0;
         double academyMult = JuniorDevAcademyUI.Instance != null ? JuniorDevAcademyUI.Instance.GetAcademyIncomeMultiplier() : 1.0;
         double raidMult = OpenSourceCommunityRaidUI.Instance != null ? OpenSourceCommunityRaidUI.Instance.GetRaidIncomeMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult * cdnMult * bpMult * cryptoMult * academyMult * raidMult;
+        double ergoMult = WorkspaceErgonomicsUI.Instance != null ? WorkspaceErgonomicsUI.Instance.GetErgonomicsIncomeMultiplier() : 1.0;
+        double pitchMult = ElevatorPitchDemoDayUI.Instance != null ? ElevatorPitchDemoDayUI.Instance.GetDemoDayIncomeMultiplier() : 1.0;
+        double patentMult = PatentPortfolioWarsUI.Instance != null ? PatentPortfolioWarsUI.Instance.GetPatentIncomeMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult * cdnMult * bpMult * cryptoMult * academyMult * raidMult * ergoMult * pitchMult * patentMult;
     }
 
     /// <summary>
@@ -303,7 +306,9 @@ public class GameManager : MonoBehaviour
         double bpClickMult = StudioBattlePassUI.Instance != null ? StudioBattlePassUI.Instance.GetBattlePassClickMultiplier() : 1.0;
         double academyClickMult = JuniorDevAcademyUI.Instance != null ? JuniorDevAcademyUI.Instance.GetAcademyClickMultiplier() : 1.0;
         double raidClickMult = OpenSourceCommunityRaidUI.Instance != null ? OpenSourceCommunityRaidUI.Instance.GetRaidClickMultiplier() : 1.0;
-        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult * cdnClickMult * bpClickMult * academyClickMult * raidClickMult;
+        double ergoClickMult = WorkspaceErgonomicsUI.Instance != null ? WorkspaceErgonomicsUI.Instance.GetErgonomicsClickMultiplier() : 1.0;
+        double patentClickMult = PatentPortfolioWarsUI.Instance != null ? PatentPortfolioWarsUI.Instance.GetPatentClickMultiplier() : 1.0;
+        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult * cdnClickMult * bpClickMult * academyClickMult * raidClickMult * ergoClickMult * patentClickMult;
     }
 
     private double screensaverMultiplier = 1.0;
