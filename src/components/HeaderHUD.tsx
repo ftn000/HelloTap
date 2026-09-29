@@ -11,7 +11,7 @@ interface HeaderHUDProps {
 }
 
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenDigest, onOpenSave }) => {
-  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec } = useGame();
+  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
 
   const toggleMute = () => {
@@ -74,6 +74,15 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenDigest, o
             {isInFlow && <span className="text-[10px] text-amber-300 uppercase tracking-wider">FLOW</span>}
           </div>
 
+          {/* Кнопка смены языка */}
+          <button
+            onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}
+            className="px-2 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-xs font-mono font-bold text-slate-200 transition-colors"
+            title="Язык / Language"
+          >
+            {lang === 'ru' ? '🇷🇺 RU' : '🇬🇧 EN'}
+          </button>
+
           {/* Кнопка Mute */}
           <button
             onClick={toggleMute}
@@ -87,7 +96,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenDigest, o
           <button
             onClick={onOpenDigest}
             className="p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)]"
-            title="Ежедневный Дайджест"
+            title={t.digestBtn}
           >
             <FileText className="w-4 h-4" />
           </button>
@@ -96,7 +105,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenDigest, o
           <button
             onClick={onOpenSave}
             className="p-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 transition-all"
-            title="Облако и Сохранения"
+            title={t.saveBtn}
           >
             <Save className="w-4 h-4" />
           </button>
@@ -107,7 +116,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenDigest, o
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all active:scale-95"
           >
             <Building2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Hub Студии</span>
+            <span className="hidden sm:inline">{t.hubBtn}</span>
           </button>
         </div>
       </div>

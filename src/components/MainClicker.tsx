@@ -22,7 +22,7 @@ const CODE_SNIPPETS = [
 ];
 
 export const MainClicker: React.FC = () => {
-  const { handleClick, comboEnergy, isInFlow, codePerClick } = useGame();
+  const { handleClick, comboEnergy, isInFlow, codePerClick, t } = useGame();
   const [popups, setPopups] = useState<Popup[]>([]);
   const [activeKey, setActiveKey] = useState<boolean>(false);
   const [snippetIndex, setSnippetIndex] = useState<number>(0);
@@ -47,7 +47,7 @@ export const MainClicker: React.FC = () => {
 
     const newPopup: Popup = {
       id: Date.now() + Math.random(),
-      text: isCrit ? `🔥 КРИТ +${formatNumber(codeAdded)}` : `+${formatNumber(codeAdded)}`,
+      text: isCrit ? `${t.critText} +${formatNumber(codeAdded)}` : `+${formatNumber(codeAdded)}`,
       x,
       y,
       isCrit
@@ -72,7 +72,7 @@ export const MainClicker: React.FC = () => {
           <div className="flex items-center gap-1 text-slate-300">
             <Flame className={`w-3.5 h-3.5 ${isInFlow ? 'text-amber-400 animate-bounce' : 'text-slate-500'}`} />
             <span className={isInFlow ? 'text-amber-400 font-bold' : ''}>
-              {isInFlow ? '🔥 РЕЖИМ В ПОТОКЕ (x3.0 МНОЖИТЕЛЬ)!' : 'Шкала фокуса разработчика'}
+              {isInFlow ? t.flowMode : t.focusBar}
             </span>
           </div>
           <span className="text-slate-400">{(comboEnergy * 100).toFixed(0)}%</span>
@@ -129,7 +129,7 @@ export const MainClicker: React.FC = () => {
             <span>{CODE_SNIPPETS[snippetIndex]}</span>
           </div>
           <div className="text-xs text-slate-500 italic">
-            // Нажимайте для компиляции и генерации дохода
+            {t.clickInstruction}
           </div>
         </div>
 
@@ -141,7 +141,7 @@ export const MainClicker: React.FC = () => {
             ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-[0_4px_0_#b45309]'
             : 'bg-slate-800/80 text-cyan-300 border-slate-700 shadow-[0_4px_0_#1e293b] hover:bg-slate-800'
         }`}>
-          <span>⌨️ КОМПИЛИРОВАТЬ КОД</span>
+          <span>{t.compileBtn}</span>
           {isInFlow && <Sparkles className="w-4 h-4 animate-spin" />}
         </div>
 

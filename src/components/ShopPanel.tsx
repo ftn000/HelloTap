@@ -4,14 +4,14 @@ import { formatNumber } from '../utils/numberFormatter';
 import { ShoppingBag, ArrowUpRight, Check } from 'lucide-react';
 
 export const ShopPanel: React.FC = () => {
-  const { upgrades, buyUpgrade, codeLines, money } = useGame();
+  const { upgrades, buyUpgrade, codeLines, money, t } = useGame();
 
   return (
     <div className="w-full max-w-md mx-auto px-4 pb-20">
       <div className="flex items-center gap-2 mb-3">
         <ShoppingBag className="w-4 h-4 text-cyan-400" />
         <h2 className="text-sm font-bold uppercase tracking-wider text-slate-300 font-mono">
-          Оборудование и Улучшения
+          {t.upgradesTitle}
         </h2>
       </div>
 
@@ -42,7 +42,7 @@ export const ShopPanel: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-sm text-slate-200 truncate">{u.name}</span>
                     <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 shrink-0">
-                      ур. {u.level}/{u.maxLevel}
+                      {t.lvlPrefix} {u.level}/{u.maxLevel}
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 truncate mt-0.5">{u.description}</p>
@@ -70,12 +70,12 @@ export const ShopPanel: React.FC = () => {
               >
                 {isMax ? (
                   <span className="flex items-center gap-1">
-                    <Check className="w-3.5 h-3.5" /> MAX
+                    <Check className="w-3.5 h-3.5" /> {t.maxBtn}
                   </span>
                 ) : (
                   <>
                     <span className="flex items-center gap-1">
-                      КУПИТЬ <ArrowUpRight className="w-3 h-3" />
+                      {t.buyBtn} <ArrowUpRight className="w-3 h-3" />
                     </span>
                     <span className="text-[10px] font-normal opacity-90">
                       {formatNumber(costCode)} C# / {formatNumber(costMoney)} ₽

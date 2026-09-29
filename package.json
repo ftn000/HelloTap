@@ -1,11 +1,13 @@
 {
   "name": "hellotap",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "package:yandex": "node scripts/package-yandex.js",
+    "build:yandex": "npm run build && npm run package:yandex",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -34,7 +34,8 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
     setSwitchType,
     exportSaveBase64,
     importSaveBase64,
-    hardReset
+    hardReset,
+    t
   } = useGame();
 
   const [copied, setCopied] = useState<boolean>(false);
@@ -120,7 +121,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
               activeTab === 'systems' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            🏢 Системы
+            {t.tabSystems}
           </button>
           <button
             onClick={() => setActiveTab('digest')}
@@ -128,7 +129,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
               activeTab === 'digest' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            ⚡ Бусты & Реклама
+            {t.tabBoosts}
           </button>
           <button
             onClick={() => setActiveTab('prestige')}
@@ -136,7 +137,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
               activeTab === 'prestige' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            📈 IPO
+            {t.tabIPO}
           </button>
           <button
             onClick={() => setActiveTab('custom')}
@@ -144,7 +145,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
               activeTab === 'custom' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            ⌨️ Свитчи
+            {t.tabSwitches}
           </button>
           <button
             onClick={() => setActiveTab('save')}
@@ -152,7 +153,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
               activeTab === 'save' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            💾 Сейвы
+            {t.tabSaves}
           </button>
         </div>
 
@@ -173,7 +174,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                         : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                     }`}
                   >
-                    {cat === 'all' ? 'Все' : cat === 'office' ? 'Офис' : cat === 'business' ? 'Бизнес' : cat === 'tech' ? 'Технологии' : 'Культура'}
+                    {cat === 'all' ? t.catAll : cat === 'office' ? t.catOffice : cat === 'business' ? t.catBusiness : cat === 'tech' ? t.catTech : t.catCulture}
                   </button>
                 ))}
               </div>
@@ -234,13 +235,13 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                   <div className="flex items-center gap-2">
                     <Tv className="w-5 h-5 text-indigo-400" />
                     <div>
-                      <h3 className="text-sm font-bold text-indigo-300">БОНУСЫ ЯНДЕКС ИГР</h3>
-                      <p className="text-xs text-slate-400">Просмотр короткого ролика за супер-буст</p>
+                      <h3 className="text-sm font-bold text-indigo-300">{t.yandexBonusTitle}</h3>
+                      <p className="text-xs text-slate-400">{t.yandexBonusDesc}</p>
                     </div>
                   </div>
                   {adBoostRemainingSec > 0 && (
                     <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/30 animate-pulse">
-                      x2 АКТИВЕН ({adBoostRemainingSec}с)
+                      {t.adActive} ({adBoostRemainingSec}с)
                     </span>
                   )}
                 </div>
@@ -250,16 +251,16 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                     onClick={watchAdForDoubleBoost}
                     className="p-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-md transition-all active:scale-98"
                   >
-                    <span>📺 x2 ДОХОД НА 3 МИНУТЫ</span>
-                    <span className="text-[10px] font-normal opacity-90">Удваивает весь C# и рубли</span>
+                    <span>{t.yandexAdDouble}</span>
+                    <span className="text-[10px] font-normal opacity-90">{t.yandexAdDoubleDesc}</span>
                   </button>
 
                   <button
                     onClick={watchAdForTimeWarpReset}
                     className="p-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-md transition-all active:scale-98"
                   >
-                    <span>📺 СБРОСИТЬ TIME WARP</span>
-                    <span className="text-[10px] font-normal opacity-90">Мгновенная зарядка 2h варпа</span>
+                    <span>{t.yandexAdTimeWarp}</span>
+                    <span className="text-[10px] font-normal opacity-90">{t.yandexAdTimeWarpDesc}</span>
                   </button>
                 </div>
               </div>
@@ -270,7 +271,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">📋</span>
                     <div>
-                      <h3 className="text-sm font-bold text-amber-300">УТРЕННИЙ ДАЙДЖЕСТ</h3>
+                      <h3 className="text-sm font-bold text-amber-300">{t.digestTitle}</h3>
                       <p className="text-xs text-slate-400">Сборов: {dailyDigestClaims}</p>
                     </div>
                   </div>
@@ -282,7 +283,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                   onClick={handleClaim}
                   className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all active:scale-98"
                 >
-                  💰 СОБРАТЬ ВСЕ НАГРАДЫ И ДИВИДЕНДЫ
+                  {t.digestClaimBtn}
                 </button>
               </div>
 
@@ -292,8 +293,8 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">⚡</span>
                     <div>
-                      <h3 className="text-sm font-bold text-cyan-300">TIME WARP: СИМУЛЯТОР СМЕНЫ</h3>
-                      <p className="text-xs text-slate-400">Мгновенная автономная выработка за 2 часа</p>
+                      <h3 className="text-sm font-bold text-cyan-300">{t.timeWarpTitle}</h3>
+                      <p className="text-xs text-slate-400">{t.timeWarpDesc}</p>
                     </div>
                   </div>
                 </div>
@@ -307,8 +308,8 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                   }`}
                 >
                   {timeWarpRemainingSec > 0
-                    ? `⏳ ЗАРЯДКА: ${Math.floor(timeWarpRemainingSec / 60)}:${(timeWarpRemainingSec % 60).toString().padStart(2, '0')}`
-                    : '⚡ ЗАПУСТИТЬ TIME WARP (2 ЧАСА)'}
+                    ? `${t.timeWarpCharging}: ${Math.floor(timeWarpRemainingSec / 60)}:${(timeWarpRemainingSec % 60).toString().padStart(2, '0')}`
+                    : t.timeWarpBtn}
                 </button>
               </div>
             </div>
@@ -321,22 +322,22 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                 <div className="flex items-center gap-2.5">
                   <TrendingUp className="w-6 h-6 text-emerald-400" />
                   <div>
-                    <h3 className="text-sm font-bold text-emerald-300">ВЫХОД НА IPO (ПРЕСТИЖ)</h3>
-                    <p className="text-xs text-slate-400">Проведено IPO: {prestigeCount} раз</p>
+                    <h3 className="text-sm font-bold text-emerald-300">{t.ipoTitle}</h3>
+                    <p className="text-xs text-slate-400">IPO: {prestigeCount}</p>
                   </div>
                 </div>
 
                 <p className="text-xs text-slate-300 font-sans leading-relaxed">
-                  Продайте акции компании инвесторам на бирже. Строки кода и базовые апгрейды сбрасываются, но вы получаете <b>Токены Акций</b> и <b>постоянный множитель x1.5</b> на все будущие сессии!
+                  {t.ipoDesc}
                 </p>
 
                 <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
-                  <span className="text-slate-400">Акции в портфеле:</span>
+                  <span className="text-slate-400">{t.ipoShares}</span>
                   <span className="text-emerald-400 font-bold">{prestigeTokens} шт. (+{(prestigeTokens * 5)}% буст)</span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
-                  <span className="text-slate-400">Будет начислено при IPO:</span>
+                  <span className="text-slate-400">{t.ipoWillGain}</span>
                   <span className="text-amber-400 font-bold">+{potentialTokens} Токенов</span>
                 </div>
 
@@ -349,7 +350,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                       : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
                   }`}
                 >
-                  {potentialTokens > 0 ? `🚀 ПРОВЕСТИ IPO (+${potentialTokens} ТОКЕНОВ)` : 'ТРЕБУЕТСЯ БОЛЬШЕ КОДА ДЛЯ IPO'}
+                  {potentialTokens > 0 ? `${t.ipoBtn} (+${potentialTokens})` : t.ipoNotEnough}
                 </button>
               </div>
             </div>
@@ -360,10 +361,10 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
             <div className="space-y-3 font-mono text-xs">
               <div className="flex items-center gap-2 text-indigo-400 font-bold mb-1">
                 <Sliders className="w-4 h-4" />
-                <span>МЕХАНИЧЕСКИЕ ПЕРЕКЛЮЧАТЕЛИ КЛАВИАТУРЫ</span>
+                <span>{t.switchTitle}</span>
               </div>
               <p className="text-slate-400 font-sans">
-                Выберите тип механических свитчей для изменения звукового профиля синтезатора:
+                {t.switchDesc}
               </p>
 
               <div className="grid grid-cols-2 gap-2">
@@ -400,25 +401,28 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
               <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
                 <div className="flex items-center gap-2 text-cyan-400 font-bold">
                   <Copy className="w-4 h-4" />
-                  <span>ЭКСПОРТ СОХРАНЕНИЯ (BASE64)</span>
+                  <span>{t.saveExportTitle}</span>
                 </div>
+                <p className="text-slate-400 text-[11px] font-sans">
+                  {t.saveExportDesc}
+                </p>
                 <button
                   onClick={handleCopy}
                   className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 font-semibold transition-all"
                 >
                   {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                  <span>{copied ? 'СКОПИРОВАНО В БУФЕР!' : 'КОПИРОВАТЬ КЛЮЧ СОХРАНЕНИЯ'}</span>
+                  <span>{copied ? t.saveCopied : t.saveCopyBtn}</span>
                 </button>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
                 <div className="flex items-center gap-2 text-emerald-400 font-bold">
                   <Save className="w-4 h-4" />
-                  <span>ИМПОРТ СОХРАНЕНИЯ</span>
+                  <span>{t.saveImportTitle}</span>
                 </div>
                 <input
                   type="text"
-                  placeholder="Вставьте код HELLOTAP_SAVE_V2:..."
+                  placeholder={t.saveImportPlaceholder}
                   value={importInput}
                   onChange={(e) => setImportInput(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 focus:outline-none focus:border-cyan-500 font-mono text-xs"
@@ -427,7 +431,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                   onClick={handleImport}
                   className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold tracking-wide transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)]"
                 >
-                  ЗАГРУЗИТЬ ПРОГРЕСС
+                  {t.saveImportBtn}
                 </button>
                 {importMsg && <div className="text-center mt-1">{importMsg}</div>}
               </div>
@@ -435,7 +439,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
               <div className="p-3.5 rounded-2xl bg-red-950/20 border border-red-900/40 space-y-2">
                 <div className="flex items-center gap-2 text-red-400 font-bold">
                   <AlertTriangle className="w-4 h-4" />
-                  <span>ОПАСНАЯ ЗОНА</span>
+                  <span>{t.saveDangerZone}</span>
                 </div>
                 <button
                   onClick={() => {
@@ -447,7 +451,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                   }}
                   className="w-full py-2 rounded-xl bg-red-950/50 hover:bg-red-900/60 text-red-300 border border-red-800/60 font-semibold transition-all"
                 >
-                  {resetConfirm ? '❓ ТОЧНО СБРОСИТЬ? НАЖМИТЕ ЕЩЁ РАЗ' : '⚠️ СБРОСИТЬ ВЕСЬ ПРОГРЕСС'}
+                  {resetConfirm ? t.saveResetConfirm : t.saveResetBtn}
                 </button>
               </div>
             </div>

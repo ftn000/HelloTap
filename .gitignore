@@ -2,6 +2,7 @@
 node_modules/
 dist/
 dist-ssr/
+*.zip
 *.local
 npm-debug.log*
 yarn-debug.log*

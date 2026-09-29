@@ -5,16 +5,47 @@
 class SoundEngine {
   private ctx: AudioContext | null = null;
   public isMuted: boolean = false;
+  private isTabVisible: boolean = true;
+
+  constructor() {
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          this.isTabVisible = false;
+          if (this.ctx && this.ctx.state === 'running') {
+            this.ctx.suspend();
+          }
+        } else {
+          this.isTabVisible = true;
+          if (this.ctx && this.ctx.state === 'suspended' && !this.isMuted) {
+            this.ctx.resume();
+          }
+        }
+      });
+
+      window.addEventListener('blur', () => {
+        if (this.ctx && this.ctx.state === 'running') {
+          this.ctx.suspend();
+        }
+      });
+
+      window.addEventListener('focus', () => {
+        if (this.ctx && this.ctx.state === 'suspended' && !this.isMuted && this.isTabVisible) {
+          this.ctx.resume();
+        }
+      });
+    }
+  }
 
   private getContext(): AudioContext | null {
-    if (this.isMuted) return null;
+    if (this.isMuted || !this.isTabVisible) return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
       }
     }
-    if (this.ctx && this.ctx.state === 'suspended') {
+    if (this.ctx && this.ctx.state === 'suspended' && this.isTabVisible) {
       this.ctx.resume();
     }
     return this.ctx;

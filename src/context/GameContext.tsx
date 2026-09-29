@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { ShopUpgrade, StudioSystem, GameSaveData, HubCategoryType } from '../types/game';
 import { sounds } from '../utils/soundEffects';
 import { yandexSdk } from '../utils/yandexSdk';
+import { Language, TranslationDictionary, TRANSLATIONS, detectInitialLanguage } from '../utils/i18n';
 
 const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
@@ -225,6 +226,9 @@ const INITIAL_SYSTEMS: StudioSystem[] = [
 const LOCAL_STORAGE_KEY = "HELLOTAP_WEB_SAVE_V2";
 
 interface GameContextType {
+  lang: Language;
+  setLang: (l: Language) => void;
+  t: TranslationDictionary;
   codeLines: number;
   money: number;
   totalCodeEver: number;
@@ -271,6 +275,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [timeWarpCooldown, setTimeWarpCooldown] = useState<number>(0);
   const [adBoostEndTime, setAdBoostEndTime] = useState<number>(0);
   const [switchType, setSwitchTypeState] = useState<'blue' | 'red' | 'brown' | 'laser'>('blue');
+  const [lang, setLangState] = useState<Language>(detectInitialLanguage());
+  const t = TRANSLATIONS[lang];
+
+  const setLang = (l: Language) => {
+    setLangState(l);
+    try {
+      localStorage.setItem("HELLOTAP_LANG", l);
+    } catch {}
+  };
 
   const setSwitchType = (t: 'blue' | 'red' | 'brown' | 'laser') => {
     setSwitchTypeState(t);
@@ -606,6 +619,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <GameContext.Provider
       value={{
+        lang,
+        setLang,
+        t,
         codeLines,
         money,
         totalCodeEver,
