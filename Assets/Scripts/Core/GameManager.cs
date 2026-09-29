@@ -265,7 +265,10 @@ public class GameManager : MonoBehaviour
         double shelfIncomeMult = DeskCollectiblesShelfUI.Instance != null ? DeskCollectiblesShelfUI.Instance.GetCollectiblesIncomeMultiplier() : 1.0;
         double cicdIncomeMult = AutomatedCICDBotUI.Instance != null ? AutomatedCICDBotUI.Instance.GetCICDIncomeMultiplier() : 1.0;
         double festivalMult = CommunityHypeFestivalUI.Instance != null ? CommunityHypeFestivalUI.Instance.GetHypeFestivalMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult;
+        double spatialMult = SpatialComputingLabUI.Instance != null ? SpatialComputingLabUI.Instance.GetSpatialIncomeMultiplier() : 1.0;
+        double esportsMult = EsportsTeamManagerUI.Instance != null ? EsportsTeamManagerUI.Instance.GetEsportsIncomeMultiplier() : 1.0;
+        double museumMult = HallOfFameMuseumUI.Instance != null ? HallOfFameMuseumUI.Instance.GetMuseumIncomeMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult;
     }
 
     /// <summary>
@@ -288,7 +291,10 @@ public class GameManager : MonoBehaviour
         double syndicateClickMult = IndieDevSyndicateUI.Instance != null ? IndieDevSyndicateUI.Instance.GetSyndicateClickMultiplier() : 1.0;
         double shelfClickMult = DeskCollectiblesShelfUI.Instance != null ? DeskCollectiblesShelfUI.Instance.GetCollectiblesClickMultiplier() : 1.0;
         double cicdClickMult = AutomatedCICDBotUI.Instance != null ? AutomatedCICDBotUI.Instance.GetCICDClickMultiplier() : 1.0;
-        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult;
+        double spatialClickMult = SpatialComputingLabUI.Instance != null ? SpatialComputingLabUI.Instance.GetSpatialClickMultiplier() : 1.0;
+        double esportsClickMult = EsportsTeamManagerUI.Instance != null ? EsportsTeamManagerUI.Instance.GetEsportsClickMultiplier() : 1.0;
+        double museumClickMult = HallOfFameMuseumUI.Instance != null ? HallOfFameMuseumUI.Instance.GetMuseumClickMultiplier() : 1.0;
+        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult;
     }
 
     private double screensaverMultiplier = 1.0;
