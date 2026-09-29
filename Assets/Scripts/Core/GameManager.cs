@@ -279,7 +279,10 @@ public class GameManager : MonoBehaviour
         double aiMult = AutonomousAiAgentsUI.Instance != null ? AutonomousAiAgentsUI.Instance.GetAiIncomeMultiplier() : 1.0;
         double storeMult = AssetStoreMarketplaceUI.Instance != null ? AssetStoreMarketplaceUI.Instance.GetMarketplaceIncomeMultiplier() : 1.0;
         double gotyMult = GotyAwardsGalaUI.Instance != null ? GotyAwardsGalaUI.Instance.GetGotyIncomeMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult * cdnMult * bpMult * cryptoMult * academyMult * raidMult * ergoMult * pitchMult * patentMult * aiMult * storeMult * gotyMult;
+        double satMult = OrbitalSatelliteUplinkUI.Instance != null ? OrbitalSatelliteUplinkUI.Instance.GetSatelliteIncomeMultiplier() : 1.0;
+        double ventureMult = VentureCapitalFundUI.Instance != null ? VentureCapitalFundUI.Instance.GetVentureIncomeMultiplier() : 1.0;
+        double holoMult = HolographicKeynoteUI.Instance != null ? HolographicKeynoteUI.Instance.GetHoloIncomeMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult * cdnMult * bpMult * cryptoMult * academyMult * raidMult * ergoMult * pitchMult * patentMult * aiMult * storeMult * gotyMult * satMult * ventureMult * holoMult;
     }
 
     /// <summary>
@@ -314,7 +317,10 @@ public class GameManager : MonoBehaviour
         double aiClickMult = AutonomousAiAgentsUI.Instance != null ? AutonomousAiAgentsUI.Instance.GetAiClickMultiplier() : 1.0;
         double storeClickMult = AssetStoreMarketplaceUI.Instance != null ? AssetStoreMarketplaceUI.Instance.GetMarketplaceClickMultiplier() : 1.0;
         double gotyClickMult = GotyAwardsGalaUI.Instance != null ? GotyAwardsGalaUI.Instance.GetGotyClickMultiplier() : 1.0;
-        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult * cdnClickMult * bpClickMult * academyClickMult * raidClickMult * ergoClickMult * patentClickMult * aiClickMult * storeClickMult * gotyClickMult;
+        double satClickMult = OrbitalSatelliteUplinkUI.Instance != null ? OrbitalSatelliteUplinkUI.Instance.GetSatelliteClickMultiplier() : 1.0;
+        double ventureClickMult = VentureCapitalFundUI.Instance != null ? VentureCapitalFundUI.Instance.GetVentureClickMultiplier() : 1.0;
+        double holoClickMult = HolographicKeynoteUI.Instance != null ? HolographicKeynoteUI.Instance.GetHoloClickMultiplier() : 1.0;
+        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult * cdnClickMult * bpClickMult * academyClickMult * raidClickMult * ergoClickMult * patentClickMult * aiClickMult * storeClickMult * gotyClickMult * satClickMult * ventureClickMult * holoClickMult;
     }
 
     private double screensaverMultiplier = 1.0;
@@ -343,6 +349,8 @@ public class GameManager : MonoBehaviour
         staffBonus += academyBonus;
         double aiBonus = AutonomousAiAgentsUI.Instance != null ? AutonomousAiAgentsUI.Instance.GetAiCodePerSec() : 0.0;
         staffBonus += aiBonus;
+        double ventureBonus = VentureCapitalFundUI.Instance != null ? VentureCapitalFundUI.Instance.GetVentureCodePerSec() : 0.0;
+        staffBonus += ventureBonus;
 
         if (screensaverMultiplier > 1.0 && staffBonus < 1.0)
         {
@@ -366,6 +374,8 @@ public class GameManager : MonoBehaviour
         }
         double storeBonus = AssetStoreMarketplaceUI.Instance != null ? AssetStoreMarketplaceUI.Instance.GetMarketplaceMoneyPerSec() : 0.0;
         moneyIncome += storeBonus;
+        double satBonus = OrbitalSatelliteUplinkUI.Instance != null ? OrbitalSatelliteUplinkUI.Instance.GetSatelliteMoneyPerSec() : 0.0;
+        moneyIncome += satBonus;
         double streakMult = DailyStreakUI.Instance != null ? DailyStreakUI.Instance.GetStreakMultiplier() : 1.0;
         double realEstateMult = StudioRealEstateUI.Instance != null ? StudioRealEstateUI.Instance.GetIncomeMultiplier() : 1.0;
         double steamBadgeMult = SteamTradingCardsUI.Instance != null ? SteamTradingCardsUI.Instance.GetBadgeMultiplier() : 1.0;
@@ -375,7 +385,10 @@ public class GameManager : MonoBehaviour
         double aiMult = AutonomousAiAgentsUI.Instance != null ? AutonomousAiAgentsUI.Instance.GetAiIncomeMultiplier() : 1.0;
         double storeMult = AssetStoreMarketplaceUI.Instance != null ? AssetStoreMarketplaceUI.Instance.GetMarketplaceIncomeMultiplier() : 1.0;
         double gotyMult = GotyAwardsGalaUI.Instance != null ? GotyAwardsGalaUI.Instance.GetGotyIncomeMultiplier() : 1.0;
-        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * aiMult * storeMult * gotyMult;
+        double satMult = OrbitalSatelliteUplinkUI.Instance != null ? OrbitalSatelliteUplinkUI.Instance.GetSatelliteIncomeMultiplier() : 1.0;
+        double ventureMult = VentureCapitalFundUI.Instance != null ? VentureCapitalFundUI.Instance.GetVentureIncomeMultiplier() : 1.0;
+        double holoMult = HolographicKeynoteUI.Instance != null ? HolographicKeynoteUI.Instance.GetHoloIncomeMultiplier() : 1.0;
+        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * aiMult * storeMult * gotyMult * satMult * ventureMult * holoMult;
     }
 
     /// <summary>
