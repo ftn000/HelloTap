@@ -45,8 +45,9 @@ namespace HelloTap.Editor
 
             // 2. Configure Player & WebGL Settings
             PlayerSettings.WebGL.template = "PROJECT:MobilePortrait";
-            PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled; // Uncompressed for universal compatibility without custom headers
+            PlayerSettings.WebGL.compressionFormat = isDevelopment ? WebGLCompressionFormat.Disabled : WebGLCompressionFormat.Brotli;
             PlayerSettings.WebGL.decompressionFallback = true;
+            PlayerSettings.stripEngineCode = true;
             PlayerSettings.defaultWebScreenWidth = 540;
             PlayerSettings.defaultWebScreenHeight = 960;
             PlayerSettings.runInBackground = true;

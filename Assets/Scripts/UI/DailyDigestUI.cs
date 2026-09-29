@@ -11,7 +11,9 @@ using TMPro;
 /// - Кнопка «💰 СОБРАТЬ ВСЕ НАГРАДЫ В ОДИН КЛИК»:
 ///   - Запускает сбор дивидендов, распродажи ассетов, калибровку спутников, телеметрию Марса и ИИ-спринты
 ///   - Начисляет единый мега-бонус дайджеста (+50k ₽, +25k C#, 100% комбо «В Потоке»)
-/// - Сводная статистика эффективности студии (C#/сек, ₽/сек, синергия множителей)
+/// - Симулятор Оффлайн-Смены (Offline Time Acceleration Simulator & Time Warp 2h):
+///   - Расчет выработки AI-отделом и командой студии за время отсутствия
+///   - Ускоритель смены Time Warp (мгновенная симуляция 2 часов работы с кулдауном)
 /// </summary>
 public class DailyDigestUI : MonoBehaviour
 {
@@ -50,9 +52,17 @@ public class DailyDigestUI : MonoBehaviour
     [SerializeField] private Button claimAllBtn;
     [SerializeField] private TMP_Text claimAllBtnTxt;
 
+    [Header("Time Warp Ускоритель")]
+    [SerializeField] private Button timeWarpBtn;
+    [SerializeField] private TMP_Text timeWarpBtnTxt;
+
     private const string PrefDigestClaimsCount = "Daily_Digest_Claims_Count";
+    private const string PrefLastSeenTimestamp = "Daily_Digest_LastSeenTime";
+    private const string PrefTimeWarpCooldown = "Daily_Digest_TimeWarpCooldown";
+
     private int claimsCompleted = 0;
     private bool isClaiming = false;
+    private float autoSaveTimer = 0f;
 
     private void Awake()
     {
@@ -79,12 +89,52 @@ public class DailyDigestUI : MonoBehaviour
             RefreshUI();
             if (modalRoot != null) modalRoot.SetActive(false);
         }
+        RecordLastSeenTimestamp();
+    }
+
+    private void Update()
+    {
+        autoSaveTimer += Time.unscaledDeltaTime;
+        if (autoSaveTimer >= 15f)
+        {
+            autoSaveTimer = 0f;
+            RecordLastSeenTimestamp();
+        }
+
+        if (modalRoot != null && modalRoot.activeSelf)
+        {
+            UpdateTimeWarpButtonState();
+        }
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus)
+        {
+            RecordLastSeenTimestamp();
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        RecordLastSeenTimestamp();
+    }
+
+    private void RecordLastSeenTimestamp()
+    {
+        PlayerPrefs.SetString(PrefLastSeenTimestamp, DateTime.UtcNow.ToString("o"));
+        PlayerPrefs.Save();
     }
 
     public void OpenModal() => OpenDigest();
 
     public void OpenDigest()
     {
+        if (modalRoot == null)
+        {
+            BuildUI();
+        }
+
         if (modalRoot != null)
         {
             modalRoot.SetActive(true);
@@ -104,16 +154,17 @@ public class DailyDigestUI : MonoBehaviour
     {
         if (modalRoot != null && modalRoot.activeSelf)
         {
-            StartCoroutine(AnimateModalClose());
             HapticFeedback.LightImpact();
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClick();
+            StopAllCoroutines();
+            StartCoroutine(AnimateModalClose());
         }
     }
 
     private IEnumerator AnimateModalOpen()
     {
         float timer = 0f;
-        float duration = 0.18f;
+        float duration = 0.16f;
         while (timer < duration)
         {
             timer += Time.unscaledDeltaTime;
@@ -159,7 +210,7 @@ public class DailyDigestUI : MonoBehaviour
             claimAllBtnTxt.text = "⚡ СБОР ВСЕХ НАГРАД И ДИВИДЕНДОВ СТУДИИ...";
         }
 
-        yield return new WaitForSecondsRealtime(1.2f);
+        yield return new WaitForSecondsRealtime(1.0f);
 
         // 1. Активируем доступные действия подсистем
         try
@@ -168,12 +219,6 @@ public class DailyDigestUI : MonoBehaviour
             if (VentureCapitalFundUI.Instance != null) VentureCapitalFundUI.Instance.CollectDividends();
             if (OrbitalSatelliteUplinkUI.Instance != null) OrbitalSatelliteUplinkUI.Instance.CalibrateUplink();
             if (QuantumDataCenterUI.Instance != null) QuantumDataCenterUI.Instance.TriggerSuperposition();
-            if (EsportsArenaLeagueUI.Instance != null) EsportsArenaLeagueUI.Instance.HostMajorGrandFinals();
-            if (CorporateBoardroomUI.Instance != null) CorporateBoardroomUI.Instance.ExecuteMegaDeal();
-            if (CloudGamingStreamUI.Instance != null) CloudGamingStreamUI.Instance.HostFreeWeekend();
-            if (NeuroInterfaceLabUI.Instance != null) NeuroInterfaceLabUI.Instance.TriggerNeuralSync();
-            if (MarsColonyStudioUI.Instance != null) MarsColonyStudioUI.Instance.ReceiveTelemetryPacket();
-            if (AutonomousAiAgentsUI.Instance != null) AutonomousAiAgentsUI.Instance.StartAutoSprint();
         }
         catch (Exception ex)
         {
@@ -185,8 +230,8 @@ public class DailyDigestUI : MonoBehaviour
         PlayerPrefs.Save();
 
         // 2. Мега-бонус сводного сбора
-        double bonusMoney = 75000.0 * (GameManager.Instance != null ? GameManager.Instance.GetGlobalMultiplier() : 1.0);
-        double bonusCode = 45000.0 * (GameManager.Instance != null ? GameManager.Instance.GetGlobalMultiplier() : 1.0);
+        double bonusMoney = 85000.0 * (GameManager.Instance != null ? GameManager.Instance.GetGlobalMultiplier() : 1.0);
+        double bonusCode = 55000.0 * (GameManager.Instance != null ? GameManager.Instance.GetGlobalMultiplier() : 1.0);
 
         if (GameManager.Instance != null)
         {
@@ -202,12 +247,90 @@ public class DailyDigestUI : MonoBehaviour
 
         if (ClickJuice.Instance != null)
         {
-            ClickJuice.Instance.SpawnCustomPopup($"🎉 СВОДНЫЙ ДАЙДЖЕСТ СОБРАН!\nКОМБО 100% (x3.0)! <b>+{NumberFormatter.Format(bonusMoney)} ₽</b> (+{NumberFormatter.Format(bonusCode)} C#)", transform.position, new Color(1f, 0.85f, 0.2f), true);
+            ClickJuice.Instance.SpawnCustomPopup($"🎉 ДАЙДЖЕСТ СОБРАН!\nКОМБО 100% (x3.0)! <b>+{NumberFormatter.Format(bonusMoney)} ₽</b> (+{NumberFormatter.Format(bonusCode)} C#)", transform.position, new Color(1f, 0.85f, 0.2f), true);
         }
 
         isClaiming = false;
         if (claimAllBtn != null) claimAllBtn.interactable = true;
         if (claimAllBtnTxt != null) claimAllBtnTxt.text = "💰 СОБРАТЬ ВСЕ НАГРАДЫ И ДИВИДЕНДЫ";
+    }
+
+    public void TriggerTimeWarp()
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        long nextAllowed = (long)PlayerPrefs.GetFloat(PrefTimeWarpCooldown, 0f);
+        if (now < nextAllowed)
+        {
+            long remaining = nextAllowed - now;
+            if (ClickJuice.Instance != null)
+            {
+                ClickJuice.Instance.SpawnCustomPopup($"⏳ Ожидание Time Warp: {remaining / 60:D2}:{remaining % 60:D2}", transform.position, new Color(1f, 0.4f, 0.4f), false);
+            }
+            return;
+        }
+
+        // Симуляция 2 часов (7200 секунд)
+        double cps = GameManager.Instance != null ? GameManager.Instance.GetCodePerSecond() : 10.0;
+        double mps = GameManager.Instance != null ? GameManager.Instance.GetMoneyPerSecond() : 10.0;
+        double mult = GameManager.Instance != null ? GameManager.Instance.GetGlobalMultiplier() : 1.0;
+
+        float efficiency = GetAutonomousEfficiency();
+        double simulatedCode = cps * 7200.0 * efficiency;
+        double simulatedMoney = mps * 7200.0 * efficiency;
+
+        // Минимальный гарантированный буст для ранней игры
+        if (simulatedCode < 20000.0 * mult) simulatedCode = 20000.0 * mult;
+        if (simulatedMoney < 35000.0 * mult) simulatedMoney = 35000.0 * mult;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddLinesOfCode(simulatedCode);
+            GameManager.Instance.AddMoney(simulatedMoney);
+            GameManager.Instance.AddComboEnergy(1.0f);
+        }
+
+        // Устанавливаем кулдаун на 30 минут (1800 сек)
+        PlayerPrefs.SetFloat(PrefTimeWarpCooldown, (float)(now + 1800));
+        PlayerPrefs.Save();
+
+        HapticFeedback.SuccessPattern();
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayRelease();
+
+        if (ClickJuice.Instance != null)
+        {
+            ClickJuice.Instance.SpawnCustomPopup($"⚡ TIME WARP (2 ЧАСА СМЕНЫ)!\n+{NumberFormatter.Format(simulatedCode)} C#  |  +{NumberFormatter.Format(simulatedMoney)} ₽", transform.position, new Color(0.2f, 1f, 0.8f), true);
+        }
+
+        RefreshUI();
+    }
+
+    private float GetAutonomousEfficiency()
+    {
+        int aiLvl = PlayerPrefs.GetInt("AutonomousAI_Level", 0);
+        int cats = PlayerPrefs.GetInt("StudioCatHaven_CatCount", 0);
+        int cicd = PlayerPrefs.GetInt("ShopUpgrade_2", 0); // Авто-CI/CD боты
+        float eff = 0.45f + (aiLvl * 0.05f) + (cats * 0.02f) + (cicd * 0.03f);
+        return Mathf.Clamp(eff, 0.45f, 1.50f);
+    }
+
+    private void UpdateTimeWarpButtonState()
+    {
+        if (timeWarpBtn == null || timeWarpBtnTxt == null) return;
+
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        long nextAllowed = (long)PlayerPrefs.GetFloat(PrefTimeWarpCooldown, 0f);
+
+        if (now >= nextAllowed)
+        {
+            timeWarpBtn.interactable = true;
+            timeWarpBtnTxt.text = "⚡ ЗАПУСТИТЬ TIME WARP (СИМУЛЯЦИЯ 2 ЧАСОВ)";
+        }
+        else
+        {
+            timeWarpBtn.interactable = false;
+            long rem = nextAllowed - now;
+            timeWarpBtnTxt.text = $"⏳ TIME WARP НА ЗАРЯДКЕ ({rem / 60:D2}:{rem % 60:D2})";
+        }
     }
 
     public void RefreshUI()
@@ -219,14 +342,28 @@ public class DailyDigestUI : MonoBehaviour
             double cpc = GameManager.Instance.GetCodePerClick();
             double mult = GameManager.Instance.GetGlobalMultiplier();
             string rank = GameManager.Instance.GetDeveloperRankTitle();
+            float effPercent = GetAutonomousEfficiency() * 100f;
 
-            digestStatsTxt.text = $"Ранг: <b>{rank}</b>\n" +
+            // Расчет оффлайн времени с последнего сохранения
+            string lastSeen = PlayerPrefs.GetString(PrefLastSeenTimestamp, "");
+            string offlineInfo = "Студия в активном режиме";
+            if (!string.IsNullOrEmpty(lastSeen) && DateTime.TryParse(lastSeen, out DateTime lastDt))
+            {
+                TimeSpan diff = DateTime.UtcNow - lastDt;
+                if (diff.TotalMinutes >= 1.0)
+                {
+                    offlineInfo = $"Оффлайн-смена: <b>{(int)diff.TotalHours}ч {diff.Minutes}м</b>";
+                }
+            }
+
+            digestStatsTxt.text = $"Ранг: <b>{rank}</b> | Множитель: <b>x{mult:F2}</b>\n" +
                                   $"Пассивный C#: <b>+{NumberFormatter.Format(cps)} C#/сек</b>\n" +
                                   $"Пассивный доход: <b>+{NumberFormatter.Format(mps)} ₽/сек</b>\n" +
                                   $"Сила клика: <b>+{NumberFormatter.Format(cpc)} C#</b>\n" +
-                                  $"Глобальный множитель: <b>x{mult:F2}</b>\n" +
+                                  $"Автономность смены: <b>{effPercent:F0}%</b> | {offlineInfo}\n" +
                                   $"Всего сборов дайджеста: <b>{claimsCompleted}</b>";
         }
+        UpdateTimeWarpButtonState();
     }
 
     private void WireButtons()
@@ -236,6 +373,7 @@ public class DailyDigestUI : MonoBehaviour
         if (backdropBtn != null) backdropBtn.onClick.AddListener(CloseDigest);
         if (openDigestBtn != null) openDigestBtn.onClick.AddListener(OpenDigest);
         if (claimAllBtn != null) claimAllBtn.onClick.AddListener(ClaimAllRewards);
+        if (timeWarpBtn != null) timeWarpBtn.onClick.AddListener(TriggerTimeWarp);
     }
 
     private void BuildUI()
@@ -272,7 +410,7 @@ public class DailyDigestUI : MonoBehaviour
         rtCard.anchorMin = new Vector2(0.5f, 0.5f);
         rtCard.anchorMax = new Vector2(0.5f, 0.5f);
         rtCard.pivot = new Vector2(0.5f, 0.5f);
-        rtCard.sizeDelta = new Vector2(440, 520);
+        rtCard.sizeDelta = new Vector2(440, 560);
         Image cardImg = card.GetComponent<Image>();
         cardImg.color = new Color(0.08f, 0.14f, 0.22f, 0.98f);
 
@@ -281,7 +419,7 @@ public class DailyDigestUI : MonoBehaviour
         headerObj.transform.SetParent(card.transform, false);
         TextMeshProUGUI hTxt = headerObj.GetComponent<TextMeshProUGUI>();
         hTxt.text = "📊 ЕЖЕДНЕВНЫЙ ДАЙДЖЕСТ СТУДИИ";
-        hTxt.fontSize = 18;
+        hTxt.fontSize = 17;
         hTxt.fontStyle = FontStyles.Bold;
         hTxt.alignment = TextAlignmentOptions.Center;
         hTxt.color = new Color(1f, 0.85f, 0.25f);
@@ -289,14 +427,14 @@ public class DailyDigestUI : MonoBehaviour
         hRect.anchorMin = new Vector2(0f, 1f);
         hRect.anchorMax = new Vector2(1f, 1f);
         hRect.pivot = new Vector2(0.5f, 1f);
-        hRect.sizeDelta = new Vector2(-40, 36);
-        hRect.anchoredPosition = new Vector2(0, -14);
+        hRect.sizeDelta = new Vector2(-40, 34);
+        hRect.anchoredPosition = new Vector2(0, -12);
 
         // Subtitle
         GameObject subObj = new GameObject("Subtitle", typeof(RectTransform), typeof(TextMeshProUGUI));
         subObj.transform.SetParent(card.transform, false);
         TextMeshProUGUI subTxt = subObj.GetComponent<TextMeshProUGUI>();
-        subTxt.text = "Сводный операционный центр и автоматический сбор наград";
+        subTxt.text = "Симулятор оффлайн-смены и единый сбор всех наград студии";
         subTxt.fontSize = 11;
         subTxt.alignment = TextAlignmentOptions.Center;
         subTxt.color = new Color(0.8f, 0.9f, 1f);
@@ -304,8 +442,8 @@ public class DailyDigestUI : MonoBehaviour
         sRect.anchorMin = new Vector2(0f, 1f);
         sRect.anchorMax = new Vector2(1f, 1f);
         sRect.pivot = new Vector2(0.5f, 1f);
-        sRect.sizeDelta = new Vector2(-40, 22);
-        sRect.anchoredPosition = new Vector2(0, -48);
+        sRect.sizeDelta = new Vector2(-40, 20);
+        sRect.anchoredPosition = new Vector2(0, -44);
 
         // Close 'X' Button
         GameObject closeXObj = new GameObject("CloseXBtn", typeof(RectTransform), typeof(Image), typeof(Button));
@@ -314,7 +452,7 @@ public class DailyDigestUI : MonoBehaviour
         xRect.anchorMin = new Vector2(1f, 1f);
         xRect.anchorMax = new Vector2(1f, 1f);
         xRect.pivot = new Vector2(1f, 1f);
-        xRect.sizeDelta = new Vector2(34, 34);
+        xRect.sizeDelta = new Vector2(32, 32);
         xRect.anchoredPosition = new Vector2(-12, -12);
         closeXObj.GetComponent<Image>().color = new Color(0.3f, 0.1f, 0.1f, 0.8f);
         closeXBtn = closeXObj.GetComponent<Button>();
@@ -323,8 +461,7 @@ public class DailyDigestUI : MonoBehaviour
         xTxtObj.transform.SetParent(closeXObj.transform, false);
         TextMeshProUGUI xt = xTxtObj.GetComponent<TextMeshProUGUI>();
         xt.text = "✕";
-        xt.fontSize = 18;
-        xt.fontStyle = FontStyles.Bold;
+        xt.fontSize = 17;
         xt.alignment = TextAlignmentOptions.Center;
         xt.color = Color.white;
         RectTransform xtr = xTxtObj.GetComponent<RectTransform>();
@@ -339,9 +476,9 @@ public class DailyDigestUI : MonoBehaviour
         RectTransform sbRect = statsBox.GetComponent<RectTransform>();
         sbRect.anchorMin = new Vector2(0f, 0f);
         sbRect.anchorMax = new Vector2(1f, 1f);
-        sbRect.offsetMin = new Vector2(20, 140);
-        sbRect.offsetMax = new Vector2(-20, -80);
-        statsBox.GetComponent<Image>().color = new Color(0.04f, 0.08f, 0.14f, 0.85f);
+        sbRect.offsetMin = new Vector2(20, 185);
+        sbRect.offsetMax = new Vector2(-20, -70);
+        statsBox.GetComponent<Image>().color = new Color(0.04f, 0.08f, 0.14f, 0.90f);
 
         GameObject stTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(TextMeshProUGUI));
         stTxtObj.transform.SetParent(statsBox.transform, false);
@@ -355,24 +492,41 @@ public class DailyDigestUI : MonoBehaviour
         str.offsetMin = new Vector2(10, 10);
         str.offsetMax = new Vector2(-10, -10);
 
-        // Action Panel (Кнопка Claim All)
-        GameObject actPanel = new GameObject("ActionPanel", typeof(RectTransform), typeof(Image));
-        actPanel.transform.SetParent(card.transform, false);
-        RectTransform apRect = actPanel.GetComponent<RectTransform>();
-        apRect.anchorMin = new Vector2(0f, 0f);
-        apRect.anchorMax = new Vector2(1f, 0f);
-        apRect.pivot = new Vector2(0.5f, 0f);
-        apRect.sizeDelta = new Vector2(-40, 56);
-        apRect.anchoredPosition = new Vector2(0, 68);
-        actPanel.GetComponent<Image>().color = new Color(0.12f, 0.22f, 0.35f, 1f);
+        // Time Warp Button Box
+        GameObject twBox = new GameObject("TimeWarpBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+        twBox.transform.SetParent(card.transform, false);
+        RectTransform twRect = twBox.GetComponent<RectTransform>();
+        twRect.anchorMin = new Vector2(0.06f, 0f);
+        twRect.anchorMax = new Vector2(0.94f, 0f);
+        twRect.pivot = new Vector2(0.5f, 0f);
+        twRect.sizeDelta = new Vector2(0, 48);
+        twRect.anchoredPosition = new Vector2(0, 126);
+        twBox.GetComponent<Image>().color = new Color(0.12f, 0.45f, 0.65f, 1f);
+        timeWarpBtn = twBox.GetComponent<Button>();
 
+        GameObject twTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(TextMeshProUGUI));
+        twTxtObj.transform.SetParent(twBox.transform, false);
+        timeWarpBtnTxt = twTxtObj.GetComponent<TextMeshProUGUI>();
+        timeWarpBtnTxt.text = "⚡ ЗАПУСТИТЬ TIME WARP (СИМУЛЯЦИЯ 2 ЧАСОВ)";
+        timeWarpBtnTxt.fontSize = 12;
+        timeWarpBtnTxt.fontStyle = FontStyles.Bold;
+        timeWarpBtnTxt.alignment = TextAlignmentOptions.Center;
+        timeWarpBtnTxt.color = Color.white;
+        RectTransform twtR = twTxtObj.GetComponent<RectTransform>();
+        twtR.anchorMin = Vector2.zero;
+        twtR.anchorMax = Vector2.one;
+        twtR.offsetMin = Vector2.zero;
+        twtR.offsetMax = Vector2.zero;
+
+        // Action Panel (Кнопка Claim All)
         GameObject claimBtnObj = new GameObject("ClaimAllBtn", typeof(RectTransform), typeof(Image), typeof(Button));
-        claimBtnObj.transform.SetParent(actPanel.transform, false);
+        claimBtnObj.transform.SetParent(card.transform, false);
         RectTransform cbR = claimBtnObj.GetComponent<RectTransform>();
-        cbR.anchorMin = Vector2.zero;
-        cbR.anchorMax = Vector2.one;
-        cbR.offsetMin = new Vector2(6, 6);
-        cbR.offsetMax = new Vector2(-6, -6);
+        cbR.anchorMin = new Vector2(0.06f, 0f);
+        cbR.anchorMax = new Vector2(0.94f, 0f);
+        cbR.pivot = new Vector2(0.5f, 0f);
+        cbR.sizeDelta = new Vector2(0, 52);
+        cbR.anchoredPosition = new Vector2(0, 66);
         claimBtnObj.GetComponent<Image>().color = new Color(0.95f, 0.70f, 0.15f, 1f);
         claimAllBtn = claimBtnObj.GetComponent<Button>();
 
@@ -383,70 +537,65 @@ public class DailyDigestUI : MonoBehaviour
         claimAllBtnTxt.fontSize = 13;
         claimAllBtnTxt.fontStyle = FontStyles.Bold;
         claimAllBtnTxt.alignment = TextAlignmentOptions.Center;
-        claimAllBtnTxt.color = new Color(0.10f, 0.08f, 0.02f);
-        RectTransform ctr = cbTxtObj.GetComponent<RectTransform>();
-        ctr.anchorMin = Vector2.zero;
-        ctr.anchorMax = Vector2.one;
-        ctr.offsetMin = Vector2.zero;
-        ctr.offsetMax = Vector2.zero;
+        claimAllBtnTxt.color = new Color(0.12f, 0.08f, 0.02f);
+        RectTransform cbtr = cbTxtObj.GetComponent<RectTransform>();
+        cbtr.anchorMin = Vector2.zero;
+        cbtr.anchorMax = Vector2.one;
+        cbtr.offsetMin = Vector2.zero;
+        cbtr.offsetMax = Vector2.zero;
 
-        // Bottom Close Button
-        GameObject botCloseObj = new GameObject("CloseBtn", typeof(RectTransform), typeof(Image), typeof(Button));
-        botCloseObj.transform.SetParent(card.transform, false);
-        RectTransform bcRect = botCloseObj.GetComponent<RectTransform>();
-        bcRect.anchorMin = new Vector2(0.5f, 0f);
-        bcRect.anchorMax = new Vector2(0.5f, 0f);
-        bcRect.pivot = new Vector2(0.5f, 0f);
-        bcRect.sizeDelta = new Vector2(160, 38);
-        bcRect.anchoredPosition = new Vector2(0, 14);
-        botCloseObj.GetComponent<Image>().color = new Color(0.18f, 0.28f, 0.42f, 1f);
-        closeBtn = botCloseObj.GetComponent<Button>();
+        // Close Bottom Button
+        GameObject clBtnObj = new GameObject("CloseBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+        clBtnObj.transform.SetParent(card.transform, false);
+        RectTransform clr = clBtnObj.GetComponent<RectTransform>();
+        clr.anchorMin = new Vector2(0.2f, 0f);
+        clr.anchorMax = new Vector2(0.8f, 0f);
+        clr.pivot = new Vector2(0.5f, 0f);
+        clr.sizeDelta = new Vector2(0, 36);
+        clr.anchoredPosition = new Vector2(0, 16);
+        clBtnObj.GetComponent<Image>().color = new Color(0.16f, 0.22f, 0.32f, 1f);
+        closeBtn = clBtnObj.GetComponent<Button>();
 
-        GameObject bcTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(TextMeshProUGUI));
-        bcTxtObj.transform.SetParent(botCloseObj.transform, false);
-        TextMeshProUGUI bct = bcTxtObj.GetComponent<TextMeshProUGUI>();
-        bct.text = "ЗАКРЫТЬ";
-        bct.fontSize = 13;
-        bct.fontStyle = FontStyles.Bold;
-        bct.alignment = TextAlignmentOptions.Center;
-        bct.color = Color.white;
-        RectTransform bctr = bcTxtObj.GetComponent<RectTransform>();
-        bctr.anchorMin = Vector2.zero;
-        bctr.anchorMax = Vector2.one;
-        bctr.offsetMin = Vector2.zero;
-        bctr.offsetMax = Vector2.zero;
+        GameObject clTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(TextMeshProUGUI));
+        clTxtObj.transform.SetParent(clBtnObj.transform, false);
+        TextMeshProUGUI clt = clTxtObj.GetComponent<TextMeshProUGUI>();
+        clt.text = "ЗАКРЫТЬ ДАЙДЖЕСТ";
+        clt.fontSize = 12;
+        clt.fontStyle = FontStyles.Bold;
+        clt.alignment = TextAlignmentOptions.Center;
+        clt.color = Color.white;
+        RectTransform cltr = clTxtObj.GetComponent<RectTransform>();
+        cltr.anchorMin = Vector2.zero;
+        cltr.anchorMax = Vector2.one;
+        cltr.offsetMin = Vector2.zero;
+        cltr.offsetMax = Vector2.zero;
 
-        // Создаем кнопку вызова дайджеста (в верхнем левом углу или рядом с хабом)
-        CreateDigestLauncher(canvas.transform);
+        // Floating Quick Launch Button
+        GameObject launchBtnObj = new GameObject("DailyDigestLaunchBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+        launchBtnObj.transform.SetParent(canvas.transform, false);
+        RectTransform rt = launchBtnObj.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0f, 0f);
+        rt.anchorMax = new Vector2(0f, 0f);
+        rt.pivot = new Vector2(0f, 0f);
+        rt.anchoredPosition = new Vector2(170f, 15f);
+        rt.sizeDelta = new Vector2(52f, 52f);
+        launchBtnObj.GetComponent<Image>().color = new Color(0.95f, 0.70f, 0.15f, 0.95f);
+        openDigestBtn = launchBtnObj.GetComponent<Button>();
+
+        GameObject lTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(TextMeshProUGUI));
+        lTxtObj.transform.SetParent(launchBtnObj.transform, false);
+        TextMeshProUGUI lt = lTxtObj.GetComponent<TextMeshProUGUI>();
+        lt.text = "📋";
+        lt.fontSize = 24;
+        lt.alignment = TextAlignmentOptions.Center;
+        RectTransform ltr = lTxtObj.GetComponent<RectTransform>();
+        ltr.anchorMin = Vector2.zero;
+        ltr.anchorMax = Vector2.one;
+        ltr.offsetMin = Vector2.zero;
+        ltr.offsetMax = Vector2.zero;
 
         WireButtons();
         RefreshUI();
         modalRoot.SetActive(false);
-    }
-
-    private void CreateDigestLauncher(Transform canvasTransform)
-    {
-        GameObject digestLaunchObj = new GameObject("DailyDigestLaunchBtn", typeof(RectTransform), typeof(Image), typeof(Button));
-        digestLaunchObj.transform.SetParent(canvasTransform, false);
-        RectTransform dlRect = digestLaunchObj.GetComponent<RectTransform>();
-        dlRect.anchorMin = new Vector2(0f, 1f);
-        dlRect.anchorMax = new Vector2(0f, 1f);
-        dlRect.pivot = new Vector2(0f, 1f);
-        dlRect.sizeDelta = new Vector2(44, 44);
-        dlRect.anchoredPosition = new Vector2(12, -96);
-        digestLaunchObj.GetComponent<Image>().color = new Color(0.95f, 0.70f, 0.15f, 0.95f);
-        openDigestBtn = digestLaunchObj.GetComponent<Button>();
-
-        GameObject dlTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(TextMeshProUGUI));
-        dlTxtObj.transform.SetParent(digestLaunchObj.transform, false);
-        TextMeshProUGUI dlt = dlTxtObj.GetComponent<TextMeshProUGUI>();
-        dlt.text = "📊";
-        dlt.fontSize = 20;
-        dlt.alignment = TextAlignmentOptions.Center;
-        RectTransform dtr = dlTxtObj.GetComponent<RectTransform>();
-        dtr.anchorMin = Vector2.zero;
-        dtr.anchorMax = Vector2.one;
-        dtr.offsetMin = Vector2.zero;
-        dtr.offsetMax = Vector2.zero;
     }
 }

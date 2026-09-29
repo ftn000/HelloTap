@@ -170,6 +170,18 @@ public class StudioHubNavigationUI : MonoBehaviour
             // --- Вкладка 1: Офис и Команда ---
             new HubSystemEntry
             {
+                id = "sys_saveexport",
+                title = "Облако и Экспорт Сохранений",
+                icon = "💾",
+                category = HubCategory.Office,
+                description = "Резервное копирование и перенос прогресса между устройствами в Base64",
+                reqTotalCode = 0,
+                reqPrestige = 0,
+                reqRankName = "Первокурсник",
+                openAction = () => SaveExportUI.Instance.OpenModal()
+            },
+            new HubSystemEntry
+            {
                 id = "sys_dailydigest",
                 title = "Утренний Дайджест и Сбор Доходов",
                 icon = "📋",
