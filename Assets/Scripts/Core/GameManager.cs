@@ -268,7 +268,9 @@ public class GameManager : MonoBehaviour
         double spatialMult = SpatialComputingLabUI.Instance != null ? SpatialComputingLabUI.Instance.GetSpatialIncomeMultiplier() : 1.0;
         double esportsMult = EsportsTeamManagerUI.Instance != null ? EsportsTeamManagerUI.Instance.GetEsportsIncomeMultiplier() : 1.0;
         double museumMult = HallOfFameMuseumUI.Instance != null ? HallOfFameMuseumUI.Instance.GetMuseumIncomeMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult;
+        double cdnMult = CloudEdgeCdnUI.Instance != null ? CloudEdgeCdnUI.Instance.GetCdnIncomeMultiplier() : 1.0;
+        double bpMult = StudioBattlePassUI.Instance != null ? StudioBattlePassUI.Instance.GetBattlePassIncomeMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult * cdnMult * bpMult;
     }
 
     /// <summary>
@@ -294,7 +296,9 @@ public class GameManager : MonoBehaviour
         double spatialClickMult = SpatialComputingLabUI.Instance != null ? SpatialComputingLabUI.Instance.GetSpatialClickMultiplier() : 1.0;
         double esportsClickMult = EsportsTeamManagerUI.Instance != null ? EsportsTeamManagerUI.Instance.GetEsportsClickMultiplier() : 1.0;
         double museumClickMult = HallOfFameMuseumUI.Instance != null ? HallOfFameMuseumUI.Instance.GetMuseumClickMultiplier() : 1.0;
-        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult;
+        double cdnClickMult = CloudEdgeCdnUI.Instance != null ? CloudEdgeCdnUI.Instance.GetCdnClickMultiplier() : 1.0;
+        double bpClickMult = StudioBattlePassUI.Instance != null ? StudioBattlePassUI.Instance.GetBattlePassClickMultiplier() : 1.0;
+        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult * cdnClickMult * bpClickMult;
     }
 
     private double screensaverMultiplier = 1.0;
@@ -772,9 +776,10 @@ public class GameManager : MonoBehaviour
 
                         if (codeRate > 0 || moneyRate > 0)
                         {
+                            double cdnOfflineMult = CloudEdgeCdnUI.Instance != null ? CloudEdgeCdnUI.Instance.GetCdnOfflineMultiplier() : 1.0;
                             pendingOfflineSeconds = clampedSec;
-                            pendingOfflineCode = Math.Floor(clampedSec * codeRate * 0.5); // 50% эффективности оффлайн
-                            pendingOfflineMoney = Math.Floor(clampedSec * moneyRate * 0.5);
+                            pendingOfflineCode = Math.Floor(clampedSec * codeRate * 0.5 * cdnOfflineMult); // 50% базовой эффективности оффлайн * CDN бонус
+                            pendingOfflineMoney = Math.Floor(clampedSec * moneyRate * 0.5 * cdnOfflineMult);
                         }
                     }
                 }
