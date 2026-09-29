@@ -285,7 +285,10 @@ public class GameManager : MonoBehaviour
         double quantumMult = QuantumDataCenterUI.Instance != null ? QuantumDataCenterUI.Instance.GetQuantumIncomeMultiplier() : 1.0;
         double arenaMult = EsportsArenaLeagueUI.Instance != null ? EsportsArenaLeagueUI.Instance.GetArenaIncomeMultiplier() : 1.0;
         double boardroomMult = CorporateBoardroomUI.Instance != null ? CorporateBoardroomUI.Instance.GetBoardroomIncomeMultiplier() : 1.0;
-        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult * cdnMult * bpMult * cryptoMult * academyMult * raidMult * ergoMult * pitchMult * patentMult * aiMult * storeMult * gotyMult * satMult * ventureMult * holoMult * quantumMult * arenaMult * boardroomMult;
+        double cloudMult = CloudGamingStreamUI.Instance != null ? CloudGamingStreamUI.Instance.GetCloudStreamIncomeMultiplier() : 1.0;
+        double neuroMult = NeuroInterfaceLabUI.Instance != null ? NeuroInterfaceLabUI.Instance.GetNeuroIncomeMultiplier() : 1.0;
+        double marsMult = MarsColonyStudioUI.Instance != null ? MarsColonyStudioUI.Instance.GetMarsIncomeMultiplier() : 1.0;
+        return GetPrestigeMultiplier() * GetAchievementMultiplier() * activeBoostMultiplier * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * engineIncomeMult * trophyMult * securityMult * duckMult * platformDealsMult * syndicateMult * shelfIncomeMult * cicdIncomeMult * festivalMult * spatialMult * esportsMult * museumMult * cdnMult * bpMult * cryptoMult * academyMult * raidMult * ergoMult * pitchMult * patentMult * aiMult * storeMult * gotyMult * satMult * ventureMult * holoMult * quantumMult * arenaMult * boardroomMult * cloudMult * neuroMult * marsMult;
     }
 
     /// <summary>
@@ -326,7 +329,10 @@ public class GameManager : MonoBehaviour
         double quantumClickMult = QuantumDataCenterUI.Instance != null ? QuantumDataCenterUI.Instance.GetQuantumClickMultiplier() : 1.0;
         double arenaClickMult = EsportsArenaLeagueUI.Instance != null ? EsportsArenaLeagueUI.Instance.GetArenaClickMultiplier() : 1.0;
         double boardroomClickMult = CorporateBoardroomUI.Instance != null ? CorporateBoardroomUI.Instance.GetBoardroomClickMultiplier() : 1.0;
-        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult * cdnClickMult * bpClickMult * academyClickMult * raidClickMult * ergoClickMult * patentClickMult * aiClickMult * storeClickMult * gotyClickMult * satClickMult * ventureClickMult * holoClickMult * quantumClickMult * arenaClickMult * boardroomClickMult;
+        double cloudClickMult = CloudGamingStreamUI.Instance != null ? CloudGamingStreamUI.Instance.GetCloudStreamClickMultiplier() : 1.0;
+        double neuroClickMult = NeuroInterfaceLabUI.Instance != null ? NeuroInterfaceLabUI.Instance.GetNeuroClickMultiplier() : 1.0;
+        double marsClickMult = MarsColonyStudioUI.Instance != null ? MarsColonyStudioUI.Instance.GetMarsClickMultiplier() : 1.0;
+        return (baseCodePerClick + hardwareBonus) * GetGlobalMultiplier() * GetComboMultiplier() * workshopClickMult * speedrunMult * engineClickMult * duckClickMult * syndicateClickMult * shelfClickMult * cicdClickMult * spatialClickMult * esportsClickMult * museumClickMult * cdnClickMult * bpClickMult * academyClickMult * raidClickMult * ergoClickMult * patentClickMult * aiClickMult * storeClickMult * gotyClickMult * satClickMult * ventureClickMult * holoClickMult * quantumClickMult * arenaClickMult * boardroomClickMult * cloudClickMult * neuroClickMult * marsClickMult;
     }
 
     private double screensaverMultiplier = 1.0;
@@ -359,6 +365,8 @@ public class GameManager : MonoBehaviour
         staffBonus += ventureBonus;
         double quantumBonus = QuantumDataCenterUI.Instance != null ? QuantumDataCenterUI.Instance.GetQuantumCodePerSec() : 0.0;
         staffBonus += quantumBonus;
+        double neuroBonus = NeuroInterfaceLabUI.Instance != null ? NeuroInterfaceLabUI.Instance.GetNeuroCodePerSec() : 0.0;
+        staffBonus += neuroBonus;
 
         if (screensaverMultiplier > 1.0 && staffBonus < 1.0)
         {
@@ -386,6 +394,8 @@ public class GameManager : MonoBehaviour
         moneyIncome += satBonus;
         double arenaBonus = EsportsArenaLeagueUI.Instance != null ? EsportsArenaLeagueUI.Instance.GetArenaMoneyPerSec() : 0.0;
         moneyIncome += arenaBonus;
+        double cloudBonus = CloudGamingStreamUI.Instance != null ? CloudGamingStreamUI.Instance.GetCloudStreamMoneyPerSec() : 0.0;
+        moneyIncome += cloudBonus;
         double streakMult = DailyStreakUI.Instance != null ? DailyStreakUI.Instance.GetStreakMultiplier() : 1.0;
         double realEstateMult = StudioRealEstateUI.Instance != null ? StudioRealEstateUI.Instance.GetIncomeMultiplier() : 1.0;
         double steamBadgeMult = SteamTradingCardsUI.Instance != null ? SteamTradingCardsUI.Instance.GetBadgeMultiplier() : 1.0;
@@ -401,7 +411,10 @@ public class GameManager : MonoBehaviour
         double quantumMult = QuantumDataCenterUI.Instance != null ? QuantumDataCenterUI.Instance.GetQuantumIncomeMultiplier() : 1.0;
         double arenaMult = EsportsArenaLeagueUI.Instance != null ? EsportsArenaLeagueUI.Instance.GetArenaIncomeMultiplier() : 1.0;
         double boardroomMult = CorporateBoardroomUI.Instance != null ? CorporateBoardroomUI.Instance.GetBoardroomIncomeMultiplier() : 1.0;
-        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * aiMult * storeMult * gotyMult * satMult * ventureMult * holoMult * quantumMult * arenaMult * boardroomMult;
+        double cloudMult = CloudGamingStreamUI.Instance != null ? CloudGamingStreamUI.Instance.GetCloudStreamIncomeMultiplier() : 1.0;
+        double neuroMult = NeuroInterfaceLabUI.Instance != null ? NeuroInterfaceLabUI.Instance.GetNeuroIncomeMultiplier() : 1.0;
+        double marsMult = MarsColonyStudioUI.Instance != null ? MarsColonyStudioUI.Instance.GetMarsIncomeMultiplier() : 1.0;
+        return moneyIncome * GetPrestigeMultiplier() * GetAchievementMultiplier() * streakMult * realEstateMult * steamBadgeMult * techLabMult * catHavenMult * workshopIncomeMult * aiMult * storeMult * gotyMult * satMult * ventureMult * holoMult * quantumMult * arenaMult * boardroomMult * cloudMult * neuroMult * marsMult;
     }
 
     /// <summary>
