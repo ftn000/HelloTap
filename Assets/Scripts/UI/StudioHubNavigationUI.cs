@@ -170,6 +170,18 @@ public class StudioHubNavigationUI : MonoBehaviour
             // --- Вкладка 1: Офис и Команда ---
             new HubSystemEntry
             {
+                id = "sys_dailydigest",
+                title = "Утренний Дайджест и Сбор Доходов",
+                icon = "📋",
+                category = HubCategory.Office,
+                description = "Сводный отчет за сессию и быстрый сбор дивидендов и наград в 1 клик",
+                reqTotalCode = 0,
+                reqPrestige = 0,
+                reqRankName = "Первокурсник",
+                openAction = () => DailyDigestUI.Instance.OpenModal()
+            },
+            new HubSystemEntry
+            {
                 id = "sys_ergo",
                 title = "Эргономика Рабочего Места",
                 icon = "💺",
