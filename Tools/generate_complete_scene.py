@@ -1,6 +1,6 @@
 import os
 
-scene_path = r"C:\HelloTap\Assets\Scenes\SampleScene.unity"
+scene_path = r"C:\github\HelloTap\Assets\Scenes\SampleScene.unity"
 
 # GUID definitions
 GUID_TMP_FONT = "8f586378b4e144a9851e7b34d9b748ee"

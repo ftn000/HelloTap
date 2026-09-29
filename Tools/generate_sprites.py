@@ -2,7 +2,7 @@ import os
 import math
 from PIL import Image, ImageDraw, ImageFont
 
-sprites_dir = r"C:\HelloTap\Assets\Sprites"
+sprites_dir = r"C:\github\HelloTap\Assets\Sprites"
 os.makedirs(sprites_dir, exist_ok=True)
 
 def create_rounded_rect(draw, bbox, radius, fill, outline=None, width=1):

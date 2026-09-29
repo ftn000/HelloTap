@@ -1,6 +1,6 @@
 import os
 
-sprites_dir = r"C:\HelloTap\Assets\Sprites"
+sprites_dir = r"C:\github\HelloTap\Assets\Sprites"
 
 sprite_configs = {
     "spr_desk_mat.png": {"border": "{x: 0, y: 0, z: 0, w: 0}"},

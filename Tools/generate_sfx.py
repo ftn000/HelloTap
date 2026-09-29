@@ -801,7 +801,7 @@ def make_duck_quack(duration=0.28):
         samples.append(val)
     return samples
 
-out_dir = r"C:\HelloTap\Assets\Audio\SFX"
+out_dir = r"C:\github\HelloTap\Assets\Audio\SFX"
 os.makedirs(out_dir, exist_ok=True)
 
 save_wav(os.path.join(out_dir, "click_key1.wav"), make_mech_switch_click("blue"))

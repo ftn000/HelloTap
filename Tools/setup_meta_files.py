@@ -131,7 +131,7 @@ DefaultImporter:
         f.write(content)
     print(f"Created folder meta: {meta_path}")
 
-base = r"C:\HelloTap"
+base = r"C:\github\HelloTap"
 
 # Folders
 create_folder_meta(os.path.join(base, "Assets", "Audio"), "4f1b7c4f1b2d26a4ea963703d6e0cb80")
