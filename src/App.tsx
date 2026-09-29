@@ -7,9 +7,9 @@ import { StudioHubModal } from './components/StudioHubModal';
 
 const GameApp: React.FC = () => {
   const [hubOpen, setHubOpen] = useState<boolean>(false);
-  const [hubTab, setHubTab] = useState<'systems' | 'digest' | 'save'>('systems');
+  const [hubTab, setHubTab] = useState<'systems' | 'digest' | 'prestige' | 'custom' | 'save'>('systems');
 
-  const openHubWithTab = (tab: 'systems' | 'digest' | 'save') => {
+  const openHubWithTab = (tab: 'systems' | 'digest' | 'prestige' | 'custom' | 'save') => {
     setHubTab(tab);
     setHubOpen(true);
   };

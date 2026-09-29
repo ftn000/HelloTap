@@ -20,6 +20,8 @@ class SoundEngine {
     return this.ctx;
   }
 
+  public switchType: 'blue' | 'red' | 'brown' | 'laser' = 'blue';
+
   public playKeyClick(isCrit: boolean = false): void {
     const ctx = this.getContext();
     if (!ctx) return;
@@ -27,19 +29,45 @@ class SoundEngine {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
-    const baseFreq = isCrit ? 880 : 380 + Math.random() * 80;
-    osc.type = isCrit ? 'triangle' : 'sine';
-    osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.3, ctx.currentTime + (isCrit ? 0.12 : 0.04));
+    let baseFreq = 420;
+    let waveType: OscillatorType = 'sine';
+    let duration = 0.04;
 
-    gain.gain.setValueAtTime(isCrit ? 0.35 : 0.2, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (isCrit ? 0.12 : 0.04));
+    switch (this.switchType) {
+      case 'blue': // Clicky & Bright
+        baseFreq = isCrit ? 920 : 540 + Math.random() * 80;
+        waveType = isCrit ? 'triangle' : 'square';
+        duration = isCrit ? 0.12 : 0.035;
+        break;
+      case 'red': // Linear & Soft
+        baseFreq = isCrit ? 700 : 260 + Math.random() * 40;
+        waveType = 'sine';
+        duration = isCrit ? 0.09 : 0.045;
+        break;
+      case 'brown': // Tactile bump
+        baseFreq = isCrit ? 800 : 380 + Math.random() * 60;
+        waveType = 'triangle';
+        duration = isCrit ? 0.10 : 0.04;
+        break;
+      case 'laser': // Cyber Synth
+        baseFreq = isCrit ? 1200 : 750 + Math.random() * 120;
+        waveType = 'sawtooth';
+        duration = isCrit ? 0.15 : 0.05;
+        break;
+    }
+
+    osc.type = waveType;
+    osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.25, ctx.currentTime + duration);
+
+    gain.gain.setValueAtTime(isCrit ? 0.35 : 0.18, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
 
     osc.connect(gain);
     gain.connect(ctx.destination);
 
     osc.start();
-    osc.stop(ctx.currentTime + (isCrit ? 0.12 : 0.04));
+    osc.stop(ctx.currentTime + duration);
   }
 
   public playUpgrade(): void {

@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import { ShopUpgrade, StudioSystem, GameSaveData } from '../types/game';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { ShopUpgrade, StudioSystem, GameSaveData, HubCategoryType } from '../types/game';
 import { sounds } from '../utils/soundEffects';
+import { yandexSdk } from '../utils/yandexSdk';
 
 const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
@@ -47,8 +48,8 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
     baseCostMoney: 900,
     costMultiplier: 1.20,
     codePerClickBonus: 0,
-    codePerSecBonus: 8,
-    moneyPerSecBonus: 12,
+    codePerSecBonus: 12,
+    moneyPerSecBonus: 18,
     multiplierBonus: 0.04
   },
   {
@@ -63,8 +64,8 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
     baseCostMoney: 3800,
     costMultiplier: 1.22,
     codePerClickBonus: 0,
-    codePerSecBonus: 32,
-    moneyPerSecBonus: 45,
+    codePerSecBonus: 45,
+    moneyPerSecBonus: 65,
     multiplierBonus: 0.08
   },
   {
@@ -79,8 +80,8 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
     baseCostMoney: 18000,
     costMultiplier: 1.25,
     codePerClickBonus: 0,
-    codePerSecBonus: 140,
-    moneyPerSecBonus: 210,
+    codePerSecBonus: 180,
+    moneyPerSecBonus: 280,
     multiplierBonus: 0.12
   },
   {
@@ -94,46 +95,36 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
     baseCostCode: 38000,
     baseCostMoney: 95000,
     costMultiplier: 1.28,
-    codePerClickBonus: 20,
-    codePerSecBonus: 650,
-    moneyPerSecBonus: 980,
+    codePerClickBonus: 25,
+    codePerSecBonus: 850,
+    moneyPerSecBonus: 1250,
     multiplierBonus: 0.20
   }
 ];
 
 const INITIAL_SYSTEMS: StudioSystem[] = [
+  // --- 1. ОФИС И КОМАНДА ---
   {
     id: "sys_dailydigest",
     title: "Утренний Дайджест и Сбор Доходов",
     icon: "📋",
     category: "office",
-    description: "Сводный отчет за сессию и сбор наград студии в 1 клик",
+    description: "Сводный отчет за сессию и быстрый сбор наград студии в 1 клик",
     level: 1,
     maxLevel: 1,
     reqCode: 0,
-    bonusDesc: "Автоматический сбор всех бонусов студии"
+    bonusDesc: "Сбор всех дивидендов студии"
   },
   {
     id: "sys_saveexport",
     title: "Облако и Экспорт Сохранений",
     icon: "💾",
     category: "office",
-    description: "Резервное копирование и перенос прогресса в Base64",
+    description: "Резервное копирование и перенос прогресса между устройствами",
     level: 1,
     maxLevel: 1,
     reqCode: 0,
-    bonusDesc: "Синхронизация между устройствами"
-  },
-  {
-    id: "sys_cathaven",
-    title: "Офисный Котоприют",
-    icon: "🐱",
-    category: "culture",
-    description: "Котики-талисманы, антистресс и постоянный пассивный буст",
-    level: 0,
-    maxLevel: 10,
-    reqCode: 2500,
-    bonusDesc: "+5% ко всем доходам за каждого котика"
+    bonusDesc: "Поддержка Яндекс Облака"
   },
   {
     id: "sys_realestate",
@@ -143,8 +134,91 @@ const INITIAL_SYSTEMS: StudioSystem[] = [
     description: "Переезд из гаража в open-space лофт и небоскреб Silicon Tower",
     level: 0,
     maxLevel: 5,
-    reqCode: 8000,
-    bonusDesc: "Новый офис и глобальный множитель x1.5 за уровень"
+    reqCode: 6000,
+    bonusDesc: "+40% к глобальному множителю за уровень"
+  },
+
+  // --- 2. БИЗНЕС И РЫНОК ---
+  {
+    id: "sys_assetstore",
+    title: "Маркетплейс Ассетов",
+    icon: "🏪",
+    category: "business",
+    description: "Публикация шейдеров, 3D-моделей и C#-скриптов на маркетплейс",
+    level: 0,
+    maxLevel: 10,
+    reqCode: 3500,
+    bonusDesc: "+150 ₽/сек пассивных роялти за уровень"
+  },
+  {
+    id: "sys_venture",
+    title: "Венчурные Инвестиции",
+    icon: "💼",
+    category: "business",
+    description: "Питч-сессии перед венчурными фондами Кремниевой Долины",
+    level: 0,
+    maxLevel: 5,
+    reqCode: 15000,
+    bonusDesc: "Гранты инвесторов и +25% к дивидендам"
+  },
+  {
+    id: "sys_merch",
+    title: "Студийный Мерч-Стор",
+    icon: "👕",
+    category: "business",
+    description: "Худи, механические кейкапы и коллекционные фигурки маскотов",
+    level: 0,
+    maxLevel: 8,
+    reqCode: 8500,
+    bonusDesc: "+80 ₽/сек и +5% к клику"
+  },
+
+  // --- 3. ТЕХНОЛОГИИ И ИНФРАСТРУКТУРА ---
+  {
+    id: "sys_satellite",
+    title: "Орбитальный Спутник Uplink",
+    icon: "🛰️",
+    category: "tech",
+    description: "Низкоорбитальная спутниковая связь с минимальным пингом",
+    level: 0,
+    maxLevel: 5,
+    reqCode: 25000,
+    bonusDesc: "+300 C#/сек и ускорение комбо"
+  },
+  {
+    id: "sys_cybersec",
+    title: "Кибербезопасность & Защита",
+    icon: "🛡️",
+    category: "tech",
+    description: "Античит, аппаратный файрвол и аудит уязвимостей смарт-контрактов",
+    level: 0,
+    maxLevel: 6,
+    reqCode: 12000,
+    bonusDesc: "+15% к защите от багов и стабильности"
+  },
+
+  // --- 4. КУЛЬТУРА И КОМАНДА ---
+  {
+    id: "sys_cathaven",
+    title: "Офисный Котоприют",
+    icon: "🐱",
+    category: "culture",
+    description: "Котики-талисманы, антистресс и постоянный пассивный буст",
+    level: 0,
+    maxLevel: 10,
+    reqCode: 2000,
+    bonusDesc: "+6% ко всем доходам за каждого котика"
+  },
+  {
+    id: "sys_esports",
+    title: "Киберспортивная Арена",
+    icon: "🏆",
+    category: "culture",
+    description: "Организация мировых чемпионатов по играм вашей студии",
+    level: 0,
+    maxLevel: 5,
+    reqCode: 35000,
+    bonusDesc: "+500 ₽/сек и +15% к силе клика"
   }
 ];
 
@@ -155,6 +229,7 @@ interface GameContextType {
   money: number;
   totalCodeEver: number;
   prestigeCount: number;
+  prestigeTokens: number;
   comboEnergy: number;
   isInFlow: boolean;
   codePerClick: number;
@@ -165,11 +240,17 @@ interface GameContextType {
   systems: StudioSystem[];
   dailyDigestClaims: number;
   timeWarpRemainingSec: number;
+  adBoostRemainingSec: number;
+  switchType: 'blue' | 'red' | 'brown' | 'laser';
+  setSwitchType: (t: 'blue' | 'red' | 'brown' | 'laser') => void;
   handleClick: (clientX?: number, clientY?: number) => { isCrit: boolean; codeAdded: number; moneyAdded: number };
   buyUpgrade: (id: number) => boolean;
   upgradeSystem: (id: string) => boolean;
   claimDailyDigest: () => { bonusCode: number; bonusMoney: number };
   triggerTimeWarp: () => boolean;
+  triggerPrestigeIPO: () => { gainedTokens: number };
+  watchAdForDoubleBoost: () => void;
+  watchAdForTimeWarpReset: () => void;
   exportSaveBase64: () => string;
   importSaveBase64: (code: string) => boolean;
   hardReset: () => void;
@@ -182,32 +263,74 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [money, setMoney] = useState<number>(100);
   const [totalCodeEver, setTotalCodeEver] = useState<number>(0);
   const [prestigeCount, setPrestigeCount] = useState<number>(0);
+  const [prestigeTokens, setPrestigeTokens] = useState<number>(0);
   const [comboEnergy, setComboEnergy] = useState<number>(0);
   const [upgrades, setUpgrades] = useState<ShopUpgrade[]>(INITIAL_UPGRADES);
   const [systems, setSystems] = useState<StudioSystem[]>(INITIAL_SYSTEMS);
   const [dailyDigestClaims, setDailyDigestClaims] = useState<number>(0);
   const [timeWarpCooldown, setTimeWarpCooldown] = useState<number>(0);
+  const [adBoostEndTime, setAdBoostEndTime] = useState<number>(0);
+  const [switchType, setSwitchTypeState] = useState<'blue' | 'red' | 'brown' | 'laser'>('blue');
+
+  const setSwitchType = (t: 'blue' | 'red' | 'brown' | 'laser') => {
+    setSwitchTypeState(t);
+    sounds.switchType = t;
+    sounds.playKeyClick(true);
+  };
 
   const isInFlow = comboEnergy >= 1.0;
+  const isAdBoostActive = Date.now() < adBoostEndTime;
+  const adBoostMultiplier = isAdBoostActive ? 2.0 : 1.0;
+
+  // Инициализация Yandex Games SDK
+  useEffect(() => {
+    yandexSdk.init().then(() => {
+      // Пытаемся загрузить облачные сохранения Яндекс Игр
+      yandexSdk.loadFromCloud("hellotap_save").then((cloudData) => {
+        if (cloudData && typeof cloudData === 'object') {
+          const cd = cloudData as GameSaveData;
+          if (cd.codeLines !== undefined && cd.codeLines > codeLines) {
+            setCodeLines(cd.codeLines);
+            if (cd.money) setMoney(cd.money);
+            if (cd.totalCodeEver) setTotalCodeEver(cd.totalCodeEver);
+            if (cd.prestigeCount) setPrestigeCount(cd.prestigeCount);
+            if (cd.prestigeTokens) setPrestigeTokens(cd.prestigeTokens);
+          }
+        }
+      });
+    });
+  }, []);
 
   // Расчет множителей и доходов
-  const globalMultiplier = 1.0 + (prestigeCount * 0.25) + 
+  const globalMultiplier = (
+    1.0 + 
+    (prestigeCount * 0.5) + 
+    (prestigeTokens * 0.05) +
     upgrades.reduce((acc, u) => acc + (u.level * u.multiplierBonus), 0) +
-    (systems.find(s => s.id === 'sys_cathaven')?.level || 0) * 0.05 +
-    (systems.find(s => s.id === 'sys_realestate')?.level || 0) * 0.5;
+    (systems.find(s => s.id === 'sys_cathaven')?.level || 0) * 0.06 +
+    (systems.find(s => s.id === 'sys_realestate')?.level || 0) * 0.40 +
+    (systems.find(s => s.id === 'sys_esports')?.level || 0) * 0.15 +
+    (systems.find(s => s.id === 'sys_cybersec')?.level || 0) * 0.10
+  ) * adBoostMultiplier;
 
   const flowMultiplier = isInFlow ? 3.0 : 1.0;
 
-  const baseCpc = 1 + upgrades.reduce((acc, u) => acc + (u.level * u.codePerClickBonus), 0);
+  const baseCpc = 1 + 
+    upgrades.reduce((acc, u) => acc + (u.level * u.codePerClickBonus), 0) +
+    (systems.find(s => s.id === 'sys_merch')?.level || 0) * 2;
   const codePerClick = baseCpc * globalMultiplier * flowMultiplier;
 
-  const baseCps = upgrades.reduce((acc, u) => acc + (u.level * u.codePerSecBonus), 0);
+  const baseCps = upgrades.reduce((acc, u) => acc + (u.level * u.codePerSecBonus), 0) +
+    (systems.find(s => s.id === 'sys_satellite')?.level || 0) * 300;
   const codePerSec = baseCps * globalMultiplier * flowMultiplier;
 
-  const baseMps = upgrades.reduce((acc, u) => acc + (u.level * u.moneyPerSecBonus), 0);
+  const baseMps = upgrades.reduce((acc, u) => acc + (u.level * u.moneyPerSecBonus), 0) +
+    (systems.find(s => s.id === 'sys_assetstore')?.level || 0) * 150 +
+    (systems.find(s => s.id === 'sys_merch')?.level || 0) * 80 +
+    (systems.find(s => s.id === 'sys_esports')?.level || 0) * 500;
   const moneyPerSec = baseMps * globalMultiplier * flowMultiplier;
 
-  // Загрузка сохранения из LocalStorage
+  // Загрузка локальных сохранений
   useEffect(() => {
     try {
       const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -217,8 +340,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.money) setMoney(data.money);
         if (data.totalCodeEver) setTotalCodeEver(data.totalCodeEver);
         if (data.prestigeCount) setPrestigeCount(data.prestigeCount);
+        if (data.prestigeTokens) setPrestigeTokens(data.prestigeTokens);
         if (data.dailyDigestClaims) setDailyDigestClaims(data.dailyDigestClaims);
         if (data.timeWarpCooldown) setTimeWarpCooldown(data.timeWarpCooldown);
+        if (data.switchType) {
+          setSwitchTypeState(data.switchType);
+          sounds.switchType = data.switchType;
+        }
 
         if (data.upgrades) {
           setUpgrades(prev => prev.map(u => ({
@@ -233,9 +361,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           })));
         }
 
-        // Оффлайн доход
         if (data.lastSeenTime) {
-          const offlineSec = Math.min((Date.now() - data.lastSeenTime) / 1000, 43200); // макс 12 часов
+          const offlineSec = Math.min((Date.now() - data.lastSeenTime) / 1000, 43200);
           if (offlineSec > 10) {
             const offCode = baseCps * globalMultiplier * offlineSec * 0.45;
             const offMoney = baseMps * globalMultiplier * offlineSec * 0.40;
@@ -249,25 +376,28 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Сохранение в LocalStorage
+  // Сохранение в LocalStorage и Яндекс Облако
   useEffect(() => {
     const save = () => {
       const data: GameSaveData = {
         game: "HelloTap",
-        version: "2.0.0",
+        version: "2.1.0",
         timestamp: new Date().toISOString(),
         codeLines,
         money,
         totalCodeEver,
         prestigeCount,
-        prestigeTokens: 0,
+        prestigeTokens,
         upgrades: upgrades.reduce((acc, u) => ({ ...acc, [u.id]: u.level }), {}),
         systems: systems.reduce((acc, s) => ({ ...acc, [s.id]: s.level }), {}),
         lastSeenTime: Date.now(),
         timeWarpCooldown,
-        dailyDigestClaims
+        dailyDigestClaims,
+        switchType
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+      yandexSdk.saveToCloud("hellotap_save", data);
+      yandexSdk.submitLeaderboardScore(totalCodeEver);
     };
 
     const interval = setInterval(save, 5000);
@@ -276,9 +406,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearInterval(interval);
       window.removeEventListener("beforeunload", save);
     };
-  }, [codeLines, money, totalCodeEver, prestigeCount, upgrades, systems, timeWarpCooldown, dailyDigestClaims]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType]);
 
-  // Основной игровой цикл (10 тиков в секунду)
+  // Основной цикл
   useEffect(() => {
     const interval = setInterval(() => {
       const dt = 0.1;
@@ -290,7 +420,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setMoney(m => m + moneyPerSec * dt);
       }
 
-      // Спад комбо
       setComboEnergy(energy => {
         if (energy <= 0) return 0;
         const decayRate = energy >= 1.0 ? 0.08 : 0.04;
@@ -301,7 +430,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => clearInterval(interval);
   }, [codePerSec, moneyPerSec]);
 
-  // Клик игрока
+  // Клик
   const handleClick = useCallback((_clientX?: number, _clientY?: number) => {
     const isCrit = Math.random() < 0.12;
     const critMult = isCrit ? 4.0 : 1.0;
@@ -312,7 +441,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTotalCodeEver(t => t + codeAdded);
     setMoney(m => m + moneyAdded);
 
-    // Добавляем энергию комбо (+6% за обычный клик, +15% за крит)
     setComboEnergy(e => Math.min(1.0, e + (isCrit ? 0.15 : 0.06)));
 
     sounds.playKeyClick(isCrit);
@@ -321,7 +449,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { isCrit, codeAdded, moneyAdded };
   }, [codePerClick]);
 
-  // Покупка улучшения
+  // Покупка апгрейда
   const buyUpgrade = useCallback((id: number): boolean => {
     const up = upgrades.find(u => u.id === id);
     if (!up || up.level >= up.maxLevel) return false;
@@ -340,7 +468,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   }, [upgrades, codeLines, money]);
 
-  // Прокачка системы студии
+  // Прокачка системы
   const upgradeSystem = useCallback((id: string): boolean => {
     const sys = systems.find(s => s.id === id);
     if (!sys || sys.level >= sys.maxLevel) return false;
@@ -358,12 +486,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Daily Digest
   const claimDailyDigest = useCallback(() => {
-    const bonusCode = 45000 * globalMultiplier;
-    const bonusMoney = 75000 * globalMultiplier;
+    const bonusCode = 55000 * globalMultiplier;
+    const bonusMoney = 85000 * globalMultiplier;
 
     setCodeLines(c => c + bonusCode);
     setMoney(m => m + bonusMoney);
-    setComboEnergy(1.0); // 100% комбо В Потоке
+    setComboEnergy(1.0);
     setDailyDigestClaims(d => d + 1);
 
     sounds.playRelease();
@@ -371,46 +499,82 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { bonusCode, bonusMoney };
   }, [globalMultiplier]);
 
-  // Time Warp (2 часа)
+  // Time Warp
   const triggerTimeWarp = useCallback((): boolean => {
     const now = Date.now();
     if (now < timeWarpCooldown) return false;
 
-    const simulatedCode = Math.max(25000 * globalMultiplier, codePerSec * 7200 * 0.7);
-    const simulatedMoney = Math.max(45000 * globalMultiplier, moneyPerSec * 7200 * 0.7);
+    const simulatedCode = Math.max(30000 * globalMultiplier, codePerSec * 7200 * 0.75);
+    const simulatedMoney = Math.max(50000 * globalMultiplier, moneyPerSec * 7200 * 0.75);
 
     setCodeLines(c => c + simulatedCode);
     setMoney(m => m + simulatedMoney);
     setComboEnergy(1.0);
-    setTimeWarpCooldown(now + 1800 * 1000); // 30 минут кулдаун
+    setTimeWarpCooldown(now + 1800 * 1000);
 
     sounds.playRelease();
     sounds.triggerHaptic('success');
     return true;
   }, [timeWarpCooldown, globalMultiplier, codePerSec, moneyPerSec]);
 
-  // Экспорт сохранения в Base64
+  // Яндекс Реклама: Буст x2 на 3 минуты
+  const watchAdForDoubleBoost = useCallback(() => {
+    yandexSdk.showRewardedVideo(() => {
+      setAdBoostEndTime(Date.now() + 180 * 1000);
+      sounds.playRelease();
+      sounds.triggerHaptic('success');
+    });
+  }, []);
+
+  // Яндекс Реклама: Сброс кулдауна Time Warp
+  const watchAdForTimeWarpReset = useCallback(() => {
+    yandexSdk.showRewardedVideo(() => {
+      setTimeWarpCooldown(0);
+      sounds.playRelease();
+      sounds.triggerHaptic('success');
+    });
+  }, []);
+
+  // Престиж / Выход на IPO
+  const triggerPrestigeIPO = useCallback(() => {
+    const newTokens = Math.floor(Math.sqrt(totalCodeEver / 80000));
+    if (newTokens <= 0) return { gainedTokens: 0 };
+
+    setPrestigeCount(p => p + 1);
+    setPrestigeTokens(t => t + newTokens);
+    setCodeLines(0);
+    setMoney(500 * (prestigeCount + 1));
+    setUpgrades(INITIAL_UPGRADES);
+
+    sounds.playRelease();
+    sounds.triggerHaptic('success');
+    yandexSdk.showInterstitial();
+    return { gainedTokens: newTokens };
+  }, [totalCodeEver, prestigeCount]);
+
+  // Base64 Экспорт
   const exportSaveBase64 = useCallback((): string => {
     const data: GameSaveData = {
       game: "HelloTap",
-      version: "2.0.0",
+      version: "2.1.0",
       timestamp: new Date().toISOString(),
       codeLines,
       money,
       totalCodeEver,
       prestigeCount,
-      prestigeTokens: 0,
+      prestigeTokens,
       upgrades: upgrades.reduce((acc, u) => ({ ...acc, [u.id]: u.level }), {}),
       systems: systems.reduce((acc, s) => ({ ...acc, [s.id]: s.level }), {}),
       lastSeenTime: Date.now(),
       timeWarpCooldown,
-      dailyDigestClaims
+      dailyDigestClaims,
+      switchType
     };
     const json = JSON.stringify(data);
     return "HELLOTAP_SAVE_V2:" + btoa(unescape(encodeURIComponent(json)));
-  }, [codeLines, money, totalCodeEver, prestigeCount, upgrades, systems, timeWarpCooldown, dailyDigestClaims]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType]);
 
-  // Импорт сохранения из Base64
+  // Base64 Импорт
   const importSaveBase64 = useCallback((code: string): boolean => {
     try {
       let b64 = code.trim();
@@ -424,6 +588,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.money) setMoney(data.money);
       if (data.totalCodeEver) setTotalCodeEver(data.totalCodeEver);
       if (data.prestigeCount) setPrestigeCount(data.prestigeCount);
+      if (data.prestigeTokens) setPrestigeTokens(data.prestigeTokens);
       return true;
     } catch {
       return false;
@@ -436,6 +601,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const timeWarpRemainingSec = Math.max(0, Math.ceil((timeWarpCooldown - Date.now()) / 1000));
+  const adBoostRemainingSec = Math.max(0, Math.ceil((adBoostEndTime - Date.now()) / 1000));
 
   return (
     <GameContext.Provider
@@ -444,6 +610,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         money,
         totalCodeEver,
         prestigeCount,
+        prestigeTokens,
         comboEnergy,
         isInFlow,
         codePerClick,
@@ -454,11 +621,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         systems,
         dailyDigestClaims,
         timeWarpRemainingSec,
+        adBoostRemainingSec,
+        switchType,
+        setSwitchType,
         handleClick,
         buyUpgrade,
         upgradeSystem,
         claimDailyDigest,
         triggerTimeWarp,
+        triggerPrestigeIPO,
+        watchAdForDoubleBoost,
+        watchAdForTimeWarpReset,
         exportSaveBase64,
         importSaveBase64,
         hardReset

@@ -15,16 +15,20 @@ export interface ShopUpgrade {
   multiplierBonus: number;
 }
 
+export type HubCategoryType = 'office' | 'business' | 'tech' | 'culture';
+
 export interface StudioSystem {
   id: string;
   title: string;
   icon: string;
-  category: 'office' | 'business' | 'tech' | 'culture';
+  category: HubCategoryType;
   description: string;
   level: number;
   maxLevel: number;
   reqCode: number;
   bonusDesc: string;
+  cooldownSec?: number;
+  lastActionTimestamp?: number;
 }
 
 export interface GameSaveData {
@@ -41,4 +45,5 @@ export interface GameSaveData {
   lastSeenTime: number;
   timeWarpCooldown: number;
   dailyDigestClaims: number;
+  switchType?: 'blue' | 'red' | 'brown' | 'laser';
 }

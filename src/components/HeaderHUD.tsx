@@ -11,7 +11,7 @@ interface HeaderHUDProps {
 }
 
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenDigest, onOpenSave }) => {
-  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy } = useGame();
+  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
 
   const toggleMute = () => {
@@ -55,6 +55,14 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenDigest, o
 
         {/* Множитель и Быстрые Кнопки */}
         <div className="flex items-center gap-2">
+          {/* Индикатор Активного Яндекс Буста x2 */}
+          {adBoostRemainingSec > 0 && (
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 animate-pulse">
+              <span className="text-xs">📺</span>
+              <span>x2 ({adBoostRemainingSec}с)</span>
+            </div>
+          )}
+
           {/* Индикатор Комбо «В Потоке» */}
           <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-mono transition-all ${
             isInFlow 
