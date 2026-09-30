@@ -11,6 +11,7 @@ import { ThemeId } from '../types/themes';
 import { DEFAULT_THEME_ID } from '../utils/themesList';
 import { GameRandomEvent, GameEventOption } from '../types/events';
 import { generateRandomEvent } from '../utils/eventsList';
+import { SKILL_NODES } from '../utils/skillsList';
 
 const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
@@ -276,7 +277,15 @@ interface GameContextType {
   upgradeSystem: (id: string) => boolean;
   claimDailyDigest: () => { bonusCode: number; bonusMoney: number };
   triggerTimeWarp: () => boolean;
-  triggerPrestigeIPO: () => { gainedTokens: number };
+  triggerPrestigeIPO: () => { gainedTokens: number; gainedSkillPoints: number };
+  skillPoints: number;
+  unlockedSkills: Record<string, number>;
+  upgradeSkill: (skillId: string, cost: number) => boolean;
+  resetSkills: () => void;
+  overclockRemainingSec: number;
+  triggerOverclock: (sec?: number) => void;
+  offlineReport: { isOpen: boolean; seconds: number; codeEarned: number; moneyEarned: number } | null;
+  claimOfflineEarnings: (double: boolean) => void;
   watchAdForDoubleBoost: () => void;
   watchAdForTimeWarpReset: () => void;
   exportSaveBase64: () => string;
@@ -310,10 +319,54 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [testedSwitches, setTestedSwitches] = useState<string[]>(['blue']);
   const [themeId, setThemeIdState] = useState<ThemeId>(DEFAULT_THEME_ID);
   const [activeEvent, setActiveEvent] = useState<GameRandomEvent | null>(null);
+  const [skillPoints, setSkillPoints] = useState<number>(0);
+  const [unlockedSkills, setUnlockedSkills] = useState<Record<string, number>>({});
+  const [overclockEndTime, setOverclockEndTime] = useState<number>(0);
+  const [offlineReport, setOfflineReport] = useState<{ isOpen: boolean; seconds: number; codeEarned: number; moneyEarned: number } | null>(null);
   const [achievements, setAchievements] = useState<Record<string, number>>({});
   const [achievementToasts, setAchievementToasts] = useState<ToastItem[]>([]);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(musicSynth.getIsPlaying());
   const t = TRANSLATIONS[lang];
+
+  const isOverclocked = Date.now() < overclockEndTime;
+  const overclockMultiplier = isOverclocked ? 3.0 : 1.0;
+  const overclockRemainingSec = Math.max(0, Math.ceil((overclockEndTime - Date.now()) / 1000));
+
+  const triggerOverclock = useCallback((sec: number = 12) => {
+    setOverclockEndTime(Date.now() + sec * 1000);
+    sounds.playPurchaseSuccess();
+    sounds.triggerHaptic('success');
+  }, []);
+
+  const upgradeSkill = useCallback((skillId: string, cost: number): boolean => {
+    if (skillPoints < cost) return false;
+    setSkillPoints(sp => sp - cost);
+    setUnlockedSkills(prev => ({
+      ...prev,
+      [skillId]: (prev[skillId] || 0) + 1
+    }));
+    return true;
+  }, [skillPoints]);
+
+  const resetSkills = useCallback(() => {
+    const totalSpent = Object.entries(unlockedSkills).reduce((sum, [id, lvl]) => {
+      const node = SKILL_NODES.find(n => n.id === id);
+      return sum + (node ? node.costPerLevel * lvl : lvl);
+    }, 0);
+    setSkillPoints(sp => sp + totalSpent);
+    setUnlockedSkills({});
+  }, [unlockedSkills]);
+
+  const claimOfflineEarnings = useCallback((double: boolean) => {
+    if (!offlineReport) return;
+    const mult = double ? 2 : 1;
+    const finalCode = offlineReport.codeEarned * mult;
+    const finalMoney = offlineReport.moneyEarned * mult;
+    setCodeLines(c => c + finalCode);
+    setTotalCodeEver(t => t + finalCode);
+    setMoney(m => m + finalMoney);
+    setOfflineReport(null);
+  }, [offlineReport]);
 
   const setLang = (l: Language) => {
     setLangState(l);
@@ -388,6 +441,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (cd.testedSwitches) setTestedSwitches(cd.testedSwitches);
           if (cd.achievements) setAchievements(cd.achievements);
           if (cd.themeId) setThemeIdState(cd.themeId as ThemeId);
+          if (cd.skillPoints !== undefined) setSkillPoints(cd.skillPoints);
+          if (cd.unlockedSkills) setUnlockedSkills(cd.unlockedSkills);
         }
       });
 
@@ -410,6 +465,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return sum + tierBonus;
   }, 0);
 
+  // Множители от дерева IT-талантов
+  const passiveTalentMult = 1.0 + 
+    (unlockedSkills['skill_async_io'] || 0) * 0.20 + 
+    (unlockedSkills['skill_k8s_autoscaling'] || 0) * 0.35 + 
+    (unlockedSkills['skill_quantum_threads'] || 0) * 0.50;
+
+  const moneyTalentMult = 1.0 + 
+    (unlockedSkills['skill_venture_network'] || 0) * 0.25 + 
+    (unlockedSkills['skill_unicorn_status'] || 0) * 0.40;
+
   // Расчет множителей и доходов
   const globalMultiplier = (
     1.0 + 
@@ -420,7 +485,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     (systems.find(s => s.id === 'sys_realestate')?.level || 0) * 0.40 +
     (systems.find(s => s.id === 'sys_esports')?.level || 0) * 0.15 +
     (systems.find(s => s.id === 'sys_cybersec')?.level || 0) * 0.10
-  ) * adBoostMultiplier * vipMultiplier * achievementBonusMultiplier;
+  ) * adBoostMultiplier * vipMultiplier * achievementBonusMultiplier * overclockMultiplier;
 
   const flowMultiplier = isInFlow ? 3.0 : 1.0;
 
@@ -431,13 +496,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const baseCps = upgrades.reduce((acc, u) => acc + (u.level * u.codePerSecBonus), 0) +
     (systems.find(s => s.id === 'sys_satellite')?.level || 0) * 300;
-  const codePerSec = baseCps * globalMultiplier * flowMultiplier;
+  const codePerSec = baseCps * globalMultiplier * flowMultiplier * passiveTalentMult;
 
   const baseMps = upgrades.reduce((acc, u) => acc + (u.level * u.moneyPerSecBonus), 0) +
     (systems.find(s => s.id === 'sys_assetstore')?.level || 0) * 150 +
     (systems.find(s => s.id === 'sys_merch')?.level || 0) * 80 +
     (systems.find(s => s.id === 'sys_esports')?.level || 0) * 500;
-  const moneyPerSec = baseMps * globalMultiplier * flowMultiplier;
+  const moneyPerSec = baseMps * globalMultiplier * flowMultiplier * moneyTalentMult;
 
   // Загрузка локальных сохранений
   useEffect(() => {
@@ -462,6 +527,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.testedSwitches) setTestedSwitches(data.testedSwitches);
         if (data.achievements) setAchievements(data.achievements);
         if (data.themeId) setThemeIdState(data.themeId as ThemeId);
+        if (data.skillPoints !== undefined) setSkillPoints(data.skillPoints);
+        if (data.unlockedSkills) setUnlockedSkills(data.unlockedSkills);
         if (data.switchType) {
           setSwitchTypeState(data.switchType);
           sounds.switchType = data.switchType;
@@ -482,11 +549,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (data.lastSeenTime) {
           const offlineSec = Math.min((Date.now() - data.lastSeenTime) / 1000, 43200);
-          if (offlineSec > 10) {
-            const offCode = baseCps * globalMultiplier * offlineSec * 0.45;
-            const offMoney = baseMps * globalMultiplier * offlineSec * 0.40;
-            if (offCode > 0) setCodeLines(c => c + offCode);
-            if (offMoney > 0) setMoney(m => m + offMoney);
+          if (offlineSec > 25) {
+            const offCode = Math.floor(Math.max(10, baseCps * globalMultiplier * offlineSec * 0.45));
+            const offMoney = Math.floor(Math.max(5, baseMps * globalMultiplier * offlineSec * 0.40));
+            if (offCode > 0 || offMoney > 0) {
+              setOfflineReport({
+                isOpen: true,
+                seconds: Math.floor(offlineSec),
+                codeEarned: offCode,
+                moneyEarned: offMoney
+              });
+            }
           }
         }
       }
@@ -500,7 +573,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const save = () => {
       const data: GameSaveData = {
         game: "HelloTap",
-        version: "2.7.0",
+        version: "2.8.0",
         timestamp: new Date().toISOString(),
         codeLines,
         money,
@@ -514,6 +587,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dailyDigestClaims,
         switchType,
         themeId,
+        skillPoints,
+        unlockedSkills,
         hasVipX2,
         hasAutoClicker,
         hasNoAds,
@@ -535,7 +610,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearInterval(interval);
       window.removeEventListener("beforeunload", save);
     };
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
 
   // Периодический спавн случайных мини-событий (каждые 90-120 секунд)
   useEffect(() => {
@@ -585,8 +660,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Клик
   const handleClick = useCallback((_clientX?: number, _clientY?: number) => {
-    const isCrit = Math.random() < 0.12;
-    const critMult = isCrit ? 4.0 : 1.0;
+    const critChance = Math.min(0.40, 0.12 + (unlockedSkills['skill_clean_code'] || 0) * 0.03);
+    const isCrit = Math.random() < critChance;
+    const critMult = isCrit ? (4.0 + (unlockedSkills['skill_pixel_perfect'] || 0) * 1.0 + (unlockedSkills['skill_wasm_speed'] || 0) * 1.5) : 1.0;
     const codeAdded = codePerClick * critMult;
     const moneyAdded = Math.max(0.5, codeAdded * 0.35);
 
@@ -597,8 +673,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setManualClicks(c => c + 1);
     if (isCrit) setCritClicks(c => c + 1);
 
+    const flowStep = (isCrit ? 0.15 : 0.06) * (1.0 + (unlockedSkills['skill_hot_reload'] || 0) * 0.25);
     setComboEnergy(e => {
-      const next = Math.min(1.0, e + (isCrit ? 0.15 : 0.06));
+      const next = Math.min(1.0, e + flowStep);
       if (next >= 1.0 && e < 1.0) {
         setFlowEnters(f => f + 1);
       }
@@ -609,15 +686,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sounds.triggerHaptic(isCrit ? 'heavy' : 'light');
 
     return { isCrit, codeAdded, moneyAdded };
-  }, [codePerClick]);
+  }, [codePerClick, unlockedSkills]);
 
   // Покупка апгрейда
   const buyUpgrade = useCallback((id: number): boolean => {
     const up = upgrades.find(u => u.id === id);
     if (!up || up.level >= up.maxLevel) return false;
 
-    const costCode = Math.floor(up.baseCostCode * Math.pow(up.costMultiplier, up.level));
-    const costMoney = Math.floor(up.baseCostMoney * Math.pow(up.costMultiplier, up.level));
+    const discountMultiplier = Math.max(0.65, 1.0 - ((unlockedSkills['skill_negotiation'] || 0) * 0.05 + (unlockedSkills['skill_unicorn_status'] || 0) * 0.08));
+    const costCode = Math.floor(up.baseCostCode * Math.pow(up.costMultiplier, up.level) * discountMultiplier);
+    const costMoney = Math.floor(up.baseCostMoney * Math.pow(up.costMultiplier, up.level) * discountMultiplier);
 
     if (codeLines < costCode || money < costMoney) return false;
 
@@ -628,7 +706,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sounds.playUpgrade();
     sounds.triggerHaptic('medium');
     return true;
-  }, [upgrades, codeLines, money]);
+  }, [upgrades, codeLines, money, unlockedSkills]);
 
   // Прокачка системы
   const upgradeSystem = useCallback((id: string): boolean => {
@@ -750,10 +828,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Престиж / Выход на IPO
   const triggerPrestigeIPO = useCallback(() => {
     const newTokens = Math.floor(Math.sqrt(totalCodeEver / 80000));
-    if (newTokens <= 0) return { gainedTokens: 0 };
+    if (newTokens <= 0) return { gainedTokens: 0, gainedSkillPoints: 0 };
 
+    const gainedSkillPoints = 3 + Math.floor(newTokens / 15);
     setPrestigeCount(p => p + 1);
     setPrestigeTokens(t => t + newTokens);
+    setSkillPoints(sp => sp + gainedSkillPoints);
     setCodeLines(0);
     setMoney(500 * (prestigeCount + 1));
     setUpgrades(INITIAL_UPGRADES);
@@ -761,7 +841,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sounds.playRelease();
     sounds.triggerHaptic('success');
     yandexSdk.showInterstitial();
-    return { gainedTokens: newTokens };
+    return { gainedTokens: newTokens, gainedSkillPoints };
   }, [totalCodeEver, prestigeCount]);
 
   // Получение актуального значения прогресса для любого типа ачивки
@@ -857,7 +937,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const exportSaveBase64 = useCallback((): string => {
     const data: GameSaveData = {
       game: "HelloTap",
-      version: "2.7.0",
+      version: "2.8.0",
       timestamp: new Date().toISOString(),
       codeLines,
       money,
@@ -871,6 +951,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dailyDigestClaims,
       switchType,
       themeId,
+      skillPoints,
+      unlockedSkills,
       hasVipX2,
       hasAutoClicker,
       hasNoAds,
@@ -883,7 +965,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     const json = JSON.stringify(data);
     return "HELLOTAP_SAVE_V2:" + btoa(unescape(encodeURIComponent(json)));
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
 
   // Base64 Импорт
   const importSaveBase64 = useCallback((code: string): boolean => {
@@ -910,6 +992,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.testedSwitches) setTestedSwitches(data.testedSwitches);
       if (data.achievements) setAchievements(data.achievements);
       if (data.themeId) setThemeIdState(data.themeId as ThemeId);
+      if (data.skillPoints !== undefined) setSkillPoints(data.skillPoints);
+      if (data.unlockedSkills) setUnlockedSkills(data.unlockedSkills);
       return true;
     } catch {
       return false;
@@ -953,6 +1037,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         activeEvent,
         dismissEvent,
         handleEventOption,
+        skillPoints,
+        unlockedSkills,
+        upgradeSkill,
+        resetSkills,
+        overclockRemainingSec,
+        triggerOverclock,
+        offlineReport,
+        claimOfflineEarnings,
         hasVipX2,
         hasAutoClicker,
         hasNoAds,

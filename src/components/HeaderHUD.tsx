@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText, Crown, Trophy, Music, Award } from 'lucide-react';
+import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText, Crown, Trophy, Music, Award, GitBranch } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 interface HeaderHUDProps {
@@ -11,10 +11,11 @@ interface HeaderHUDProps {
   onOpenSave: () => void;
   onOpenLeaderboard: () => void;
   onOpenAchievements: () => void;
+  onOpenTechTree: () => void;
 }
 
-export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard, onOpenAchievements }) => {
-  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t, isMusicPlaying, toggleMusic, achievements } = useGame();
+export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard, onOpenAchievements, onOpenTechTree }) => {
+  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t, isMusicPlaying, toggleMusic, achievements, skillPoints } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
 
   const totalAchStars = Object.values(achievements).reduce((sum, tier) => sum + tier, 0);
@@ -129,6 +130,24 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             {totalAchStars > 0 && (
               <span className="absolute -top-1 -right-1 px-1 min-w-[15px] h-3.5 rounded-full bg-amber-500 text-slate-950 font-mono font-bold text-[9px] flex items-center justify-center">
                 {totalAchStars}
+              </span>
+            )}
+          </button>
+
+          {/* Кнопка Дерева Талантов */}
+          <button
+            onClick={onOpenTechTree}
+            className={`relative p-2 rounded-xl border transition-all ${
+              skillPoints > 0
+                ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50 shadow-[0_0_12px_rgba(99,102,241,0.3)] animate-pulse'
+                : 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:text-indigo-300'
+            }`}
+            title="Дерево IT-навыков и талантов [K]"
+          >
+            <GitBranch className="w-4 h-4" />
+            {skillPoints > 0 && (
+              <span className="absolute -top-1 -right-1 px-1 min-w-[15px] h-3.5 rounded-full bg-indigo-500 text-white font-mono font-bold text-[9px] flex items-center justify-center shadow-md">
+                {skillPoints}
               </span>
             )}
           </button>

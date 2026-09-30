@@ -56,4 +56,6 @@ export interface GameSaveData {
   timeWarpsUsed?: number;
   testedSwitches?: string[];
   themeId?: string;
+  skillPoints?: number;
+  unlockedSkills?: Record<string, number>;
 }
