@@ -183,6 +183,7 @@ public class WorkplaceVisuals : MonoBehaviour
     private Graphic[] fizzGraphics;
     private float coffeeJostleBoost = 0f;
     private float energyJostleBoost = 0f;
+    private float fizzPhaseTimer = 0f;
 
     // Анимация кота
     private Coroutine catWiggleCoroutine;
@@ -830,11 +831,6 @@ public class WorkplaceVisuals : MonoBehaviour
             coffeeJostleBoost = 1.0f;
         }
 
-        if (energyCanTransform != null && energyCanTransform.gameObject.activeSelf)
-        {
-            energyJostleBoost = 1.0f;
-        }
-
         bool isCombo = GameManager.Instance != null && GameManager.Instance.GetComboMultiplier() > 1.15;
         TriggerCatTapReaction(isCombo);
 
@@ -1440,7 +1436,7 @@ public class WorkplaceVisuals : MonoBehaviour
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySipSound();
         if (energyCanTransform != null) StartCoroutine(DrinkPunchRoutine(energyCanTransform));
-        energyJostleBoost = 3.2f;
+        energyJostleBoost = 1.0f;
 
         if (ClickJuice.Instance != null && energyCanTransform != null)
         {
@@ -1619,28 +1615,29 @@ public class WorkplaceVisuals : MonoBehaviour
 
         if (energyJostleBoost > 0f)
         {
-            energyJostleBoost = Mathf.Max(0f, energyJostleBoost - dt * 3f);
+            energyJostleBoost = Mathf.Max(0f, energyJostleBoost - dt * 2.5f);
         }
 
         bool isBoostActive = GameManager.Instance != null && GameManager.Instance.IsBoostActive;
-        float speed = isBoostActive ? 1.8f : (0.95f + energyJostleBoost * 1.2f);
-        float time = Time.time * speed;
+        // Ограничение скорости пузырьков: плавное движение с жестким лимитом
+        float targetSpeed = isBoostActive ? 1.35f : Mathf.Clamp(0.95f + energyJostleBoost * 0.35f, 0.8f, 1.4f);
+        fizzPhaseTimer += dt * targetSpeed;
 
         for (int i = 0; i < energyFizzBubbles.Length; i++)
         {
             var rt = energyFizzBubbles[i];
             if (rt == null) continue;
 
-            float phase = (time + i * 0.28f) % 1.0f;
+            float phase = (fizzPhaseTimer + i * 0.28f) % 1.0f;
             Vector2 baseP = fizzBasePos != null && i < fizzBasePos.Length ? fizzBasePos[i] : Vector2.zero;
 
-            // Вылет пузырьков из горлышка банки с мелкой вибрацией
-            float riseY = phase * (38f + energyJostleBoost * 18f);
-            float jitterX = Mathf.Cos((time * 8f) + i * 2.1f) * 4.5f;
+            // Вылет пузырьков из горлышка банки с плавной микро-вибрацией
+            float riseY = phase * (32f + Mathf.Min(energyJostleBoost, 1.0f) * 6f);
+            float jitterX = Mathf.Cos((fizzPhaseTimer * 4.5f) + i * 2.1f) * 2.5f;
             rt.anchoredPosition = new Vector2(baseP.x + jitterX, baseP.y + riseY);
 
-            // Микро-хлопок в конце подъема
-            float popScale = phase > 0.85f ? Mathf.Lerp(1f, 1.4f, (phase - 0.85f) / 0.15f) : 1f;
+            // Мягкий микро-хлопок в конце подъема
+            float popScale = phase > 0.88f ? Mathf.Lerp(1f, 1.25f, (phase - 0.88f) / 0.12f) : 1f;
             rt.localScale = new Vector3(popScale, popScale, 1f);
 
             if (fizzGraphics != null && i < fizzGraphics.Length && fizzGraphics[i] != null)

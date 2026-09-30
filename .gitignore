@@ -18,7 +18,7 @@ pnpm-debug.log*
 id_rsa*
 credentials.json
 
-# Unity Project (in unity/)
+# Unity Project (root & unity/)
 [Uu]nity/[Ll]ibrary/
 [Uu]nity/[Tt]emp/
 [Uu]nity/[Oo]bj/
@@ -28,8 +28,22 @@ credentials.json
 [Uu]nity/[Uu]ser[Ss]ettings/
 unity/*.csproj
 unity/*.sln
+unity/*.slnx
 unity/*.log
 unity/.vsconfig
+
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+*.csproj
+*.sln
+*.slnx
+*.log
+.vsconfig
 
 # IDE & Editor
 .idea/

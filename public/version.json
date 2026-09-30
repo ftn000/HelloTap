@@ -1,9 +1,11 @@
 {
   "name": "CodeTap: Симулятор Программиста",
-  "version": "2.8.0",
-  "buildDate": "2026-09-30T12:40:00.000Z",
+  "version": "2.8.1",
+  "buildDate": "2026-09-30T22:00:00.000Z",
   "platform": "yandex-games",
   "features": [
+    "Fix: smooth continuous energy fizz bubbles animation without glitches on rapid tapping",
+    "Fix: keep accumulated money on IPO prestige and grant starting investment capital",
     "Tech Skill Tree (12 perks across Frontend, Backend and Business branches)",
     "Bug Hunt & Code Review interactive mini-game with Overclock x3.0 mode",
     "Welcome Back Offline Earnings Modal with x2 double claim option",

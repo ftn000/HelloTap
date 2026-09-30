@@ -661,8 +661,12 @@ public class GameManager : MonoBehaviour
 
         prestigeLevel++;
         codeLines = 0;
-        money = 0;
         comboEnergy = 0f;
+
+        // Деньги не сгорают: сохраняем весь капитал + начисляем стартовый инвест-бонус IPO
+        double ipoCashBonus = Math.Max(5000.0 * prestigeLevel, totalMoneyEarned * 0.10);
+        money += ipoCashBonus;
+        totalMoneyEarned += ipoCashBonus;
 
         foreach (var upg in upgrades)
         {

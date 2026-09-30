@@ -248,12 +248,14 @@ public class GameOverlaysUI : MonoBehaviour
         int curLvl = GameManager.Instance.PrestigeLevel;
         double curMult = GameManager.Instance.GetPrestigeMultiplier();
         double nextMult = 1.0 + (curLvl + 1) * 0.5;
+        double ipoGrant = Math.Max(5000.0 * (curLvl + 1), GameManager.Instance.TotalMoneyEarned * 0.10);
 
         if (prestigeInfoText != null)
         {
             prestigeInfoText.text =
                 $"ПРЕСТИЖ СТУДИИ (IPO Ур. {curLvl})\n" +
-                $"Текущий бонус: x{curMult:F1} -> После IPO: x{nextMult:F1} ко всему доходу\n" +
+                $"Бонус к доходу: x{curMult:F1} -> x{nextMult:F1}\n" +
+                $"Инвест-капитал IPO: +{NumberFormatter.Format(ipoGrant)} ₽ (деньги сохраняются!)\n" +
                 (canPrestige ? "<color=#00FF88>Доступен выход на биржу!</color>" : "<color=#AAAAAA>Требуется 2 релиза или 10K всего строк кода</color>");
         }
 
@@ -271,6 +273,10 @@ public class GameOverlaysUI : MonoBehaviour
     private void OnPrestigeClicked()
     {
         if (GameManager.Instance == null) return;
+        double earnedBefore = GameManager.Instance.TotalMoneyEarned;
+        int nextLvl = GameManager.Instance.PrestigeLevel + 1;
+        double bonusGranted = Math.Max(5000.0 * nextLvl, earnedBefore * 0.10);
+
         if (GameManager.Instance.PerformPrestige())
         {
             if (AudioManager.Instance != null)
@@ -285,7 +291,7 @@ public class GameOverlaysUI : MonoBehaviour
             if (ClickJuice.Instance != null && prestigeButton != null)
             {
                 ClickJuice.Instance.SpawnCustomPopup(
-                    $"IPO УСПЕШНО! МНОЖИТЕЛЬ x{GameManager.Instance.GetPrestigeMultiplier():F1}!",
+                    $"IPO УСПЕШНО!\n+{NumberFormatter.Format(bonusGranted)} ₽ ИНВЕСТ-КАПИТАЛ!\nМНОЖИТЕЛЬ x{GameManager.Instance.GetPrestigeMultiplier():F1}!",
                     prestigeButton.transform.position,
                     new Color(1f, 0.85f, 0.25f),
                     true);

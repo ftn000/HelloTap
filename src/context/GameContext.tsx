@@ -573,7 +573,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const save = () => {
       const data: GameSaveData = {
         game: "HelloTap",
-        version: "2.8.0",
+        version: "2.8.1",
         timestamp: new Date().toISOString(),
         codeLines,
         money,
@@ -831,18 +831,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (newTokens <= 0) return { gainedTokens: 0, gainedSkillPoints: 0 };
 
     const gainedSkillPoints = 3 + Math.floor(newTokens / 15);
+    const ipoCashBonus = Math.max(5000 * (prestigeCount + 1), Math.floor(money * 0.15));
     setPrestigeCount(p => p + 1);
     setPrestigeTokens(t => t + newTokens);
     setSkillPoints(sp => sp + gainedSkillPoints);
     setCodeLines(0);
-    setMoney(500 * (prestigeCount + 1));
+    // Деньги не сгорают: сохраняем капитал + начисляем инвестиционный грант IPO
+    setMoney(m => m + ipoCashBonus);
     setUpgrades(INITIAL_UPGRADES);
 
     sounds.playRelease();
     sounds.triggerHaptic('success');
     yandexSdk.showInterstitial();
     return { gainedTokens: newTokens, gainedSkillPoints };
-  }, [totalCodeEver, prestigeCount]);
+  }, [totalCodeEver, prestigeCount, money]);
 
   // Получение актуального значения прогресса для любого типа ачивки
   const getStatValue = useCallback((statKey: string): number => {
@@ -937,7 +939,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const exportSaveBase64 = useCallback((): string => {
     const data: GameSaveData = {
       game: "HelloTap",
-      version: "2.8.0",
+      version: "2.8.1",
       timestamp: new Date().toISOString(),
       codeLines,
       money,
