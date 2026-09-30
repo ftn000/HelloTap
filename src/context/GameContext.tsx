@@ -500,7 +500,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const save = () => {
       const data: GameSaveData = {
         game: "HelloTap",
-        version: "2.6.0",
+        version: "2.7.0",
         timestamp: new Date().toISOString(),
         codeLines,
         money,
@@ -857,7 +857,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const exportSaveBase64 = useCallback((): string => {
     const data: GameSaveData = {
       game: "HelloTap",
-      version: "2.6.0",
+      version: "2.7.0",
       timestamp: new Date().toISOString(),
       codeLines,
       money,

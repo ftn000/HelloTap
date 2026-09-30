@@ -29,11 +29,17 @@
 
 ---
 
-## 2. Графика и ассеты
+## 2. Графика и промо-материалы
 
-* **Иконка (512x512 px):** лежит в репозитории по пути [`public/icon.png`](../public/icon.png).
-* **Фавиконка:** [`public/favicon.png`](../public/favicon.png).
+Все необходимые промо-материалы уже сгенерированы в максимальном качестве и находятся в папке [`promo/`](../promo/):
+
+* **Иконка игры (512x512 px, 1:1):** [`promo/icon_512x512.png`](../promo/icon_512x512.png) (или [`public/icon.png`](../public/icon.png)).
+* **Обложка карточки в каталоге (800x600 px, 4:3):** [`promo/cover_800x600.png`](../promo/cover_800x600.png) (HD: [`promo/cover_1200x900.png`](../promo/cover_1200x900.png)).
+* **Широкий промо-баннер (1920x1080 px, 16:9):** [`promo/banner_1920x1080.png`](../promo/banner_1920x1080.png) (или [`promo/banner_1280x720.png`](../promo/banner_1280x720.png)).
+* **Мастер-арт (1024x1024 px):** [`promo/icon_1024x1024.png`](../promo/icon_1024x1024.png).
+* **Фавиконка браузера:** [`public/favicon.png`](../public/favicon.png) и [`public/icon-192.png`](../public/icon-192.png).
 * **Ориентация:** Поддерживается как альбомная (Desktop), так и портретная (Mobile).
+* **Подробное руководство:** [`promo/README.md`](../promo/README.md).
 
 ---
 

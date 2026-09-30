@@ -1,9 +1,10 @@
 {
   "name": "CodeTap: Симулятор Программиста",
-  "version": "2.6.0",
-  "buildDate": "2026-09-30T12:20:00.000Z",
+  "version": "2.7.0",
+  "buildDate": "2026-09-30T12:26:00.000Z",
   "platform": "yandex-games",
   "features": [
+    "Full Promo Graphics Kit (512x512 icon, 4:3 catalog cover, 16:9 wide banner, manifest.json)",
     "TypeScript & React 18 Engine",
     "Custom IDE Themes (Cyberpunk Neon, Monokai Pro, Dracula, Retro CRT Matrix)",
     "Interactive Random Events Engine (Hacker Attack, Angel Investor, 0-Day Bug Bounty, Coffee Rush)",
