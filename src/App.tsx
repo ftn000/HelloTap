@@ -4,10 +4,12 @@ import { HeaderHUD } from './components/HeaderHUD';
 import { MainClicker } from './components/MainClicker';
 import { ShopPanel } from './components/ShopPanel';
 import { StudioHubModal } from './components/StudioHubModal';
+import { LeaderboardModal } from './components/LeaderboardModal';
 
 const GameApp: React.FC = () => {
   const [hubOpen, setHubOpen] = useState<boolean>(false);
   const [hubTab, setHubTab] = useState<'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save'>('systems');
+  const [leaderboardOpen, setLeaderboardOpen] = useState<boolean>(false);
 
   const openHubWithTab = (tab: 'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save') => {
     setHubTab(tab);
@@ -22,6 +24,7 @@ const GameApp: React.FC = () => {
         onOpenShop={() => openHubWithTab('shop')}
         onOpenDigest={() => openHubWithTab('digest')}
         onOpenSave={() => openHubWithTab('save')}
+        onOpenLeaderboard={() => setLeaderboardOpen(true)}
       />
 
       {/* Основной контент */}
@@ -35,6 +38,12 @@ const GameApp: React.FC = () => {
         isOpen={hubOpen}
         onClose={() => setHubOpen(false)}
         defaultTab={hubTab}
+      />
+
+      {/* Модальное окно Рейтинга Лидерборда */}
+      <LeaderboardModal
+        isOpen={leaderboardOpen}
+        onClose={() => setLeaderboardOpen(false)}
       />
     </div>
   );

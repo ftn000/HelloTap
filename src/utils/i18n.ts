@@ -94,6 +94,17 @@ export interface TranslationDictionary {
   saveDangerZone: string;
   saveResetBtn: string;
   saveResetConfirm: string;
+
+  // Leaderboard & HUD
+  leaderboardBtn: string;
+  leaderboardTitle: string;
+  leaderboardDesc: string;
+  leaderboardRank: string;
+  leaderboardPlayer: string;
+  leaderboardScore: string;
+  leaderboardYouBadge: string;
+  leaderboardLoading: string;
+  autoClickerActive: string;
 }
 
 export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
@@ -179,7 +190,17 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     saveImportBtn: "ЗАГРУЗИТЬ ПРОГРЕСС",
     saveDangerZone: "ОПАСНАЯ ЗОНА",
     saveResetBtn: "⚠️ СБРОСИТЬ ВЕСЬ ПРОГРЕСС",
-    saveResetConfirm: "❓ ТОЧНО СБРОСИТЬ? НАЖМИТЕ ЕЩЁ РАЗ"
+    saveResetConfirm: "❓ ТОЧНО СБРОСИТЬ? НАЖМИТЕ ЕЩЁ РАЗ",
+
+    leaderboardBtn: "Рейтинг",
+    leaderboardTitle: "ТОП РАЗРАБОТЧИКОВ (РЕЙТИНГ)",
+    leaderboardDesc: "Глобальный зал славы Яндекс Игр по количеству скомпилированных строк кода за все время",
+    leaderboardRank: "#",
+    leaderboardPlayer: "Разработчик",
+    leaderboardScore: "Строк C#",
+    leaderboardYouBadge: "ВЫ",
+    leaderboardLoading: "Загрузка топа...",
+    autoClickerActive: "⚡ АВТОКЛИКЕР (10 CPS)"
   },
   en: {
     codePerSec: "sec",
@@ -263,7 +284,17 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     saveImportBtn: "LOAD PROGRESS",
     saveDangerZone: "DANGER ZONE",
     saveResetBtn: "⚠️ HARD RESET ALL PROGRESS",
-    saveResetConfirm: "❓ ARE YOU SURE? CLICK AGAIN"
+    saveResetConfirm: "❓ ARE YOU SURE? CLICK AGAIN",
+
+    leaderboardBtn: "Rankings",
+    leaderboardTitle: "DEVELOPER HALL OF FAME",
+    leaderboardDesc: "Global Yandex Games leaderboard of all-time compiled code lines",
+    leaderboardRank: "#",
+    leaderboardPlayer: "Developer",
+    leaderboardScore: "C# Lines",
+    leaderboardYouBadge: "YOU",
+    leaderboardLoading: "Loading leaderboard...",
+    autoClickerActive: "⚡ AUTOCLICKER (10 CPS)"
   }
 };
 

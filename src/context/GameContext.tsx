@@ -417,7 +417,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const save = () => {
       const data: GameSaveData = {
         game: "HelloTap",
-        version: "2.3.0",
+        version: "2.4.0",
         timestamp: new Date().toISOString(),
         codeLines,
         money,
@@ -610,13 +610,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setHasAutoClicker(true);
       } else if (productId === "codetap_noads") {
         setHasNoAds(true);
+        yandexSdk.hideStickyBanner();
       } else if (productId === "codetap_stocks_100") {
         setPrestigeTokens(t => t + 100);
       } else if (productId === "codetap_money_1m") {
         setMoney(m => m + 1000000);
       }
 
-      sounds.playRelease();
+      sounds.playPurchaseSuccess();
       sounds.triggerHaptic('success');
       return true;
     } catch (err) {
@@ -624,6 +625,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
   }, []);
+
+  // Синхронизация RTB Sticky-баннера Яндекс Игр
+  useEffect(() => {
+    if (hasNoAds) {
+      yandexSdk.hideStickyBanner();
+    } else {
+      yandexSdk.showStickyBanner();
+    }
+  }, [hasNoAds]);
 
   // Престиж / Выход на IPO
   const triggerPrestigeIPO = useCallback(() => {
@@ -646,7 +656,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const exportSaveBase64 = useCallback((): string => {
     const data: GameSaveData = {
       game: "HelloTap",
-      version: "2.3.0",
+      version: "2.4.0",
       timestamp: new Date().toISOString(),
       codeLines,
       money,

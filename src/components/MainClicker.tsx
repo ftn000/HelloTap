@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Flame, Sparkles, Terminal, Cpu } from 'lucide-react';
+import { Flame, Sparkles, Terminal, Cpu, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface Popup {
@@ -22,7 +22,7 @@ const CODE_SNIPPETS = [
 ];
 
 export const MainClicker: React.FC = () => {
-  const { handleClick, comboEnergy, isInFlow, codePerClick, t } = useGame();
+  const { handleClick, comboEnergy, isInFlow, codePerClick, hasAutoClicker, t } = useGame();
   const [popups, setPopups] = useState<Popup[]>([]);
   const [activeKey, setActiveKey] = useState<boolean>(false);
   const [snippetIndex, setSnippetIndex] = useState<number>(0);
@@ -116,9 +116,17 @@ export const MainClicker: React.FC = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-cyan-400/80 bg-cyan-950/40 px-2 py-0.5 rounded-md border border-cyan-800/30">
-            <Cpu className="w-3 h-3" />
-            <span>+{formatNumber(codePerClick)} C#/клик</span>
+          <div className="flex items-center gap-2">
+            {hasAutoClicker && (
+              <div className="flex items-center gap-1 text-[10px] font-mono text-cyan-300 bg-cyan-500/15 px-2 py-0.5 rounded-full border border-cyan-500/40 shadow-[0_0_8px_rgba(6,182,212,0.3)] animate-pulse">
+                <Zap className="w-3 h-3 text-cyan-400" />
+                <span>10 CPS</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5 text-[11px] font-mono text-cyan-400/80 bg-cyan-950/40 px-2 py-0.5 rounded-md border border-cyan-800/30">
+              <Cpu className="w-3 h-3" />
+              <span>+{formatNumber(codePerClick)} C#/клик</span>
+            </div>
           </div>
         </div>
 

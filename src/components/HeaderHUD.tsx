@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText, Crown } from 'lucide-react';
+import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText, Crown, Trophy } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 interface HeaderHUDProps {
@@ -9,9 +9,10 @@ interface HeaderHUDProps {
   onOpenShop: () => void;
   onOpenDigest: () => void;
   onOpenSave: () => void;
+  onOpenLeaderboard: () => void;
 }
 
-export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave }) => {
+export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard }) => {
   const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
 
@@ -100,6 +101,15 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             title={t.digestBtn}
           >
             <FileText className="w-4 h-4" />
+          </button>
+
+          {/* Кнопка Рейтинга Лидерборда */}
+          <button
+            onClick={onOpenLeaderboard}
+            className="p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+            title={t.leaderboardBtn}
+          >
+            <Trophy className="w-4 h-4 text-amber-400" />
           </button>
 
           {/* Кнопка Сохранений */}

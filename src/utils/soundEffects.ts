@@ -149,6 +149,55 @@ class SoundEngine {
     });
   }
 
+  public playPurchaseSuccess(): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    // Золотой арпеджио каскад в C Major 9: C5, E5, G5, B5, C6, E6
+    const notes = [523.25, 659.25, 783.99, 987.77, 1046.50, 1318.51];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.055;
+      const duration = 0.35;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.22, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
+  public playAutoClickTick(): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    // Очень мягкий и ультракороткий клик
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const duration = 0.018;
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(560, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + duration);
+
+    gain.gain.setValueAtTime(0.035, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  }
+
   public triggerHaptic(type: 'light' | 'medium' | 'heavy' | 'success' = 'light'): void {
     // 1. Проверяем Telegram WebApp HapticFeedback
     const tg = (window as unknown as { Telegram?: { WebApp?: { HapticFeedback?: { impactOccurred: (s: string) => void; notificationOccurred: (s: string) => void } } } }).Telegram?.WebApp;

@@ -18,9 +18,37 @@ interface YandexPlayer {
   getUniqueID: () => string;
 }
 
+export interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  score: number;
+  photo?: string;
+  isPlayer?: boolean;
+}
+
 interface YandexLeaderboard {
   setLeaderboardScore: (leaderboardName: string, score: number) => Promise<void>;
   getLeaderboardPlayerEntry: (leaderboardName: string) => Promise<unknown>;
+  getLeaderboardEntries?: (
+    leaderboardName: string,
+    options?: {
+      includeUser?: boolean;
+      quantityAround?: number;
+      quantityTop?: number;
+      avatarSize?: 'small' | 'medium' | 'large';
+    }
+  ) => Promise<{
+    entries: Array<{
+      score: number;
+      rank: number;
+      player: {
+        getAvatarSrc: (size: string) => string;
+        getName: () => string;
+        uniqueID: string;
+      };
+    }>;
+    userRank?: number;
+  }>;
 }
 
 interface YandexSDK {
@@ -41,6 +69,9 @@ interface YandexSDK {
       onClose?: () => void;
       onError?: (error: unknown) => void;
     }) => void;
+    getBannerAdvStatus?: () => Promise<{ stickyAdvIsShowing: boolean; reason?: string }>;
+    showBannerAdv?: () => Promise<{ stickyAdvIsShowing: boolean; reason?: string }>;
+    hideBannerAdv?: () => Promise<void>;
   };
   getPlayer: (options?: { scopes?: boolean }) => Promise<YandexPlayer>;
   getLeaderboards: () => Promise<YandexLeaderboard>;
@@ -191,16 +222,104 @@ class YandexGamesService {
   }
 
   /**
+   * Показать адаптивный RTB Sticky-баннер Яндекс Игр
+   */
+  public async showStickyBanner(): Promise<boolean> {
+    if (!this.ysdk || !this.ysdk.adv?.showBannerAdv) return false;
+    try {
+      const res = await this.ysdk.adv.showBannerAdv();
+      return !!res?.stickyAdvIsShowing;
+    } catch (err) {
+      console.warn("[YandexSDK] Sticky banner show error:", err);
+      return false;
+    }
+  }
+
+  /**
+   * Скрыть RTB Sticky-баннер (например, при покупке No-Ads)
+   */
+  public async hideStickyBanner(): Promise<boolean> {
+    if (!this.ysdk || !this.ysdk.adv?.hideBannerAdv) return false;
+    try {
+      await this.ysdk.adv.hideBannerAdv();
+      return true;
+    } catch (err) {
+      console.warn("[YandexSDK] Sticky banner hide error:", err);
+      return false;
+    }
+  }
+
+  /**
    * Отправка счета в лидерборд Яндекс Игр
    */
   public async submitLeaderboardScore(score: number): Promise<void> {
     if (!this.ysdk) return;
     try {
       const lb = await this.ysdk.getLeaderboards();
-      await lb.setLeaderboardScore("HelloTapCodeLines", Math.floor(score));
+      const s = Math.floor(score);
+      // Записываем в основной лидерборд CodeTap и legacy HelloTap
+      await Promise.allSettled([
+        lb.setLeaderboardScore("codetap_score", s),
+        lb.setLeaderboardScore("HelloTapCodeLines", s)
+      ]);
     } catch (err) {
       console.warn("[YandexSDK] Leaderboard score submit error:", err);
     }
+  }
+
+  /**
+   * Получение топа игроков из лидерборда
+   */
+  public async getLeaderboardEntries(limit: number = 10, currentScore: number = 0): Promise<LeaderboardEntry[]> {
+    if (this.ysdk) {
+      try {
+        const lb = await this.ysdk.getLeaderboards();
+        if (lb.getLeaderboardEntries) {
+          const res = await lb.getLeaderboardEntries("codetap_score", {
+            quantityTop: limit,
+            includeUser: true
+          });
+
+          if (res && res.entries && res.entries.length > 0) {
+            const playerUid = this.player ? this.player.getUniqueID() : null;
+            return res.entries.map(e => ({
+              rank: e.rank,
+              name: e.player.getName() || "Anonymous Coder",
+              score: e.score,
+              photo: e.player.getAvatarSrc ? e.player.getAvatarSrc('small') : undefined,
+              isPlayer: playerUid ? e.player.uniqueID === playerUid : false
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn("[YandexSDK] Could not fetch Yandex leaderboards, using local fallback:", err);
+      }
+    }
+
+    // Fallback / Mock Leaderboard для автономной игры и локального тестирования
+    const mockCoders = [
+      { name: "Linus_Kernel", score: 25000000 },
+      { name: "Satoshi_N", score: 18500000 },
+      { name: "Carmack_Doom", score: 12400000 },
+      { name: "Guido_Python", score: 8900000 },
+      { name: "Anders_TS", score: 5600000 },
+      { name: "Wozniak_Apple", score: 3200000 },
+      { name: "Ada_Lovelace", score: 1800000 },
+      { name: "Dennis_Ritchie", score: 950000 },
+      { name: "Turing_Enigma", score: 450000 },
+      { name: "CyberNinja_99", score: 120000 }
+    ];
+
+    const currentName = this.player ? this.player.getName() : "Вы (Player)";
+    const list = [...mockCoders, { name: currentName, score: Math.floor(currentScore), isPlayer: true }];
+    list.sort((a, b) => b.score - a.score);
+
+    return list.slice(0, limit).map((entry, index) => ({
+      rank: index + 1,
+      name: entry.name,
+      score: entry.score,
+      isPlayer: !!(entry as { isPlayer?: boolean }).isPlayer
+    }));
   }
 }
 
