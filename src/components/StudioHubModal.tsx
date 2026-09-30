@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { X, Building2, Zap, Save, Copy, Check, AlertTriangle, Tv, TrendingUp, Sliders, Crown, Sparkles } from 'lucide-react';
+import { X, Building2, Zap, Save, Copy, Check, AlertTriangle, Tv, TrendingUp, Sliders, Crown, Sparkles, Palette } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { HubCategoryType } from '../types/game';
 import { IN_APP_PRODUCTS } from '../utils/yandexPayments';
+import { IDE_THEMES } from '../utils/themesList';
+import { ThemeId } from '../types/themes';
 
 interface StudioHubModalProps {
   isOpen: boolean;
@@ -33,6 +35,8 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
     triggerPrestigeIPO,
     switchType,
     setSwitchType,
+    themeId,
+    setThemeId,
     hasVipX2,
     hasAutoClicker,
     hasNoAds,
@@ -539,6 +543,42 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                     <span className="text-[10px] text-slate-400 font-sans">{sw.desc}</span>
                   </button>
                 ))}
+              </div>
+
+              {/* СЕКЦИЯ: ТЕМЫ ОФОРМЛЕНИЯ IDE */}
+              <div className="pt-3 border-t border-slate-800 space-y-2">
+                <div className="flex items-center gap-2 text-cyan-400 font-bold">
+                  <Palette className="w-4 h-4" />
+                  <span>Темы IDE и Терминала</span>
+                </div>
+                <p className="text-slate-400 font-sans">
+                  Цветовые схемы кода, подсветка синтаксиса и неоновое свечение рабочей среды.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {Object.values(IDE_THEMES).map(th => (
+                    <button
+                      key={th.id}
+                      onClick={() => setThemeId(th.id as ThemeId)}
+                      className={`p-3 rounded-2xl border text-left flex flex-col gap-1 transition-all ${
+                        themeId === th.id
+                          ? 'bg-cyan-950/40 border-cyan-400 text-white shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">{th.icon}</span>
+                          <span className="font-bold text-slate-200">{th.name}</span>
+                        </div>
+                        {themeId === th.id && <Check className="w-4 h-4 text-cyan-400" />}
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-sans leading-tight mt-0.5">
+                        {th.tagline}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}

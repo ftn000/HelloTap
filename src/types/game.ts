@@ -55,4 +55,5 @@ export interface GameSaveData {
   flowEnters?: number;
   timeWarpsUsed?: number;
   testedSwitches?: string[];
+  themeId?: string;
 }

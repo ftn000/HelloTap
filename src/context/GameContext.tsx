@@ -7,6 +7,10 @@ import { Language, TranslationDictionary, TRANSLATIONS, detectInitialLanguage } 
 import { ACHIEVEMENTS } from '../utils/achievementsList';
 import { ToastItem } from '../components/AchievementToast';
 import { musicSynth } from '../utils/musicSynth';
+import { ThemeId } from '../types/themes';
+import { DEFAULT_THEME_ID } from '../utils/themesList';
+import { GameRandomEvent, GameEventOption } from '../types/events';
+import { generateRandomEvent } from '../utils/eventsList';
 
 const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
@@ -251,6 +255,11 @@ interface GameContextType {
   adBoostRemainingSec: number;
   switchType: 'blue' | 'red' | 'brown' | 'laser';
   setSwitchType: (t: 'blue' | 'red' | 'brown' | 'laser') => void;
+  themeId: ThemeId;
+  setThemeId: (t: ThemeId) => void;
+  activeEvent: GameRandomEvent | null;
+  dismissEvent: () => void;
+  handleEventOption: (option: GameEventOption) => void;
   hasVipX2: boolean;
   hasAutoClicker: boolean;
   hasNoAds: boolean;
@@ -299,6 +308,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [flowEnters, setFlowEnters] = useState<number>(0);
   const [timeWarpsUsed, setTimeWarpsUsed] = useState<number>(0);
   const [testedSwitches, setTestedSwitches] = useState<string[]>(['blue']);
+  const [themeId, setThemeIdState] = useState<ThemeId>(DEFAULT_THEME_ID);
+  const [activeEvent, setActiveEvent] = useState<GameRandomEvent | null>(null);
   const [achievements, setAchievements] = useState<Record<string, number>>({});
   const [achievementToasts, setAchievementToasts] = useState<ToastItem[]>([]);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(musicSynth.getIsPlaying());
@@ -316,6 +327,37 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sounds.switchType = t;
     sounds.playKeyClick(true);
     setTestedSwitches(prev => prev.includes(t) ? prev : [...prev, t]);
+  };
+
+  const setThemeId = (t: ThemeId) => {
+    setThemeIdState(t);
+  };
+
+  const dismissEvent = () => {
+    setActiveEvent(null);
+  };
+
+  const handleEventOption = (option: GameEventOption) => {
+    switch (option.actionType) {
+      case 'grant_money':
+        setMoney(m => m + option.value);
+        break;
+      case 'grant_code':
+        setCodeLines(c => c + option.value);
+        setTotalCodeEver(t => t + option.value);
+        break;
+      case 'boost_flow':
+        setComboEnergy(1.0);
+        setFlowEnters(f => f + 1);
+        break;
+      case 'boost_cps':
+        setCodeLines(c => c + option.value);
+        break;
+      case 'grant_token':
+        setPrestigeTokens(t => t + option.value);
+        break;
+    }
+    setActiveEvent(null);
   };
 
   const isInFlow = comboEnergy >= 1.0;
@@ -345,6 +387,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (cd.timeWarpsUsed) setTimeWarpsUsed(cd.timeWarpsUsed);
           if (cd.testedSwitches) setTestedSwitches(cd.testedSwitches);
           if (cd.achievements) setAchievements(cd.achievements);
+          if (cd.themeId) setThemeIdState(cd.themeId as ThemeId);
         }
       });
 
@@ -418,6 +461,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.timeWarpsUsed) setTimeWarpsUsed(data.timeWarpsUsed);
         if (data.testedSwitches) setTestedSwitches(data.testedSwitches);
         if (data.achievements) setAchievements(data.achievements);
+        if (data.themeId) setThemeIdState(data.themeId as ThemeId);
         if (data.switchType) {
           setSwitchTypeState(data.switchType);
           sounds.switchType = data.switchType;
@@ -456,7 +500,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const save = () => {
       const data: GameSaveData = {
         game: "HelloTap",
-        version: "2.5.0",
+        version: "2.6.0",
         timestamp: new Date().toISOString(),
         codeLines,
         money,
@@ -469,6 +513,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         timeWarpCooldown,
         dailyDigestClaims,
         switchType,
+        themeId,
         hasVipX2,
         hasAutoClicker,
         hasNoAds,
@@ -490,7 +535,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearInterval(interval);
       window.removeEventListener("beforeunload", save);
     };
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
+
+  // Периодический спавн случайных мини-событий (каждые 90-120 секунд)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveEvent(prev => {
+        if (prev) return prev;
+        return generateRandomEvent(codePerSec, moneyPerSec);
+      });
+    }, 95000);
+
+    return () => clearInterval(timer);
+  }, [codePerSec, moneyPerSec]);
 
   // Основной цикл
   useEffect(() => {
@@ -800,7 +857,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const exportSaveBase64 = useCallback((): string => {
     const data: GameSaveData = {
       game: "HelloTap",
-      version: "2.5.0",
+      version: "2.6.0",
       timestamp: new Date().toISOString(),
       codeLines,
       money,
@@ -813,6 +870,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       timeWarpCooldown,
       dailyDigestClaims,
       switchType,
+      themeId,
       hasVipX2,
       hasAutoClicker,
       hasNoAds,
@@ -825,7 +883,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     const json = JSON.stringify(data);
     return "HELLOTAP_SAVE_V2:" + btoa(unescape(encodeURIComponent(json)));
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
 
   // Base64 Импорт
   const importSaveBase64 = useCallback((code: string): boolean => {
@@ -851,6 +909,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.timeWarpsUsed) setTimeWarpsUsed(data.timeWarpsUsed);
       if (data.testedSwitches) setTestedSwitches(data.testedSwitches);
       if (data.achievements) setAchievements(data.achievements);
+      if (data.themeId) setThemeIdState(data.themeId as ThemeId);
       return true;
     } catch {
       return false;
@@ -889,6 +948,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         adBoostRemainingSec,
         switchType,
         setSwitchType,
+        themeId,
+        setThemeId,
+        activeEvent,
+        dismissEvent,
+        handleEventOption,
         hasVipX2,
         hasAutoClicker,
         hasNoAds,

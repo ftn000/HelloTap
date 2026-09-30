@@ -3,6 +3,7 @@ import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
 import { Flame, Sparkles, Terminal, Cpu, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { IDE_THEMES } from '../utils/themesList';
 
 interface Popup {
   id: number;
@@ -22,7 +23,8 @@ const CODE_SNIPPETS = [
 ];
 
 export const MainClicker: React.FC = () => {
-  const { handleClick, comboEnergy, isInFlow, codePerClick, hasAutoClicker, t } = useGame();
+  const { handleClick, comboEnergy, isInFlow, codePerClick, hasAutoClicker, themeId, t } = useGame();
+  const currentTheme = IDE_THEMES[themeId] || IDE_THEMES['cyberpunk'];
   const [popups, setPopups] = useState<Popup[]>([]);
   const [activeKey, setActiveKey] = useState<boolean>(false);
   const [snippetIndex, setSnippetIndex] = useState<number>(0);
@@ -94,16 +96,28 @@ export const MainClicker: React.FC = () => {
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         onPointerLeave={onPointerUp}
+        style={{
+          boxShadow: activeKey
+            ? `0 0 35px ${currentTheme.terminalGlow}`
+            : isInFlow
+            ? '0 0 35px rgba(245,158,11,0.35)'
+            : `0 10px 30px rgba(0,0,0,0.5), 0 0 18px ${currentTheme.terminalGlow}`
+        }}
         className={`relative w-full aspect-[4/3] rounded-3xl p-6 flex flex-col justify-between cursor-pointer select-none transition-all duration-75 overflow-hidden border ${
           activeKey
-            ? 'scale-[0.98] border-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.5)] bg-slate-900/90'
+            ? `scale-[0.98] ${currentTheme.terminalBorder} bg-gradient-to-b ${currentTheme.terminalBg}`
             : isInFlow
             ? 'border-amber-500/60 shadow-[0_0_35px_rgba(245,158,11,0.3)] bg-gradient-to-b from-slate-900 to-slate-950'
-            : 'border-slate-800 shadow-[0_10px_30px_rgba(0,0,0,0.5)] bg-gradient-to-b from-slate-900/90 to-slate-950/90 hover:border-slate-700'
+            : `${currentTheme.terminalBorder} bg-gradient-to-b ${currentTheme.terminalBg}`
         }`}
       >
+        {/* Ретро CRT Scanlines оверлей */}
+        {currentTheme.crtScanline && (
+          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.35)_50%)] bg-[length:100%_4px] opacity-40 z-10" />
+        )}
+
         {/* Верхняя строка терминала */}
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+        <div className="relative z-20 flex items-center justify-between border-b border-slate-800/80 pb-3">
           <div className="flex items-center gap-2">
             <div className="flex gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
@@ -131,9 +145,9 @@ export const MainClicker: React.FC = () => {
         </div>
 
         {/* Кодовая строка / Визуализатор IDE */}
-        <div className="my-auto py-4 font-mono text-sm sm:text-base space-y-1.5">
-          <div className="text-cyan-400 font-semibold flex items-center gap-2">
-            <span className="text-emerald-400">&gt;</span>
+        <div className="relative z-20 my-auto py-4 font-mono text-sm sm:text-base space-y-1.5">
+          <div className={`${currentTheme.codeColor} font-semibold flex items-center gap-2`}>
+            <span className={currentTheme.promptColor}>&gt;</span>
             <span>{CODE_SNIPPETS[snippetIndex]}</span>
           </div>
           <div className="text-xs text-slate-500 italic">
@@ -142,12 +156,12 @@ export const MainClicker: React.FC = () => {
         </div>
 
         {/* Большая кнопка пробела / свитча */}
-        <div className={`w-full py-3.5 rounded-2xl border text-center font-mono font-bold tracking-wider text-sm transition-all duration-75 flex items-center justify-center gap-2 shadow-inner ${
+        <div className={`relative z-20 w-full py-3.5 rounded-2xl border text-center font-mono font-bold tracking-wider text-sm transition-all duration-75 flex items-center justify-center gap-2 shadow-inner ${
           activeKey
-            ? 'bg-cyan-500 text-slate-950 border-cyan-300 translate-y-1'
+            ? `${currentTheme.btnActiveBg} translate-y-1`
             : isInFlow
             ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-[0_4px_0_#b45309]'
-            : 'bg-slate-800/80 text-cyan-300 border-slate-700 shadow-[0_4px_0_#1e293b] hover:bg-slate-800'
+            : `${currentTheme.btnBg} ${currentTheme.btnText} ${currentTheme.btnBorder} ${currentTheme.btnShadow}`
         }`}>
           <span>{t.compileBtn}</span>
           {isInFlow && <Sparkles className="w-4 h-4 animate-spin" />}

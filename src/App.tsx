@@ -7,10 +7,17 @@ import { StudioHubModal } from './components/StudioHubModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { AchievementsModal } from './components/AchievementsModal';
 import { AchievementToast } from './components/AchievementToast';
+import { RandomEventModal } from './components/RandomEventModal';
 import { useGame } from './context/GameContext';
 
 const GameApp: React.FC = () => {
-  const { achievementToasts, dismissAchievementToast } = useGame();
+  const { 
+    achievementToasts, 
+    dismissAchievementToast,
+    activeEvent,
+    dismissEvent,
+    handleEventOption
+  } = useGame();
   const [hubOpen, setHubOpen] = useState<boolean>(false);
   const [hubTab, setHubTab] = useState<'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save'>('systems');
   const [leaderboardOpen, setLeaderboardOpen] = useState<boolean>(false);
@@ -62,6 +69,13 @@ const GameApp: React.FC = () => {
       <AchievementsModal
         isOpen={achievementsOpen}
         onClose={() => setAchievementsOpen(false)}
+      />
+
+      {/* Случайные интерактивные мини-события студии */}
+      <RandomEventModal
+        event={activeEvent}
+        onSelectOption={handleEventOption}
+        onClose={dismissEvent}
       />
     </div>
   );
