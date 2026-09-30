@@ -172,7 +172,7 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     timeWarpCharging: "⏳ ЗАРЯДКА",
 
     ipoTitle: "ВЫХОД НА IPO (ПРЕСТИЖ)",
-    ipoDesc: "Продайте акции компании инвесторам на бирже. Все накопленные деньги сохраняются + вы получаете инвестиционный грант, Токены Акций и постоянный множитель x1.5 на все будущие сессии!",
+    ipoDesc: "Продайте акции компании инвесторам на бирже. Все накопленные деньги, команда и купленное железо сохраняются! Вы получаете инвестиционный грант, Токены Акций и постоянный множитель x1.5 на все будущие сессии!",
     ipoShares: "Акции в портфеле:",
     ipoWillGain: "Будет начислено при IPO:",
     ipoBtn: "🚀 ПРОВЕСТИ IPO",
@@ -266,7 +266,7 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     timeWarpCharging: "⏳ CHARGING",
 
     ipoTitle: "GO PUBLIC (IPO PRESTIGE)",
-    ipoDesc: "Sell company shares to market investors. All money is kept + you receive an IPO cash grant, Stock Tokens and a permanent x1.5 multiplier for all future sessions!",
+    ipoDesc: "Sell company shares to market investors. All money, studio gear, and team members are preserved! You gain an IPO cash grant, Stock Tokens and a permanent x1.5 multiplier for all future sessions!",
     ipoShares: "Portfolio shares:",
     ipoWillGain: "Tokens on IPO:",
     ipoBtn: "🚀 EXECUTE IPO",

@@ -663,16 +663,12 @@ public class GameManager : MonoBehaviour
         codeLines = 0;
         comboEnergy = 0f;
 
-        // Деньги не сгорают: сохраняем весь капитал + начисляем стартовый инвест-бонус IPO
+        // Деньги и купленные за них апгрейды (железо, софт, персонал) СОХРАНЯЮТСЯ!
         double ipoCashBonus = Math.Max(5000.0 * prestigeLevel, totalMoneyEarned * 0.10);
         money += ipoCashBonus;
         totalMoneyEarned += ipoCashBonus;
 
-        foreach (var upg in upgrades)
-        {
-            upg.CurrentLevel = 0;
-        }
-
+        // Сбрасываются только проекты, купленные за строки кода, для нового цикла разработки
         foreach (var prj in projects)
         {
             prj.IsCompleted = false;

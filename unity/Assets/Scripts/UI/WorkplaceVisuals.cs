@@ -825,15 +825,6 @@ public class WorkplaceVisuals : MonoBehaviour
 
         FlashKey(isCrit);
 
-        if (coffeeMugTransform != null && coffeeMugTransform.gameObject.activeSelf)
-        {
-            coffeeMugTransform.localRotation = Quaternion.Euler(0, 0, Random.Range(-3f, 3f));
-            coffeeJostleBoost = 1.0f;
-        }
-
-        bool isCombo = GameManager.Instance != null && GameManager.Instance.GetComboMultiplier() > 1.15;
-        TriggerCatTapReaction(isCombo);
-
         UpdateComboVisuals();
         RefreshProgressAndComboUI();
     }
@@ -1419,7 +1410,7 @@ public class WorkplaceVisuals : MonoBehaviour
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySipSound();
         if (coffeeMugTransform != null) StartCoroutine(DrinkPunchRoutine(coffeeMugTransform));
-        coffeeJostleBoost = 3.2f;
+        coffeeJostleBoost = 1.0f;
 
         if (ClickJuice.Instance != null && coffeeMugTransform != null)
         {

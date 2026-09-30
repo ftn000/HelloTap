@@ -573,7 +573,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const save = () => {
       const data: GameSaveData = {
         game: "HelloTap",
-        version: "2.8.1",
+        version: "2.8.2",
         timestamp: new Date().toISOString(),
         codeLines,
         money,
@@ -836,9 +836,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPrestigeTokens(t => t + newTokens);
     setSkillPoints(sp => sp + gainedSkillPoints);
     setCodeLines(0);
-    // Деньги не сгорают: сохраняем капитал + начисляем инвестиционный грант IPO
+    // Деньги и купленные апгрейды сохраняются! Начисляем инвестиционный грант IPO
     setMoney(m => m + ipoCashBonus);
-    setUpgrades(INITIAL_UPGRADES);
 
     sounds.playRelease();
     sounds.triggerHaptic('success');
@@ -939,7 +938,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const exportSaveBase64 = useCallback((): string => {
     const data: GameSaveData = {
       game: "HelloTap",
-      version: "2.8.1",
+      version: "2.8.2",
       timestamp: new Date().toISOString(),
       codeLines,
       money,

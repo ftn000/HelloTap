@@ -255,7 +255,8 @@ public class GameOverlaysUI : MonoBehaviour
             prestigeInfoText.text =
                 $"ПРЕСТИЖ СТУДИИ (IPO Ур. {curLvl})\n" +
                 $"Бонус к доходу: x{curMult:F1} -> x{nextMult:F1}\n" +
-                $"Инвест-капитал IPO: +{NumberFormatter.Format(ipoGrant)} ₽ (деньги сохраняются!)\n" +
+                $"Инвест-капитал IPO: +{NumberFormatter.Format(ipoGrant)} ₽\n" +
+                "<color=#00E5FF>Команда, железо и деньги сохраняются!</color>\n" +
                 (canPrestige ? "<color=#00FF88>Доступен выход на биржу!</color>" : "<color=#AAAAAA>Требуется 2 релиза или 10K всего строк кода</color>");
         }
 
