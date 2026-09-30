@@ -4,6 +4,9 @@ import { sounds } from '../utils/soundEffects';
 import { yandexSdk } from '../utils/yandexSdk';
 import { yandexPayments } from '../utils/yandexPayments';
 import { Language, TranslationDictionary, TRANSLATIONS, detectInitialLanguage } from '../utils/i18n';
+import { ACHIEVEMENTS } from '../utils/achievementsList';
+import { ToastItem } from '../components/AchievementToast';
+import { musicSynth } from '../utils/musicSynth';
 
 const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
@@ -251,6 +254,13 @@ interface GameContextType {
   hasVipX2: boolean;
   hasAutoClicker: boolean;
   hasNoAds: boolean;
+  achievements: Record<string, number>;
+  achievementBonusMultiplier: number;
+  getAchievementProgress: (id: string) => { current: number; nextTarget: number; percent: number };
+  achievementToasts: ToastItem[];
+  dismissAchievementToast: (id: string) => void;
+  isMusicPlaying: boolean;
+  toggleMusic: () => boolean;
   buyInAppProduct: (productId: string) => Promise<boolean>;
   handleClick: (clientX?: number, clientY?: number) => { isCrit: boolean; codeAdded: number; moneyAdded: number };
   buyUpgrade: (id: number) => boolean;
@@ -284,6 +294,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [hasVipX2, setHasVipX2] = useState<boolean>(false);
   const [hasAutoClicker, setHasAutoClicker] = useState<boolean>(false);
   const [hasNoAds, setHasNoAds] = useState<boolean>(false);
+  const [manualClicks, setManualClicks] = useState<number>(0);
+  const [critClicks, setCritClicks] = useState<number>(0);
+  const [flowEnters, setFlowEnters] = useState<number>(0);
+  const [timeWarpsUsed, setTimeWarpsUsed] = useState<number>(0);
+  const [testedSwitches, setTestedSwitches] = useState<string[]>(['blue']);
+  const [achievements, setAchievements] = useState<Record<string, number>>({});
+  const [achievementToasts, setAchievementToasts] = useState<ToastItem[]>([]);
+  const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(musicSynth.getIsPlaying());
   const t = TRANSLATIONS[lang];
 
   const setLang = (l: Language) => {
@@ -297,6 +315,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSwitchTypeState(t);
     sounds.switchType = t;
     sounds.playKeyClick(true);
+    setTestedSwitches(prev => prev.includes(t) ? prev : [...prev, t]);
   };
 
   const isInFlow = comboEnergy >= 1.0;
@@ -320,6 +339,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (cd.hasVipX2) setHasVipX2(true);
           if (cd.hasAutoClicker) setHasAutoClicker(true);
           if (cd.hasNoAds) setHasNoAds(true);
+          if (cd.manualClicks) setManualClicks(cd.manualClicks);
+          if (cd.critClicks) setCritClicks(cd.critClicks);
+          if (cd.flowEnters) setFlowEnters(cd.flowEnters);
+          if (cd.timeWarpsUsed) setTimeWarpsUsed(cd.timeWarpsUsed);
+          if (cd.testedSwitches) setTestedSwitches(cd.testedSwitches);
+          if (cd.achievements) setAchievements(cd.achievements);
         }
       });
 
@@ -334,6 +359,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const vipMultiplier = hasVipX2 ? 2.0 : 1.0;
 
+  // Бонус от всех разблокированных уровней достижений (24 ачивки по 3 уровня)
+  const achievementBonusMultiplier = 1.0 + Object.entries(achievements).reduce((sum, [achId, tier]) => {
+    const def = ACHIEVEMENTS.find(a => a.id === achId);
+    if (!def || tier <= 0) return sum;
+    const tierBonus = def.tiers.slice(0, tier).reduce((acc, t) => acc + t.bonusMultiplier, 0);
+    return sum + tierBonus;
+  }, 0);
+
   // Расчет множителей и доходов
   const globalMultiplier = (
     1.0 + 
@@ -344,7 +377,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     (systems.find(s => s.id === 'sys_realestate')?.level || 0) * 0.40 +
     (systems.find(s => s.id === 'sys_esports')?.level || 0) * 0.15 +
     (systems.find(s => s.id === 'sys_cybersec')?.level || 0) * 0.10
-  ) * adBoostMultiplier * vipMultiplier;
+  ) * adBoostMultiplier * vipMultiplier * achievementBonusMultiplier;
 
   const flowMultiplier = isInFlow ? 3.0 : 1.0;
 
@@ -379,6 +412,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.hasVipX2) setHasVipX2(true);
         if (data.hasAutoClicker) setHasAutoClicker(true);
         if (data.hasNoAds) setHasNoAds(true);
+        if (data.manualClicks) setManualClicks(data.manualClicks);
+        if (data.critClicks) setCritClicks(data.critClicks);
+        if (data.flowEnters) setFlowEnters(data.flowEnters);
+        if (data.timeWarpsUsed) setTimeWarpsUsed(data.timeWarpsUsed);
+        if (data.testedSwitches) setTestedSwitches(data.testedSwitches);
+        if (data.achievements) setAchievements(data.achievements);
         if (data.switchType) {
           setSwitchTypeState(data.switchType);
           sounds.switchType = data.switchType;
@@ -417,7 +456,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const save = () => {
       const data: GameSaveData = {
         game: "HelloTap",
-        version: "2.4.0",
+        version: "2.5.0",
         timestamp: new Date().toISOString(),
         codeLines,
         money,
@@ -432,7 +471,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         switchType,
         hasVipX2,
         hasAutoClicker,
-        hasNoAds
+        hasNoAds,
+        manualClicks,
+        critClicks,
+        flowEnters,
+        timeWarpsUsed,
+        testedSwitches,
+        achievements
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
       yandexSdk.saveToCloud("hellotap_save", data);
@@ -445,7 +490,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearInterval(interval);
       window.removeEventListener("beforeunload", save);
     };
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, hasVipX2, hasAutoClicker, hasNoAds]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
 
   // Основной цикл
   useEffect(() => {
@@ -492,7 +537,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTotalCodeEver(t => t + codeAdded);
     setMoney(m => m + moneyAdded);
 
-    setComboEnergy(e => Math.min(1.0, e + (isCrit ? 0.15 : 0.06)));
+    setManualClicks(c => c + 1);
+    if (isCrit) setCritClicks(c => c + 1);
+
+    setComboEnergy(e => {
+      const next = Math.min(1.0, e + (isCrit ? 0.15 : 0.06));
+      if (next >= 1.0 && e < 1.0) {
+        setFlowEnters(f => f + 1);
+      }
+      return next;
+    });
 
     sounds.playKeyClick(isCrit);
     sounds.triggerHaptic(isCrit ? 'heavy' : 'light');
@@ -562,6 +616,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setMoney(m => m + simulatedMoney);
     setComboEnergy(1.0);
     setTimeWarpCooldown(now + 1800 * 1000);
+    setTimeWarpsUsed(w => w + 1);
 
     sounds.playRelease();
     sounds.triggerHaptic('success');
@@ -652,11 +707,100 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { gainedTokens: newTokens };
   }, [totalCodeEver, prestigeCount]);
 
+  // Получение актуального значения прогресса для любого типа ачивки
+  const getStatValue = useCallback((statKey: string): number => {
+    switch (statKey) {
+      case 'manualClicks': return manualClicks;
+      case 'critClicks': return critClicks;
+      case 'flowEnters': return flowEnters;
+      case 'totalCodeEver': return totalCodeEver;
+      case 'codePerSec': return codePerSec;
+      case 'money': return money;
+      case 'moneyPerSec': return moneyPerSec;
+      case 'upgrade_1': return upgrades.find(u => u.id === 1)?.level || 0;
+      case 'upgrade_2': return upgrades.find(u => u.id === 2)?.level || 0;
+      case 'upgrade_3': return upgrades.find(u => u.id === 3)?.level || 0;
+      case 'upgrade_4': return upgrades.find(u => u.id === 4)?.level || 0;
+      case 'upgrade_5': return upgrades.find(u => u.id === 5)?.level || 0;
+      case 'upgrade_6': return upgrades.find(u => u.id === 6)?.level || 0;
+      case 'totalUpgradeLevels': return upgrades.reduce((acc, u) => acc + u.level, 0);
+      case 'unlockedSystemsCount': return systems.filter(s => s.level > 0).length;
+      case 'sys_cathaven': return systems.find(s => s.id === 'sys_cathaven')?.level || 0;
+      case 'sys_esports': return systems.find(s => s.id === 'sys_esports')?.level || 0;
+      case 'sys_realestate': return systems.find(s => s.id === 'sys_realestate')?.level || 0;
+      case 'sys_assetstore': return systems.find(s => s.id === 'sys_assetstore')?.level || 0;
+      case 'sys_merch': return systems.find(s => s.id === 'sys_merch')?.level || 0;
+      case 'prestigeCount': return prestigeCount;
+      case 'prestigeTokens': return prestigeTokens;
+      case 'timeWarpsUsed': return timeWarpsUsed;
+      case 'switchesTestedCount': return testedSwitches.length;
+      default: return 0;
+    }
+  }, [manualClicks, critClicks, flowEnters, totalCodeEver, codePerSec, money, moneyPerSec, upgrades, systems, prestigeCount, prestigeTokens, timeWarpsUsed, testedSwitches]);
+
+  const getAchievementProgress = useCallback((id: string) => {
+    const def = ACHIEVEMENTS.find(a => a.id === id);
+    if (!def) return { current: 0, nextTarget: 1, percent: 0 };
+    const currentTier = achievements[id] || 0;
+    const currentVal = getStatValue(def.statKey);
+    if (currentTier >= 3) {
+      return { current: currentVal, nextTarget: def.tiers[2].target, percent: 100 };
+    }
+    const nextTarget = def.tiers[currentTier].target;
+    const percent = Math.min(100, (currentVal / nextTarget) * 100);
+    return { current: currentVal, nextTarget, percent };
+  }, [achievements, getStatValue]);
+
+  // Проверка прогресса ачивок и создание тостов
+  useEffect(() => {
+    ACHIEVEMENTS.forEach(ach => {
+      const currentTier = achievements[ach.id] || 0;
+      if (currentTier >= 3) return;
+
+      const val = getStatValue(ach.statKey);
+      const nextTierDef = ach.tiers[currentTier];
+
+      if (val >= nextTierDef.target) {
+        const newTier = (currentTier + 1) as 1 | 2 | 3;
+        setAchievements(prev => ({ ...prev, [ach.id]: newTier }));
+
+        const toastId = `${ach.id}_${newTier}_${Date.now()}`;
+        setAchievementToasts(prev => [
+          ...prev,
+          {
+            id: toastId,
+            icon: ach.icon,
+            title: lang === 'ru' ? ach.titleRu : ach.titleEn,
+            tier: newTier,
+            rewardDesc: lang === 'ru' ? nextTierDef.rewardDescRu : nextTierDef.rewardDescEn
+          }
+        ]);
+
+        sounds.playUpgrade();
+        sounds.triggerHaptic('success');
+
+        setTimeout(() => {
+          setAchievementToasts(prev => prev.filter(t => t.id !== toastId));
+        }, 3800);
+      }
+    });
+  }, [manualClicks, critClicks, flowEnters, totalCodeEver, codePerSec, money, moneyPerSec, upgrades, systems, prestigeCount, prestigeTokens, timeWarpsUsed, testedSwitches, achievements, getStatValue, lang]);
+
+  const dismissAchievementToast = useCallback((id: string) => {
+    setAchievementToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  const toggleMusic = useCallback(() => {
+    const playing = musicSynth.toggle();
+    setIsMusicPlaying(playing);
+    return playing;
+  }, []);
+
   // Base64 Экспорт
   const exportSaveBase64 = useCallback((): string => {
     const data: GameSaveData = {
       game: "HelloTap",
-      version: "2.4.0",
+      version: "2.5.0",
       timestamp: new Date().toISOString(),
       codeLines,
       money,
@@ -671,11 +815,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       switchType,
       hasVipX2,
       hasAutoClicker,
-      hasNoAds
+      hasNoAds,
+      manualClicks,
+      critClicks,
+      flowEnters,
+      timeWarpsUsed,
+      testedSwitches,
+      achievements
     };
     const json = JSON.stringify(data);
     return "HELLOTAP_SAVE_V2:" + btoa(unescape(encodeURIComponent(json)));
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, hasVipX2, hasAutoClicker, hasNoAds]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
 
   // Base64 Импорт
   const importSaveBase64 = useCallback((code: string): boolean => {
@@ -695,6 +845,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.hasVipX2) setHasVipX2(true);
       if (data.hasAutoClicker) setHasAutoClicker(true);
       if (data.hasNoAds) setHasNoAds(true);
+      if (data.manualClicks) setManualClicks(data.manualClicks);
+      if (data.critClicks) setCritClicks(data.critClicks);
+      if (data.flowEnters) setFlowEnters(data.flowEnters);
+      if (data.timeWarpsUsed) setTimeWarpsUsed(data.timeWarpsUsed);
+      if (data.testedSwitches) setTestedSwitches(data.testedSwitches);
+      if (data.achievements) setAchievements(data.achievements);
       return true;
     } catch {
       return false;
@@ -736,6 +892,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hasVipX2,
         hasAutoClicker,
         hasNoAds,
+        achievements,
+        achievementBonusMultiplier,
+        getAchievementProgress,
+        achievementToasts,
+        dismissAchievementToast,
+        isMusicPlaying,
+        toggleMusic,
         buyInAppProduct,
         handleClick,
         buyUpgrade,

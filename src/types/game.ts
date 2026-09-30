@@ -49,4 +49,10 @@ export interface GameSaveData {
   hasVipX2?: boolean;
   hasAutoClicker?: boolean;
   hasNoAds?: boolean;
+  achievements?: Record<string, number>;
+  manualClicks?: number;
+  critClicks?: number;
+  flowEnters?: number;
+  timeWarpsUsed?: number;
+  testedSwitches?: string[];
 }

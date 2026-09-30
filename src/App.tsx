@@ -5,11 +5,16 @@ import { MainClicker } from './components/MainClicker';
 import { ShopPanel } from './components/ShopPanel';
 import { StudioHubModal } from './components/StudioHubModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
+import { AchievementsModal } from './components/AchievementsModal';
+import { AchievementToast } from './components/AchievementToast';
+import { useGame } from './context/GameContext';
 
 const GameApp: React.FC = () => {
+  const { achievementToasts, dismissAchievementToast } = useGame();
   const [hubOpen, setHubOpen] = useState<boolean>(false);
   const [hubTab, setHubTab] = useState<'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save'>('systems');
   const [leaderboardOpen, setLeaderboardOpen] = useState<boolean>(false);
+  const [achievementsOpen, setAchievementsOpen] = useState<boolean>(false);
 
   const openHubWithTab = (tab: 'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save') => {
     setHubTab(tab);
@@ -18,6 +23,12 @@ const GameApp: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cyber-bg text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
+      {/* Всплывающие тосты ачивок */}
+      <AchievementToast
+        toasts={achievementToasts}
+        onDismiss={dismissAchievementToast}
+      />
+
       {/* Верхний статус-бар */}
       <HeaderHUD
         onOpenHub={() => openHubWithTab('systems')}
@@ -25,6 +36,7 @@ const GameApp: React.FC = () => {
         onOpenDigest={() => openHubWithTab('digest')}
         onOpenSave={() => openHubWithTab('save')}
         onOpenLeaderboard={() => setLeaderboardOpen(true)}
+        onOpenAchievements={() => setAchievementsOpen(true)}
       />
 
       {/* Основной контент */}
@@ -44,6 +56,12 @@ const GameApp: React.FC = () => {
       <LeaderboardModal
         isOpen={leaderboardOpen}
         onClose={() => setLeaderboardOpen(false)}
+      />
+
+      {/* Модальное окно Достижений (24 ачивки по 3 уровня) */}
+      <AchievementsModal
+        isOpen={achievementsOpen}
+        onClose={() => setAchievementsOpen(false)}
       />
     </div>
   );

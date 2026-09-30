@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText, Crown, Trophy } from 'lucide-react';
+import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText, Crown, Trophy, Music, Award } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 interface HeaderHUDProps {
@@ -10,11 +10,14 @@ interface HeaderHUDProps {
   onOpenDigest: () => void;
   onOpenSave: () => void;
   onOpenLeaderboard: () => void;
+  onOpenAchievements: () => void;
 }
 
-export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard }) => {
-  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t } = useGame();
+export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard, onOpenAchievements }) => {
+  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t, isMusicPlaying, toggleMusic, achievements } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
+
+  const totalAchStars = Object.values(achievements).reduce((sum, tier) => sum + tier, 0);
 
   const toggleMute = () => {
     sounds.isMuted = !sounds.isMuted;
@@ -101,6 +104,33 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             title={t.digestBtn}
           >
             <FileText className="w-4 h-4" />
+          </button>
+
+          {/* Кнопка Lo-Fi / Synthwave Музыки */}
+          <button
+            onClick={toggleMusic}
+            className={`p-2 rounded-xl border transition-all ${
+              isMusicPlaying
+                ? 'bg-purple-500/20 text-purple-300 border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.3)] animate-pulse'
+                : 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:text-slate-200'
+            }`}
+            title={isMusicPlaying ? (lang === 'ru' ? 'Выключить музыку (Lo-Fi Ambient)' : 'Mute Music') : (lang === 'ru' ? 'Включить Lo-Fi Synthwave Музыку' : 'Play Lo-Fi Ambient')}
+          >
+            <Music className="w-4 h-4" />
+          </button>
+
+          {/* Кнопка Достижений */}
+          <button
+            onClick={onOpenAchievements}
+            className="relative p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+            title={lang === 'ru' ? 'Достижения и Награды' : 'Achievements'}
+          >
+            <Award className="w-4 h-4" />
+            {totalAchStars > 0 && (
+              <span className="absolute -top-1 -right-1 px-1 min-w-[15px] h-3.5 rounded-full bg-amber-500 text-slate-950 font-mono font-bold text-[9px] flex items-center justify-center">
+                {totalAchStars}
+              </span>
+            )}
           </button>
 
           {/* Кнопка Рейтинга Лидерборда */}

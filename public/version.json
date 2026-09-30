@@ -1,10 +1,13 @@
 {
   "name": "CodeTap: Симулятор Программиста",
-  "version": "2.4.0",
-  "buildDate": "2026-09-30T10:30:00.000Z",
+  "version": "2.5.0",
+  "buildDate": "2026-09-30T10:48:00.000Z",
   "platform": "yandex-games",
   "features": [
     "TypeScript & React 18 Engine",
+    "Generative Lo-Fi / Synthwave Web Audio Music Engine",
+    "Tiered Achievements System (24 achievements, 3 tiers each, 72 stars)",
+    "Achievement Toast Notifications with Sound Effects",
     "Yandex In-App Payments (VIP Store)",
     "Yandex In-Game Leaderboard (Hall of Fame)",
     "Yandex RTB Sticky Banners & Rewarded Ads",
