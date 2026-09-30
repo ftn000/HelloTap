@@ -1,0 +1,14 @@
+{
+  "name": "CodeTap: Симулятор Программиста",
+  "version": "2.3.0",
+  "buildDate": "2026-09-30T10:16:00.000Z",
+  "platform": "yandex-games",
+  "features": [
+    "TypeScript & React 18 Engine",
+    "Yandex In-App Payments (VIP Store)",
+    "Yandex Rewarded & Interstitial Ads",
+    "Yandex Cloud Saves & Leaderboards",
+    "Keyboard Web Audio Synthesizer",
+    "RU / EN Localization"
+  ]
+}

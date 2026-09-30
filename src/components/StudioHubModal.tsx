@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { X, Building2, Zap, Save, Copy, Check, AlertTriangle, Tv, TrendingUp, Sliders } from 'lucide-react';
+import { X, Building2, Zap, Save, Copy, Check, AlertTriangle, Tv, TrendingUp, Sliders, Crown, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { HubCategoryType } from '../types/game';
+import { IN_APP_PRODUCTS } from '../utils/yandexPayments';
 
 interface StudioHubModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultTab?: 'systems' | 'digest' | 'prestige' | 'custom' | 'save';
+  defaultTab?: 'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save';
 }
 
 export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose, defaultTab = 'systems' }) => {
-  const [activeTab, setActiveTab] = useState<'systems' | 'digest' | 'prestige' | 'custom' | 'save'>(defaultTab);
+  const [activeTab, setActiveTab] = useState<'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save'>(defaultTab);
   const [categoryFilter, setCategoryFilter] = useState<HubCategoryType | 'all'>('all');
 
   const {
@@ -32,9 +33,14 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
     triggerPrestigeIPO,
     switchType,
     setSwitchType,
+    hasVipX2,
+    hasAutoClicker,
+    hasNoAds,
+    buyInAppProduct,
     exportSaveBase64,
     importSaveBase64,
     hardReset,
+    lang,
     t
   } = useGame();
 
@@ -42,6 +48,8 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
   const [importInput, setImportInput] = useState<string>('');
   const [importMsg, setImportMsg] = useState<string>('');
   const [resetConfirm, setResetConfirm] = useState<boolean>(false);
+  const [purchasingId, setPurchasingId] = useState<string | null>(null);
+  const [purchaseStatus, setPurchaseStatus] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -114,7 +122,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
         </div>
 
         {/* Tabs Bar */}
-        <div className="grid grid-cols-5 gap-1 p-1.5 bg-slate-950/70 border-b border-cyber-border text-[11px] font-mono">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1.5 bg-slate-950/70 border-b border-cyber-border text-[10px] sm:text-[11px] font-mono">
           <button
             onClick={() => setActiveTab('systems')}
             className={`py-2 px-1 rounded-xl font-semibold transition-all text-center ${
@@ -124,9 +132,17 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
             {t.tabSystems}
           </button>
           <button
+            onClick={() => setActiveTab('shop')}
+            className={`py-2 px-1 rounded-xl font-semibold transition-all text-center ${
+              activeTab === 'shop' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'text-amber-400/80 hover:text-amber-200'
+            }`}
+          >
+            {t.tabShop}
+          </button>
+          <button
             onClick={() => setActiveTab('digest')}
             className={`py-2 px-1 rounded-xl font-semibold transition-all text-center ${
-              activeTab === 'digest' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'text-slate-400 hover:text-slate-200'
+              activeTab === 'digest' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             {t.tabBoosts}
@@ -142,7 +158,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
           <button
             onClick={() => setActiveTab('custom')}
             className={`py-2 px-1 rounded-xl font-semibold transition-all text-center ${
-              activeTab === 'custom' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40' : 'text-slate-400 hover:text-slate-200'
+              activeTab === 'custom' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             {t.tabSwitches}
@@ -226,7 +242,133 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
             </div>
           )}
 
-          {/* TAB 2: ДАЙДЖЕСТ, TIME WARP И ЯНДЕКС РЕКЛАМА */}
+          {/* TAB: VIP МАРКЕТПЛЕЙС И ДОНАТ */}
+          {activeTab === 'shop' && (
+            <div className="space-y-3 font-mono">
+              {/* VIP Store Banner */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-950/40 to-slate-900 border border-purple-500/30 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-sm font-bold text-amber-300 tracking-wide">{t.vipStoreTitle}</h3>
+                </div>
+                <p className="text-xs text-slate-300 font-sans">{t.vipStoreDesc}</p>
+
+                {/* Active Perks summary */}
+                {(hasVipX2 || hasAutoClicker || hasNoAds) && (
+                  <div className="pt-2 border-t border-purple-500/20 space-y-1">
+                    <div className="text-[11px] text-amber-400/90 font-bold">{t.vipActivePerks}</div>
+                    <div className="flex flex-wrap gap-1.5 text-[10px]">
+                      {hasVipX2 && (
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          {t.vipPerkMultiplier}
+                        </span>
+                      )}
+                      {hasAutoClicker && (
+                        <span className="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                          {t.vipPerkAutoclicker}
+                        </span>
+                      )}
+                      {hasNoAds && (
+                        <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          {t.vipPerkNoAds}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {purchaseStatus && (
+                  <div className="p-2 rounded-lg bg-slate-950 text-center text-xs text-emerald-400 font-bold border border-emerald-500/40 animate-fade-in">
+                    {purchaseStatus}
+                  </div>
+                )}
+              </div>
+
+              {/* Products list */}
+              <div className="space-y-2.5">
+                {IN_APP_PRODUCTS.map((prod) => {
+                  const isOwned = 
+                    (prod.id === 'codetap_vip_x2' && hasVipX2) ||
+                    (prod.id === 'codetap_autoclicker' && hasAutoClicker) ||
+                    (prod.id === 'codetap_noads' && hasNoAds);
+
+                  const title = lang === 'ru' ? prod.titleRu : prod.titleEn;
+                  const desc = lang === 'ru' ? prod.descRu : prod.descEn;
+                  const isBusy = purchasingId === prod.id;
+
+                  return (
+                    <div
+                      key={prod.id}
+                      className={`p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                        isOwned
+                          ? 'bg-slate-900/60 border-emerald-500/30 opacity-80'
+                          : 'bg-slate-900/90 border-slate-800 hover:border-purple-500/40'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-3xl p-2 rounded-xl bg-slate-800/80 border border-slate-700/60 flex-shrink-0">
+                          {prod.icon}
+                        </span>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-bold text-slate-100">{title}</span>
+                            <span
+                              className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold ${
+                                prod.isConsumable
+                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                  : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                              }`}
+                            >
+                              {prod.isConsumable ? t.consumableBadge : t.permanentBadge}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-400 font-sans leading-relaxed">{desc}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex-shrink-0 sm:self-center">
+                        {isOwned ? (
+                          <div className="px-4 py-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 text-xs font-bold text-center">
+                            {t.alreadyOwned}
+                          </div>
+                        ) : (
+                          <button
+                            disabled={isBusy}
+                            onClick={async () => {
+                              setPurchasingId(prod.id);
+                              const ok = await buyInAppProduct(prod.id);
+                              setPurchasingId(null);
+                              if (ok) {
+                                setPurchaseStatus(t.purchaseSuccess);
+                                confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+                              } else {
+                                setPurchaseStatus(t.purchaseFailed);
+                              }
+                              setTimeout(() => setPurchaseStatus(null), 3500);
+                            }}
+                            className={`w-full sm:w-auto px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wide transition-all shadow-md active:scale-98 flex items-center justify-center gap-1.5 ${
+                              isBusy
+                                ? 'bg-slate-800 text-slate-500 cursor-wait'
+                                : 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
+                            }`}
+                          >
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>
+                              {isBusy
+                                ? '⏳...'
+                                : t.buyForYans.replace('{0}', prod.priceYans.toString())}
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: ДАЙДЖЕСТ, TIME WARP И ЯНДЕКС РЕКЛАМА */}
           {activeTab === 'digest' && (
             <div className="space-y-3 font-mono">
               {/* Рекламные бусты Яндекс Игр */}
@@ -245,6 +387,12 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                     </span>
                   )}
                 </div>
+
+                {hasNoAds && (
+                  <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold text-center tracking-wide">
+                    {t.noAdsActiveBadge}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button

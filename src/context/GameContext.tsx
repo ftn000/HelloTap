@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { ShopUpgrade, StudioSystem, GameSaveData, HubCategoryType } from '../types/game';
 import { sounds } from '../utils/soundEffects';
 import { yandexSdk } from '../utils/yandexSdk';
+import { yandexPayments } from '../utils/yandexPayments';
 import { Language, TranslationDictionary, TRANSLATIONS, detectInitialLanguage } from '../utils/i18n';
 
 const INITIAL_UPGRADES: ShopUpgrade[] = [
@@ -247,6 +248,10 @@ interface GameContextType {
   adBoostRemainingSec: number;
   switchType: 'blue' | 'red' | 'brown' | 'laser';
   setSwitchType: (t: 'blue' | 'red' | 'brown' | 'laser') => void;
+  hasVipX2: boolean;
+  hasAutoClicker: boolean;
+  hasNoAds: boolean;
+  buyInAppProduct: (productId: string) => Promise<boolean>;
   handleClick: (clientX?: number, clientY?: number) => { isCrit: boolean; codeAdded: number; moneyAdded: number };
   buyUpgrade: (id: number) => boolean;
   upgradeSystem: (id: string) => boolean;
@@ -276,6 +281,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [adBoostEndTime, setAdBoostEndTime] = useState<number>(0);
   const [switchType, setSwitchTypeState] = useState<'blue' | 'red' | 'brown' | 'laser'>('blue');
   const [lang, setLangState] = useState<Language>(detectInitialLanguage());
+  const [hasVipX2, setHasVipX2] = useState<boolean>(false);
+  const [hasAutoClicker, setHasAutoClicker] = useState<boolean>(false);
+  const [hasNoAds, setHasNoAds] = useState<boolean>(false);
   const t = TRANSLATIONS[lang];
 
   const setLang = (l: Language) => {
@@ -295,7 +303,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isAdBoostActive = Date.now() < adBoostEndTime;
   const adBoostMultiplier = isAdBoostActive ? 2.0 : 1.0;
 
-  // Инициализация Yandex Games SDK
+  // Инициализация Yandex Games SDK & Платежей
   useEffect(() => {
     yandexSdk.init().then(() => {
       // Пытаемся загрузить облачные сохранения Яндекс Игр
@@ -309,10 +317,22 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (cd.prestigeCount) setPrestigeCount(cd.prestigeCount);
             if (cd.prestigeTokens) setPrestigeTokens(cd.prestigeTokens);
           }
+          if (cd.hasVipX2) setHasVipX2(true);
+          if (cd.hasAutoClicker) setHasAutoClicker(true);
+          if (cd.hasNoAds) setHasNoAds(true);
         }
+      });
+
+      // Загружаем активные покупки Яндекс Игр
+      yandexPayments.getActivePurchases().then(purchases => {
+        if (purchases.includes("codetap_vip_x2")) setHasVipX2(true);
+        if (purchases.includes("codetap_autoclicker")) setHasAutoClicker(true);
+        if (purchases.includes("codetap_noads")) setHasNoAds(true);
       });
     });
   }, []);
+
+  const vipMultiplier = hasVipX2 ? 2.0 : 1.0;
 
   // Расчет множителей и доходов
   const globalMultiplier = (
@@ -324,7 +344,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     (systems.find(s => s.id === 'sys_realestate')?.level || 0) * 0.40 +
     (systems.find(s => s.id === 'sys_esports')?.level || 0) * 0.15 +
     (systems.find(s => s.id === 'sys_cybersec')?.level || 0) * 0.10
-  ) * adBoostMultiplier;
+  ) * adBoostMultiplier * vipMultiplier;
 
   const flowMultiplier = isInFlow ? 3.0 : 1.0;
 
@@ -356,6 +376,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.prestigeTokens) setPrestigeTokens(data.prestigeTokens);
         if (data.dailyDigestClaims) setDailyDigestClaims(data.dailyDigestClaims);
         if (data.timeWarpCooldown) setTimeWarpCooldown(data.timeWarpCooldown);
+        if (data.hasVipX2) setHasVipX2(true);
+        if (data.hasAutoClicker) setHasAutoClicker(true);
+        if (data.hasNoAds) setHasNoAds(true);
         if (data.switchType) {
           setSwitchTypeState(data.switchType);
           sounds.switchType = data.switchType;
@@ -394,7 +417,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const save = () => {
       const data: GameSaveData = {
         game: "HelloTap",
-        version: "2.1.0",
+        version: "2.3.0",
         timestamp: new Date().toISOString(),
         codeLines,
         money,
@@ -406,7 +429,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         lastSeenTime: Date.now(),
         timeWarpCooldown,
         dailyDigestClaims,
-        switchType
+        switchType,
+        hasVipX2,
+        hasAutoClicker,
+        hasNoAds
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
       yandexSdk.saveToCloud("hellotap_save", data);
@@ -419,7 +445,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearInterval(interval);
       window.removeEventListener("beforeunload", save);
     };
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, hasVipX2, hasAutoClicker, hasNoAds]);
 
   // Основной цикл
   useEffect(() => {
@@ -433,7 +459,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setMoney(m => m + moneyPerSec * dt);
       }
 
+      // Автокликер Bot Pro (10 CPS)
+      if (hasAutoClicker && codePerClick > 0) {
+        const autoCode = codePerClick;
+        const autoMoney = codePerClick * 0.25;
+        setCodeLines(c => c + autoCode);
+        setTotalCodeEver(t => t + autoCode);
+        setMoney(m => m + autoMoney);
+      }
+
       setComboEnergy(energy => {
+        if (hasAutoClicker) {
+          return Math.min(1.0, energy + 0.005);
+        }
         if (energy <= 0) return 0;
         const decayRate = energy >= 1.0 ? 0.08 : 0.04;
         return Math.max(0, energy - decayRate * dt);
@@ -441,7 +479,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, 100);
 
     return () => clearInterval(interval);
-  }, [codePerSec, moneyPerSec]);
+  }, [codePerSec, moneyPerSec, hasAutoClicker, codePerClick]);
 
   // Клик
   const handleClick = useCallback((_clientX?: number, _clientY?: number) => {
@@ -530,22 +568,61 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   }, [timeWarpCooldown, globalMultiplier, codePerSec, moneyPerSec]);
 
-  // Яндекс Реклама: Буст x2 на 3 минуты
+  // Яндекс Реклама: Буст x2 на 3 минуты (или мгновенно с No-Ads)
   const watchAdForDoubleBoost = useCallback(() => {
+    if (hasNoAds) {
+      setAdBoostEndTime(Date.now() + 180 * 1000);
+      sounds.playRelease();
+      sounds.triggerHaptic('success');
+      return;
+    }
     yandexSdk.showRewardedVideo(() => {
       setAdBoostEndTime(Date.now() + 180 * 1000);
       sounds.playRelease();
       sounds.triggerHaptic('success');
     });
-  }, []);
+  }, [hasNoAds]);
 
-  // Яндекс Реклама: Сброс кулдауна Time Warp
+  // Яндекс Реклама: Сброс кулдауна Time Warp (или мгновенно с No-Ads)
   const watchAdForTimeWarpReset = useCallback(() => {
+    if (hasNoAds) {
+      setTimeWarpCooldown(0);
+      sounds.playRelease();
+      sounds.triggerHaptic('success');
+      return;
+    }
     yandexSdk.showRewardedVideo(() => {
       setTimeWarpCooldown(0);
       sounds.playRelease();
       sounds.triggerHaptic('success');
     });
+  }, [hasNoAds]);
+
+  // Покупка In-App товара Яндекс Игр
+  const buyInAppProduct = useCallback(async (productId: string): Promise<boolean> => {
+    try {
+      const res = await yandexPayments.buyProduct(productId);
+      if (!res.success) return false;
+
+      if (productId === "codetap_vip_x2") {
+        setHasVipX2(true);
+      } else if (productId === "codetap_autoclicker") {
+        setHasAutoClicker(true);
+      } else if (productId === "codetap_noads") {
+        setHasNoAds(true);
+      } else if (productId === "codetap_stocks_100") {
+        setPrestigeTokens(t => t + 100);
+      } else if (productId === "codetap_money_1m") {
+        setMoney(m => m + 1000000);
+      }
+
+      sounds.playRelease();
+      sounds.triggerHaptic('success');
+      return true;
+    } catch (err) {
+      console.error("[GameContext] buyInAppProduct error:", err);
+      return false;
+    }
   }, []);
 
   // Престиж / Выход на IPO
@@ -569,7 +646,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const exportSaveBase64 = useCallback((): string => {
     const data: GameSaveData = {
       game: "HelloTap",
-      version: "2.1.0",
+      version: "2.3.0",
       timestamp: new Date().toISOString(),
       codeLines,
       money,
@@ -581,11 +658,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       lastSeenTime: Date.now(),
       timeWarpCooldown,
       dailyDigestClaims,
-      switchType
+      switchType,
+      hasVipX2,
+      hasAutoClicker,
+      hasNoAds
     };
     const json = JSON.stringify(data);
     return "HELLOTAP_SAVE_V2:" + btoa(unescape(encodeURIComponent(json)));
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, hasVipX2, hasAutoClicker, hasNoAds]);
 
   // Base64 Импорт
   const importSaveBase64 = useCallback((code: string): boolean => {
@@ -602,6 +682,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.totalCodeEver) setTotalCodeEver(data.totalCodeEver);
       if (data.prestigeCount) setPrestigeCount(data.prestigeCount);
       if (data.prestigeTokens) setPrestigeTokens(data.prestigeTokens);
+      if (data.hasVipX2) setHasVipX2(true);
+      if (data.hasAutoClicker) setHasAutoClicker(true);
+      if (data.hasNoAds) setHasNoAds(true);
       return true;
     } catch {
       return false;
@@ -640,6 +723,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         adBoostRemainingSec,
         switchType,
         setSwitchType,
+        hasVipX2,
+        hasAutoClicker,
+        hasNoAds,
+        buyInAppProduct,
         handleClick,
         buyUpgrade,
         upgradeSystem,

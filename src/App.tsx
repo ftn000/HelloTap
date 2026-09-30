@@ -7,9 +7,9 @@ import { StudioHubModal } from './components/StudioHubModal';
 
 const GameApp: React.FC = () => {
   const [hubOpen, setHubOpen] = useState<boolean>(false);
-  const [hubTab, setHubTab] = useState<'systems' | 'digest' | 'prestige' | 'custom' | 'save'>('systems');
+  const [hubTab, setHubTab] = useState<'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save'>('systems');
 
-  const openHubWithTab = (tab: 'systems' | 'digest' | 'prestige' | 'custom' | 'save') => {
+  const openHubWithTab = (tab: 'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save') => {
     setHubTab(tab);
     setHubOpen(true);
   };
@@ -19,6 +19,7 @@ const GameApp: React.FC = () => {
       {/* Верхний статус-бар */}
       <HeaderHUD
         onOpenHub={() => openHubWithTab('systems')}
+        onOpenShop={() => openHubWithTab('shop')}
         onOpenDigest={() => openHubWithTab('digest')}
         onOpenSave={() => openHubWithTab('save')}
       />

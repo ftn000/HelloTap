@@ -26,10 +26,26 @@ export interface TranslationDictionary {
 
   // Hub Tabs
   tabSystems: string;
+  tabShop: string;
   tabBoosts: string;
   tabIPO: string;
   tabSwitches: string;
   tabSaves: string;
+
+  // VIP Shop
+  vipStoreTitle: string;
+  vipStoreDesc: string;
+  vipActivePerks: string;
+  vipPerkMultiplier: string;
+  vipPerkAutoclicker: string;
+  vipPerkNoAds: string;
+  buyForYans: string;
+  alreadyOwned: string;
+  permanentBadge: string;
+  consumableBadge: string;
+  purchaseSuccess: string;
+  purchaseFailed: string;
+  noAdsActiveBadge: string;
 
   // Categories
   catAll: string;
@@ -103,10 +119,25 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     lvlPrefix: "ур.",
 
     tabSystems: "🏢 Системы",
+    tabShop: "💎 Донат",
     tabBoosts: "⚡ Бусты & Реклама",
     tabIPO: "📈 IPO",
     tabSwitches: "⌨️ Свитчи",
     tabSaves: "💾 Сейвы",
+
+    vipStoreTitle: "VIP МАРКЕТПЛЕЙС (ЯНДЕКС ИГРЫ)",
+    vipStoreDesc: "Покупки за игровую валюту Ян (Yandex In-App Purchases). Вечные улучшения сохраняются навсегда!",
+    vipActivePerks: "АКТИВНЫЕ ПРИВИЛЕГИИ:",
+    vipPerkMultiplier: "👑 Вечный x2 множитель дохода",
+    vipPerkAutoclicker: "⚡ Авто-кликер Bot Pro (10 CPS)",
+    vipPerkNoAds: "🚫 Реклама отключена (бонусы мгновенно)",
+    buyForYans: "КУПИТЬ ЗА {0} ЯН",
+    alreadyOwned: "КУПЛЕНО ✓",
+    permanentBadge: "ВЕЧНО",
+    consumableBadge: "МГНОВЕННО",
+    purchaseSuccess: "🎉 Покупка успешно совершена!",
+    purchaseFailed: "❌ Ошибка покупки или действие отменено",
+    noAdsActiveBadge: "👑 VIP NO-ADS: РЕКЛАМА ОТКЛЮЧЕНА (НАГРАДА МГНОВЕННО)",
 
     catAll: "Все",
     catOffice: "Офис",
@@ -172,10 +203,25 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     lvlPrefix: "lvl",
 
     tabSystems: "🏢 Systems",
+    tabShop: "💎 VIP Store",
     tabBoosts: "⚡ Boosts & Ads",
     tabIPO: "📈 IPO",
     tabSwitches: "⌨️ Switches",
     tabSaves: "💾 Saves",
+
+    vipStoreTitle: "VIP MARKETPLACE (YANDEX GAMES)",
+    vipStoreDesc: "Purchases with Yan currency (Yandex In-App Purchases). Permanent upgrades stay with you forever!",
+    vipActivePerks: "ACTIVE PRIVILEGES:",
+    vipPerkMultiplier: "👑 Permanent x2 income multiplier",
+    vipPerkAutoclicker: "⚡ Auto-Clicker Bot Pro (10 CPS)",
+    vipPerkNoAds: "🚫 Ads disabled (instant bonus rewards)",
+    buyForYans: "BUY FOR {0} YAN",
+    alreadyOwned: "PURCHASED ✓",
+    permanentBadge: "PERMANENT",
+    consumableBadge: "INSTANT",
+    purchaseSuccess: "🎉 Purchase completed successfully!",
+    purchaseFailed: "❌ Purchase error or cancelled",
+    noAdsActiveBadge: "👑 VIP NO-ADS: ADS SKIPPED (INSTANT REWARD)",
 
     catAll: "All",
     catOffice: "Office",

@@ -1,16 +1,17 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText } from 'lucide-react';
+import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText, Crown } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 interface HeaderHUDProps {
   onOpenHub: () => void;
+  onOpenShop: () => void;
   onOpenDigest: () => void;
   onOpenSave: () => void;
 }
 
-export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenDigest, onOpenSave }) => {
+export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave }) => {
   const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
 
@@ -108,6 +109,16 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenDigest, o
             title={t.saveBtn}
           >
             <Save className="w-4 h-4" />
+          </button>
+
+          {/* Кнопка VIP Донат */}
+          <button
+            onClick={onOpenShop}
+            className="flex items-center gap-1 p-2 sm:px-2.5 sm:py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold transition-all shadow-[0_0_12px_rgba(245,158,11,0.2)] active:scale-95"
+            title={t.tabShop}
+          >
+            <Crown className="w-4 h-4 text-amber-400" />
+            <span className="hidden sm:inline">{t.tabShop}</span>
           </button>
 
           {/* Кнопка Hub Студии */}

@@ -8,6 +8,8 @@
  * - Безопасную работу в локальном браузере без SDK (mock fallback)
  */
 
+import { yandexPayments } from './yandexPayments';
+
 interface YandexPlayer {
   getData: (keys?: string[]) => Promise<Record<string, unknown>>;
   setData: (data: Record<string, unknown>, flush?: boolean) => Promise<void>;
@@ -80,6 +82,13 @@ class YandexGamesService {
           this.player = await this.ysdk.getPlayer({ scopes: false });
         } catch {
           console.log("[YandexSDK] Guest player mode");
+        }
+
+        try {
+          // Инициализируем сервис внутриигровых покупок
+          await yandexPayments.init(this.ysdk);
+        } catch (e) {
+          console.warn("[YandexSDK] Could not init payments:", e);
         }
 
         console.log("[YandexSDK] Initialized successfully");
