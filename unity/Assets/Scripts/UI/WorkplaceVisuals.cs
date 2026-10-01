@@ -16,6 +16,14 @@ using TMPro;
 /// </summary>
 public class WorkplaceVisuals : MonoBehaviour
 {
+    public static WorkplaceVisuals Instance { get; private set; }
+
+    public bool IsBugActive => bugHp > 0 && bugAlertButton != null && bugAlertButton.gameObject.activeSelf;
+    public RectTransform BugAlertRectTransform => bugAlertButton != null ? bugAlertButton.GetComponent<RectTransform>() : null;
+    public Button BugAlertButton => bugAlertButton;
+
+    private int lastBugClickFrame = -1;
+
     [Header("Монитор и Код")]
     [SerializeField] private TMP_Text monitorCodeText;
     [SerializeField] private Graphic monitorScreenGlow;
@@ -214,6 +222,7 @@ public class WorkplaceVisuals : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
         AutoBindMissingReferences();
 
         terminalHistory.Add("<color=#6A9955>// HelloTap Dev Terminal v1.3.0</color>");
@@ -733,6 +742,28 @@ public class WorkplaceVisuals : MonoBehaviour
         bugActiveTimer = BugLifetime;
         bugAlertButton.gameObject.SetActive(true);
 
+        // Гарантируем, что кнопка бага находится на самом переднем плане и всегда перехватывает клики
+        Canvas bugCanvas = bugAlertButton.GetComponent<Canvas>();
+        if (bugCanvas == null)
+        {
+            bugCanvas = bugAlertButton.gameObject.AddComponent<Canvas>();
+        }
+        bugCanvas.overrideSorting = true;
+        bugCanvas.sortingOrder = 50;
+
+        if (bugAlertButton.GetComponent<GraphicRaycaster>() == null)
+        {
+            bugAlertButton.gameObject.AddComponent<GraphicRaycaster>();
+        }
+
+        Image bugImg = bugAlertButton.GetComponent<Image>();
+        if (bugImg != null)
+        {
+            bugImg.raycastTarget = true;
+        }
+
+        bugAlertButton.transform.SetAsLastSibling();
+
         RectTransform rt = bugAlertButton.GetComponent<RectTransform>();
         if (rt != null)
         {
@@ -742,8 +773,11 @@ public class WorkplaceVisuals : MonoBehaviour
         StartCoroutine(PopInRoutine(bugAlertButton.transform));
     }
 
-    private void OnBugClicked()
+    public void OnBugClicked()
     {
+        if (lastBugClickFrame == Time.frameCount) return;
+        lastBugClickFrame = Time.frameCount;
+
         if (bugHp <= 0 || GameManager.Instance == null) return;
 
         bugHp--;

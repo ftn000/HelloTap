@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -277,6 +278,40 @@ public class TapCounter : MonoBehaviour
 
     private bool IsValidTapPosition(Vector2 screenPos)
     {
+        // 1. Приоритетная охота на баги: если активен баг и клик пришёлся в зону плашки бага
+        if (WorkplaceVisuals.Instance != null && WorkplaceVisuals.Instance.IsBugActive)
+        {
+            RectTransform bugRt = WorkplaceVisuals.Instance.BugAlertRectTransform;
+            if (bugRt != null && RectTransformUtility.RectangleContainsScreenPoint(bugRt, screenPos, null))
+            {
+                WorkplaceVisuals.Instance.OnBugClicked();
+                return false;
+            }
+        }
+
+        // 2. Если клик попал в любую другую UI-кнопку на экране (кроме фоновой tapButton) — не засчитываем как клик кода
+        if (EventSystem.current != null)
+        {
+            PointerEventData pointerData = new PointerEventData(EventSystem.current)
+            {
+                position = screenPos
+            };
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(pointerData, results);
+            for (int i = 0; i < results.Count; i++)
+            {
+                GameObject go = results[i].gameObject;
+                if (go != null)
+                {
+                    Button btn = go.GetComponentInParent<Button>();
+                    if (btn != null && (tapButton == null || btn != tapButton))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
         if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null)
         {
             GameObject selected = EventSystem.current.currentSelectedGameObject;
