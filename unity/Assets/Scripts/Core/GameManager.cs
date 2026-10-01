@@ -539,22 +539,35 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Награда за обезвреживание бага на мониторе
+    /// Награда за обезвреживание бага на мониторе (с поддержкой Золотого Бага)
     /// </summary>
-    public void ClaimBugFixReward(Vector2 screenPos, out double bonusCode, out double bonusMoney)
+    public void ClaimBugFixReward(Vector2 screenPos, bool isGolden, out double bonusCode, out double bonusMoney)
     {
         bugsFixedCount++;
-        bonusCode = Math.Floor(Math.Max(15, GetCodePerClick() * 12));
-        bonusMoney = Math.Floor(Math.Max(50, GetMoneyPerSecond() * 10 + 50));
+        double multiplier = isGolden ? 5.0 : 1.0;
+        bonusCode = Math.Floor(Math.Max(15, GetCodePerClick() * 12 * multiplier));
+        bonusMoney = Math.Floor(Math.Max(50, (GetMoneyPerSecond() * 10 + 50) * multiplier));
 
         codeLines += bonusCode;
         totalCodeWritten += bonusCode;
         money += bonusMoney;
         totalMoneyEarned += bonusMoney;
 
+        if (isGolden)
+        {
+            // Золотой баг даёт моментальный оверклок: +50% энергии комбо и 15 секунд буста клика x2.5!
+            AddComboEnergy(0.50f);
+            ActivateEnergyBoost(15f, 2.5);
+        }
+
         CheckAchievements();
         OnCurrenciesChanged?.Invoke();
         SaveGame();
+    }
+
+    public void ClaimBugFixReward(Vector2 screenPos, out double bonusCode, out double bonusMoney)
+    {
+        ClaimBugFixReward(screenPos, false, out bonusCode, out bonusMoney);
     }
 
     /// <summary>

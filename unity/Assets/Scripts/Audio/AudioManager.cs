@@ -423,14 +423,60 @@ public class AudioManager : MonoBehaviour
 
     public void PlayBugHit(bool killed)
     {
-        if (isMuted || isFocusLost) return;
-        if (killed && releaseSound != null)
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (killed)
         {
-            sfxSource.PlayOneShot(releaseSound, 0.95f);
+            if (bugSquashSound != null)
+            {
+                sfxSource.pitch = Random.Range(1.05f, 1.2f);
+                sfxSource.PlayOneShot(bugSquashSound, 0.95f);
+            }
+            else if (releaseSound != null)
+            {
+                sfxSource.pitch = 1.1f;
+                sfxSource.PlayOneShot(releaseSound, 0.95f);
+            }
         }
         else if (critSound != null)
         {
+            sfxSource.pitch = Random.Range(0.95f, 1.15f);
             sfxSource.PlayOneShot(critSound, 0.8f);
+        }
+    }
+
+    public void PlayGoldenBugHit(bool killed)
+    {
+        if (isMuted || isFocusLost || sfxSource == null) return;
+        if (killed)
+        {
+            if (rushSuccessSound != null)
+            {
+                sfxSource.pitch = 1.05f;
+                sfxSource.PlayOneShot(rushSuccessSound, 1.0f);
+            }
+            else if (wheelWinSound != null)
+            {
+                sfxSource.pitch = 1.1f;
+                sfxSource.PlayOneShot(wheelWinSound, 1.0f);
+            }
+            else if (releaseSound != null)
+            {
+                sfxSource.pitch = 1.25f;
+                sfxSource.PlayOneShot(releaseSound, 1.0f);
+            }
+        }
+        else
+        {
+            if (wheelTickSound != null)
+            {
+                sfxSource.pitch = Random.Range(1.2f, 1.4f);
+                sfxSource.PlayOneShot(wheelTickSound, 0.9f);
+            }
+            else if (critSound != null)
+            {
+                sfxSource.pitch = Random.Range(1.2f, 1.35f);
+                sfxSource.PlayOneShot(critSound, 0.9f);
+            }
         }
     }
 

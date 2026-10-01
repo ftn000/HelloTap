@@ -205,6 +205,72 @@ public class ClickJuice : MonoBehaviour
         Destroy(txt.gameObject);
     }
 
+    /// <summary>
+    /// Эффект праздничного взрыва искр и конфетти при победе над багом
+    /// </summary>
+    public void SpawnBugExplosionEffect(Vector2 centerPos, bool isGolden)
+    {
+        Transform parent = floatingTextParent != null ? floatingTextParent : transform.parent;
+        if (parent == null) return;
+
+        string[] symbols = isGolden
+            ? new string[] { "⭐", "✨", "⚡", "🟡", "💎", "🎉", "x5", "💰" }
+            : new string[] { "✨", "💥", "⚡", "🐞", "🟢", "🎉", "+100%", "🛠️" };
+
+        Color[] colors = isGolden
+            ? new Color[] { new Color(1f, 0.84f, 0f), new Color(1f, 0.95f, 0.3f), new Color(1f, 0.6f, 0f), new Color(0.2f, 1f, 0.8f) }
+            : new Color[] { new Color(0.2f, 1f, 0.55f), new Color(1f, 0.35f, 0.4f), new Color(0.3f, 0.9f, 1f), Color.white };
+
+        int count = isGolden ? 16 : 10;
+        for (int i = 0; i < count; i++)
+        {
+            GameObject go = new GameObject("BugSpark", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            go.transform.SetParent(parent, false);
+            TextMeshProUGUI tmp = go.GetComponent<TextMeshProUGUI>();
+            tmp.fontSize = Random.Range(18, 28);
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.text = symbols[Random.Range(0, symbols.Length)];
+            tmp.color = colors[Random.Range(0, colors.Length)];
+            tmp.raycastTarget = false;
+
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(50f, 50f);
+            go.transform.position = centerPos != Vector2.zero ? (Vector3)centerPos : targetTransform.position;
+
+            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+            float speed = Random.Range(180f, 420f);
+            Vector2 velocity = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * speed;
+            float duration = Random.Range(0.65f, 0.95f);
+
+            StartCoroutine(BurstParticleRoutine(tmp, velocity, duration));
+        }
+    }
+
+    private IEnumerator BurstParticleRoutine(TMP_Text txt, Vector2 velocity, float duration)
+    {
+        float elapsed = 0f;
+        Color startColor = txt.color;
+        Vector3 curPos = txt.transform.position;
+
+        while (elapsed < duration)
+        {
+            float dt = Time.unscaledDeltaTime;
+            elapsed += dt;
+            float t = elapsed / duration;
+
+            curPos.x += velocity.x * dt;
+            curPos.y += velocity.y * dt;
+            velocity.x *= (1f - dt * 2.2f);
+            velocity.y = (velocity.y * (1f - dt * 1.5f)) - (240f * dt);
+
+            txt.transform.position = curPos;
+            txt.color = new Color(startColor.r, startColor.g, startColor.b, Mathf.Clamp01(1f - (t * t)));
+            yield return null;
+        }
+
+        Destroy(txt.gameObject);
+    }
+
     private void PlayTypingSound()
     {
         if (audioSource != null && typingSounds != null && typingSounds.Length > 0)

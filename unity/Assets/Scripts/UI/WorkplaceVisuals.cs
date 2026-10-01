@@ -22,6 +22,8 @@ public class WorkplaceVisuals : MonoBehaviour
     public bool IsBugActive => bugHp > 0 && bugAlertButton != null && bugAlertButton.gameObject.activeSelf;
     public RectTransform BugAlertRectTransform => bugAlertButton != null ? bugAlertButton.GetComponent<RectTransform>() : null;
     public Button BugAlertButton => bugAlertButton;
+    public bool IsGoldenBug => isGoldenBug;
+    private bool isGoldenBug = false;
 
     public bool IsPointInsideBugHitbox(Vector2 screenPos)
     {
@@ -715,7 +717,10 @@ public class WorkplaceVisuals : MonoBehaviour
             if (bugHp > 0)
             {
                 float pulse = (Mathf.Sin(Time.time * 9f) + 1f) * 0.5f;
-                monitorScreenGlow.color = new Color(1f, 0.12f, 0.15f, 0.10f + pulse * 0.32f);
+                Color glowCol = isGoldenBug
+                    ? new Color(1f, 0.82f, 0.12f, 0.14f + pulse * 0.38f)
+                    : new Color(1f, 0.12f, 0.15f, 0.10f + pulse * 0.32f);
+                monitorScreenGlow.color = glowCol;
             }
             else if (monitorScreenGlow.color.a > 0.005f)
             {
@@ -730,7 +735,9 @@ public class WorkplaceVisuals : MonoBehaviour
             bugActiveTimer -= dt;
             if (bugAlertText != null)
             {
-                bugAlertText.text = $"⚡ ТАПАЙ / [ПРОБЕЛ]! БАГ ({bugHp} шт) [{bugActiveTimer:F1}с]";
+                bugAlertText.text = isGoldenBug
+                    ? $"⭐ ЗОЛОТОЙ БАГ x5! [ПРОБЕЛ] ({bugHp} шт) [{bugActiveTimer:F1}с]"
+                    : $"⚡ ТАПАЙ / [ПРОБЕЛ]! БАГ ({bugHp} шт) [{bugActiveTimer:F1}с]";
             }
 
             // Быстрый удар по багу клавишей Пробел / Enter (ПК)
@@ -752,7 +759,8 @@ public class WorkplaceVisuals : MonoBehaviour
                 OnBugClicked();
                 if (keyGlowSpace != null)
                 {
-                    StartCoroutine(IndividualKeyFlashRoutine(keyGlowSpace, new Color(1f, 0.35f, 0.45f, 0.95f), 0.16f));
+                    Color flashCol = isGoldenBug ? new Color(1f, 0.85f, 0.2f, 0.95f) : new Color(1f, 0.35f, 0.45f, 0.95f);
+                    StartCoroutine(IndividualKeyFlashRoutine(keyGlowSpace, flashCol, 0.16f));
                 }
             }
 
@@ -779,8 +787,9 @@ public class WorkplaceVisuals : MonoBehaviour
     private void SpawnBug()
     {
         if (bugAlertButton == null) return;
-        bugHp = MaxBugHp;
-        bugActiveTimer = BugLifetime;
+        isGoldenBug = Random.value < 0.25f; // 25% шанс на появление Золотого Бага
+        bugHp = isGoldenBug ? 7 : MaxBugHp;
+        bugActiveTimer = isGoldenBug ? 10.5f : BugLifetime;
         bugAlertButton.gameObject.SetActive(true);
 
         // Гарантируем, что кнопка бага находится на самом переднем плане и всегда перехватывает клики
@@ -802,6 +811,15 @@ public class WorkplaceVisuals : MonoBehaviour
         {
             bugImg.raycastTarget = true;
             bugImg.raycastPadding = new Vector4(-24f, -20f, -24f, -20f); // Расширенный хитбокс (+48px по ширине, +40px по высоте)
+            bugImg.color = isGoldenBug ? new Color(1f, 0.82f, 0.12f, 1f) : new Color(0.95f, 0.22f, 0.22f, 1f);
+        }
+
+        if (bugAlertText != null)
+        {
+            bugAlertText.color = isGoldenBug ? new Color(0.15f, 0.08f, 0.01f, 1f) : Color.white;
+            bugAlertText.text = isGoldenBug
+                ? $"⭐ ЗОЛОТОЙ БАГ x5! [ПРОБЕЛ] ({bugHp} шт) [{bugActiveTimer:F1}с]"
+                : $"⚡ ТАПАЙ / [ПРОБЕЛ]! БАГ ({bugHp} шт) [{bugActiveTimer:F1}с]";
         }
 
         bugAlertButton.transform.SetAsLastSibling();
@@ -828,32 +846,75 @@ public class WorkplaceVisuals : MonoBehaviour
 
         if (bugHp > 0)
         {
-            HapticFeedback.Vibrate(24);
-            if (AudioManager.Instance != null) AudioManager.Instance.PlayBugHit(false);
+            HapticFeedback.Vibrate(isGoldenBug ? 30 : 24);
+            if (AudioManager.Instance != null)
+            {
+                if (isGoldenBug) AudioManager.Instance.PlayGoldenBugHit(false);
+                else AudioManager.Instance.PlayBugHit(false);
+            }
             if (ClickJuice.Instance != null)
             {
-                ClickJuice.Instance.SpawnCustomPopup($"ТАП! Еще {bugHp}", pos, new Color(1f, 0.45f, 0.25f), false);
+                string tapMsg = isGoldenBug ? $"⭐ ЗОЛОТО! Еще {bugHp}" : $"ТАП! Еще {bugHp}";
+                Color tapCol = isGoldenBug ? new Color(1f, 0.88f, 0.2f) : new Color(1f, 0.45f, 0.25f);
+                ClickJuice.Instance.SpawnCustomPopup(tapMsg, pos, tapCol, false);
             }
             StartCoroutine(PopInRoutine(bugAlertButton.transform));
         }
         else
         {
-            HapticFeedback.Vibrate(45);
+            bool wasGolden = isGoldenBug;
+            HapticFeedback.Vibrate(wasGolden ? 65 : 45);
             bugAlertButton.gameObject.SetActive(false);
             bugSpawnTimer = Random.Range(25f, 40f);
 
-            if (AudioManager.Instance != null) AudioManager.Instance.PlayBugHit(true);
-            GameManager.Instance.ClaimBugFixReward(pos, out double bonusCode, out double bonusMoney);
+            if (AudioManager.Instance != null)
+            {
+                if (wasGolden) AudioManager.Instance.PlayGoldenBugHit(true);
+                else AudioManager.Instance.PlayBugHit(true);
+            }
+
+            GameManager.Instance.ClaimBugFixReward(pos, wasGolden, out double bonusCode, out double bonusMoney);
             if (DailyQuestsUI.Instance != null) DailyQuestsUI.Instance.OnBugSquashed();
+
+            // Вспышка экрана монитора
+            StartCoroutine(ScreenFlashRoutine(wasGolden ? new Color(1f, 0.88f, 0.2f, 0.85f) : new Color(0.2f, 1f, 0.55f, 0.7f)));
 
             if (ClickJuice.Instance != null)
             {
-                ClickJuice.Instance.SpawnCustomPopup(
-                    $"🎉 БАГ УСТРАНЕН! +{NumberFormatter.Format(bonusCode)} кода | +{NumberFormatter.Format(bonusMoney)} руб.",
-                    pos,
-                    new Color(0.2f, 1f, 0.55f),
-                    true);
+                ClickJuice.Instance.SpawnBugExplosionEffect(pos, wasGolden);
+
+                if (wasGolden)
+                {
+                    ClickJuice.Instance.SpawnCustomPopup(
+                        $"👑 ЗОЛОТОЙ БАГ x5 ПОЙМАН!\n+{NumberFormatter.Format(bonusCode)} C# | +{NumberFormatter.Format(bonusMoney)} ₽\n⚡ OVERCLOCK x2.5 (15с)!",
+                        pos,
+                        new Color(1f, 0.88f, 0.2f),
+                        true);
+                }
+                else
+                {
+                    ClickJuice.Instance.SpawnCustomPopup(
+                        $"🎉 БАГ УСТРАНЕН!\n+{NumberFormatter.Format(bonusCode)} C# | +{NumberFormatter.Format(bonusMoney)} ₽",
+                        pos,
+                        new Color(0.2f, 1f, 0.55f),
+                        true);
+                }
             }
+        }
+    }
+
+    private IEnumerator ScreenFlashRoutine(Color flashColor)
+    {
+        if (monitorScreenGlow == null) yield break;
+        monitorScreenGlow.color = flashColor;
+        float elapsed = 0f;
+        float duration = 0.45f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            monitorScreenGlow.color = Color.Lerp(flashColor, new Color(flashColor.r, flashColor.g, flashColor.b, 0f), t);
+            yield return null;
         }
     }
 
