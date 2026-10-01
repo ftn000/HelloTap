@@ -51,7 +51,7 @@ class SoundEngine {
     return this.ctx;
   }
 
-  public switchType: 'blue' | 'red' | 'brown' | 'laser' = 'blue';
+  public switchType: 'blue' | 'red' | 'brown' | 'laser' | 'typewriter' = 'blue';
 
   public playKeyClick(isCrit: boolean = false): void {
     const ctx = this.getContext();
@@ -84,6 +84,11 @@ class SoundEngine {
         baseFreq = isCrit ? 1200 : 750 + Math.random() * 120;
         waveType = 'sawtooth';
         duration = isCrit ? 0.15 : 0.05;
+        break;
+      case 'typewriter': // Vintage Mechanical Strike + Ding Bell on Crit
+        baseFreq = isCrit ? 2200 : 180 + Math.random() * 50;
+        waveType = isCrit ? 'sine' : 'sawtooth';
+        duration = isCrit ? 0.40 : 0.025;
         break;
     }
 

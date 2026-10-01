@@ -13,36 +13,67 @@ const NOTE_FREQS: Record<string, number> = {
 };
 
 // 4-тактовая Lo-Fi / Synthwave гармония
-interface ChordProgression {
+export interface ChordProgression {
   bass: string;
   pad: string[];
   pluckNotes: string[];
 }
 
-const PROGRESSION: ChordProgression[] = [
-  // 1. Am9 (Ночной кодинг)
+export interface SynthTrack {
+  id: string;
+  name: string;
+  genre: string;
+  bpm: number;
+  filterCutoff: number;
+  stepDuration: number;
+  progression: ChordProgression[];
+}
+
+export const SYNTH_TRACKS: SynthTrack[] = [
+  // 1. Chill Lo-Fi: Ночной кодинг
   {
-    bass: 'A1',
-    pad: ['A2', 'C3', 'E3', 'G3', 'B3'],
-    pluckNotes: ['E4', 'G4', 'B4', 'C5', 'B4', 'G4']
+    id: 'midnight',
+    name: 'Midnight Coding',
+    genre: 'Lo-Fi Chill',
+    bpm: 67,
+    filterCutoff: 850,
+    stepDuration: 3.6,
+    progression: [
+      { bass: 'A1', pad: ['A2', 'C3', 'E3', 'G3', 'B3'], pluckNotes: ['E4', 'G4', 'B4', 'C5', 'B4', 'G4'] },
+      { bass: 'F2', pad: ['F2', 'C3', 'E3', 'A3', 'B3'], pluckNotes: ['A4', 'C5', 'E5', 'B4', 'A4', 'E4'] },
+      { bass: 'C2', pad: ['C2', 'G2', 'D3', 'E3', 'B3'], pluckNotes: ['G4', 'B4', 'D5', 'E5', 'D5', 'B4'] },
+      { bass: 'E2', pad: ['E2', 'B2', 'D3', 'G3', 'B3'], pluckNotes: ['E4', 'G4', 'B4', 'D5', 'B4', 'G4'] }
+    ]
   },
-  // 2. Fmaj7#11 (Неоновый дождь)
+  // 2. Synthwave: Неоновый киберпанк
   {
-    bass: 'F2',
-    pad: ['F2', 'C3', 'E3', 'A3', 'B3'],
-    pluckNotes: ['A4', 'C5', 'E5', 'B4', 'A4', 'E4']
+    id: 'cyberpunk',
+    name: 'Neon Cyberpunk Rain',
+    genre: 'Synthwave',
+    bpm: 78,
+    filterCutoff: 1250,
+    stepDuration: 3.0,
+    progression: [
+      { bass: 'D2', pad: ['D3', 'F3', 'A3', 'C4'], pluckNotes: ['A4', 'C5', 'D5', 'F5', 'D5', 'A4'] },
+      { bass: 'B2', pad: ['B2', 'D3', 'F3', 'A3'], pluckNotes: ['F4', 'A4', 'C5', 'D5', 'C5', 'A4'] },
+      { bass: 'G2', pad: ['G2', 'B2', 'D3', 'F3'], pluckNotes: ['D4', 'G4', 'B4', 'D5', 'B4', 'G4'] },
+      { bass: 'A2', pad: ['A2', 'C3', 'E3', 'G3'], pluckNotes: ['E4', 'A4', 'C5', 'E5', 'C5', 'A4'] }
+    ]
   },
-  // 3. Cmaj9 (Успешный релиз)
+  // 3. Warm Acoustic: Утренний кофе и чистый код
   {
-    bass: 'C2',
-    pad: ['C2', 'G2', 'D3', 'E3', 'B3'],
-    pluckNotes: ['G4', 'B4', 'D5', 'E5', 'D5', 'B4']
-  },
-  // 4. Em7 (Рефакторинг на рассвете)
-  {
-    bass: 'E2',
-    pad: ['E2', 'B2', 'D3', 'G3', 'B3'],
-    pluckNotes: ['E4', 'G4', 'B4', 'D5', 'B4', 'G4']
+    id: 'coffee',
+    name: 'Coffee & Clean Code',
+    genre: 'Warm Acoustic',
+    bpm: 60,
+    filterCutoff: 720,
+    stepDuration: 4.0,
+    progression: [
+      { bass: 'C2', pad: ['C3', 'E3', 'G3', 'B3'], pluckNotes: ['E4', 'G4', 'B4', 'D5', 'B4', 'G4'] },
+      { bass: 'A1', pad: ['A2', 'C3', 'E3', 'G3'], pluckNotes: ['C4', 'E4', 'G4', 'C5', 'G4', 'E4'] },
+      { bass: 'F2', pad: ['F2', 'A2', 'C3', 'E3'], pluckNotes: ['A4', 'C5', 'E5', 'G4', 'E4', 'C4'] },
+      { bass: 'G2', pad: ['G2', 'B2', 'D3', 'F3'], pluckNotes: ['B4', 'D5', 'F4', 'G4', 'D4', 'B3'] }
+    ]
   }
 ];
 
@@ -55,6 +86,7 @@ class LoFiSynthwaveEngine {
   private currentStep: number = 0;
   private isTabVisible: boolean = true;
   private userMuted: boolean = false;
+  public currentTrackIndex: number = 0;
 
   constructor() {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
@@ -119,12 +151,16 @@ class LoFiSynthwaveEngine {
   // Играем один аккордовый такт
   private playChordStep(step: number): void {
     if (!this.ctx || !this.filterNode || this.ctx.state !== 'running') return;
-    const chord = PROGRESSION[step % PROGRESSION.length];
+    const track = SYNTH_TRACKS[this.currentTrackIndex % SYNTH_TRACKS.length];
+    const chord = track.progression[step % track.progression.length];
     const now = this.ctx.currentTime;
-    const stepDuration = 3.6; // 3.6 секунды на аккорд (~67 BPM chill)
+    const stepDuration = track.stepDuration;
+
+    // Регулируем частоту среза фильтра под трек
+    this.filterNode.frequency.setValueAtTime(track.filterCutoff, now);
 
     // 1. Теплый аналоговый пэд (Pad)
-    chord.pad.forEach((noteName, idx) => {
+    chord.pad.forEach((noteName) => {
       if (!this.ctx || !this.filterNode) return;
       const freq = NOTE_FREQS[noteName];
       if (!freq) return;
@@ -176,12 +212,13 @@ class LoFiSynthwaveEngine {
     }
 
     // 3. Деликатные Lo-Fi синтезаторные плаки (Arp Plucks)
+    const pluckInterval = (stepDuration - 0.8) / Math.max(1, chord.pluckNotes.length);
     chord.pluckNotes.forEach((pluckNote, pIdx) => {
       if (!this.ctx || !this.filterNode) return;
       const pluckFreq = NOTE_FREQS[pluckNote];
       if (!pluckFreq) return;
 
-      const pluckTime = now + 0.4 + pIdx * 0.48;
+      const pluckTime = now + 0.35 + pIdx * pluckInterval;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
@@ -214,15 +251,35 @@ class LoFiSynthwaveEngine {
       this.masterGain.gain.linearRampToValueAtTime(0.35, this.ctx.currentTime + 1.2);
     }
 
+    const track = SYNTH_TRACKS[this.currentTrackIndex % SYNTH_TRACKS.length];
     this.playChordStep(this.currentStep);
     this.currentStep++;
 
     this.loopInterval = window.setInterval(() => {
       this.playChordStep(this.currentStep);
       this.currentStep++;
-    }, 3600);
+    }, Math.round(track.stepDuration * 1000));
 
     return true;
+  }
+
+  public setTrack(index: number): string {
+    this.currentTrackIndex = (index + SYNTH_TRACKS.length) % SYNTH_TRACKS.length;
+    this.currentStep = 0;
+    if (this.isPlaying) {
+      this.stop();
+      this.start();
+    }
+    return this.getTrackName();
+  }
+
+  public nextTrack(): string {
+    return this.setTrack(this.currentTrackIndex + 1);
+  }
+
+  public getTrackName(): string {
+    const track = SYNTH_TRACKS[this.currentTrackIndex % SYNTH_TRACKS.length];
+    return `${track.name} (${track.genre})`;
   }
 
   public stop(): void {

@@ -1,4 +1,4 @@
-export type SkillBranch = 'frontend' | 'backend' | 'business';
+export type SkillBranch = 'frontend' | 'backend' | 'business' | 'ai';
 
 export interface SkillNode {
   id: string;
@@ -16,7 +16,9 @@ export interface SkillNode {
     | 'timewarp_cdr'       // -% к кулдауну Time Warp
     | 'shop_discount'      // -% к стоимости улучшений
     | 'money_boost'        // +% к заработку рублей ₽
-    | 'bug_reward_boost';  // +% к награде за дебаггинг багов
+    | 'bug_reward_boost'   // +% к награде за дебаггинг багов
+    | 'click_boost'        // +% к коду за клик
+    | 'singularity';       // глобальный множитель ко всему
   valuePerLevel: number;
   reqSkillId?: string;     // Требуемый предыдущий навык в ветке
 }

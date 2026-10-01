@@ -4,7 +4,9 @@ import { formatNumber } from '../utils/numberFormatter';
 import { ShoppingBag, ArrowUpRight, Check } from 'lucide-react';
 
 export const ShopPanel: React.FC = () => {
-  const { upgrades, buyUpgrade, codeLines, money, t } = useGame();
+  const { upgrades, buyUpgrade, codeLines, money, unlockedSkills, t } = useGame();
+
+  const discountMultiplier = Math.max(0.65, 1.0 - ((unlockedSkills['skill_negotiation'] || 0) * 0.05 + (unlockedSkills['skill_unicorn_status'] || 0) * 0.08));
 
   return (
     <div className="w-full max-w-md mx-auto px-4 pb-20">
@@ -17,8 +19,8 @@ export const ShopPanel: React.FC = () => {
 
       <div className="space-y-2.5">
         {upgrades.map(u => {
-          const costCode = Math.floor(u.baseCostCode * Math.pow(u.costMultiplier, u.level));
-          const costMoney = Math.floor(u.baseCostMoney * Math.pow(u.costMultiplier, u.level));
+          const costCode = Math.floor(u.baseCostCode * Math.pow(u.costMultiplier, u.level) * discountMultiplier);
+          const costMoney = Math.floor(u.baseCostMoney * Math.pow(u.costMultiplier, u.level) * discountMultiplier);
           const canAfford = codeLines >= costCode && money >= costMoney && u.level < u.maxLevel;
           const isMax = u.level >= u.maxLevel;
 

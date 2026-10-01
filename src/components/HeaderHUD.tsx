@@ -15,7 +15,7 @@ interface HeaderHUDProps {
 }
 
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard, onOpenAchievements, onOpenTechTree }) => {
-  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t, isMusicPlaying, toggleMusic, achievements, skillPoints } = useGame();
+  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t, isMusicPlaying, toggleMusic, currentTrackName, nextMusicTrack, achievements, skillPoints } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
 
   const totalAchStars = Object.values(achievements).reduce((sum, tier) => sum + tier, 0);
@@ -107,18 +107,32 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             <FileText className="w-4 h-4" />
           </button>
 
-          {/* Кнопка Lo-Fi / Synthwave Музыки */}
-          <button
-            onClick={toggleMusic}
-            className={`p-2 rounded-xl border transition-all ${
-              isMusicPlaying
-                ? 'bg-purple-500/20 text-purple-300 border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.3)] animate-pulse'
-                : 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:text-slate-200'
-            }`}
-            title={isMusicPlaying ? (lang === 'ru' ? 'Выключить музыку (Lo-Fi Ambient)' : 'Mute Music') : (lang === 'ru' ? 'Включить Lo-Fi Synthwave Музыку' : 'Play Lo-Fi Ambient')}
-          >
-            <Music className="w-4 h-4" />
-          </button>
+          {/* Lo-Fi / Synthwave Музыкальный плеер */}
+          <div className="flex items-center gap-1 bg-slate-800/60 p-1 rounded-xl border border-slate-700/60">
+            <button
+              onClick={toggleMusic}
+              className={`p-1.5 rounded-lg border transition-all ${
+                isMusicPlaying
+                  ? 'bg-purple-500/25 text-purple-300 border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.4)] animate-pulse'
+                  : 'bg-transparent text-slate-400 border-transparent hover:text-slate-200'
+              }`}
+              title={isMusicPlaying ? `Сейчас играет: ${currentTrackName} (Клик для паузы)` : (lang === 'ru' ? 'Включить Lo-Fi Synthwave Музыку' : 'Play Lo-Fi Ambient')}
+            >
+              <Music className="w-3.5 h-3.5" />
+            </button>
+            {isMusicPlaying && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextMusicTrack();
+                }}
+                className="px-1 py-0.5 rounded text-[10px] text-purple-300 hover:text-white hover:bg-purple-500/20 font-mono transition-colors"
+                title={`След. трек (${currentTrackName})`}
+              >
+                ⏭️
+              </button>
+            )}
+          </div>
 
           {/* Кнопка Достижений */}
           <button

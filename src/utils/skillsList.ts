@@ -146,5 +146,54 @@ export const SKILL_NODES: SkillNode[] = [
     effectType: 'money_boost',
     valuePerLevel: 0.40,
     reqSkillId: 'skill_venture_network'
+  },
+
+  // ВЕТКА: AI & НЕЙРОСЕТИ
+  {
+    id: 'skill_prompt_engineering',
+    name: 'Промпт-инжиниринг LLM',
+    branch: 'ai',
+    icon: '💬',
+    description: 'Ювелирные промпты: нейросети ускоряют генерацию кода за клик на +20%',
+    maxLevel: 5,
+    costPerLevel: 1,
+    effectType: 'click_boost',
+    valuePerLevel: 0.20
+  },
+  {
+    id: 'skill_ai_agents',
+    name: 'Мультиагентный рой',
+    branch: 'ai',
+    icon: '🤖',
+    description: 'Сотни микроагентов автономно пишут фичи: пассивный доход C#/сек +40%',
+    maxLevel: 4,
+    costPerLevel: 2,
+    effectType: 'passive_boost',
+    valuePerLevel: 0.40,
+    reqSkillId: 'skill_prompt_engineering'
+  },
+  {
+    id: 'skill_fine_tuning',
+    name: 'LoRA & Файн-тюнинг весов',
+    branch: 'ai',
+    icon: '🧠',
+    description: 'Кастомные веса модели: шанс критического клика +5% и множитель +2.0x',
+    maxLevel: 3,
+    costPerLevel: 3,
+    effectType: 'crit_chance',
+    valuePerLevel: 0.05,
+    reqSkillId: 'skill_ai_agents'
+  },
+  {
+    id: 'skill_agi_singularity',
+    name: 'AGI Сингулярность',
+    branch: 'ai',
+    icon: '🌟',
+    description: 'Искусственный общий интеллект: грандиозный буст всего прогресса студии x2.5!',
+    maxLevel: 2,
+    costPerLevel: 5,
+    effectType: 'singularity',
+    valuePerLevel: 1.5,
+    reqSkillId: 'skill_fine_tuning'
   }
 ];

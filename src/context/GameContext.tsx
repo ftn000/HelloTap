@@ -109,6 +109,102 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
     codePerSecBonus: 850,
     moneyPerSecBonus: 1250,
     multiplierBonus: 0.20
+  },
+  {
+    id: 7,
+    name: "Нейросеть AI Copilot Pro",
+    category: "idle",
+    icon: "🧠",
+    description: "LLM-ассистент генерирует микросервисы и пишет тесты",
+    level: 0,
+    maxLevel: 25,
+    baseCostCode: 150000,
+    baseCostMoney: 380000,
+    costMultiplier: 1.28,
+    codePerClickBonus: 0,
+    codePerSecBonus: 3200,
+    moneyPerSecBonus: 4800,
+    multiplierBonus: 0.25
+  },
+  {
+    id: 8,
+    name: "Тензорный GPU Кластер H100",
+    category: "idle",
+    icon: "⚡",
+    description: "Стойка из 8x H100 с жидкостным охлаждением для обучения моделей",
+    level: 0,
+    maxLevel: 20,
+    baseCostCode: 750000,
+    baseCostMoney: 1900000,
+    costMultiplier: 1.30,
+    codePerClickBonus: 0,
+    codePerSecBonus: 14500,
+    moneyPerSecBonus: 22000,
+    multiplierBonus: 0.35
+  },
+  {
+    id: 9,
+    name: "Автономный Дев-Рой Агентов",
+    category: "idle",
+    icon: "🤖",
+    description: "Рой AI-агентов закрывает тикеты на GitHub и рефакторит код 24/7",
+    level: 0,
+    maxLevel: 20,
+    baseCostCode: 3800000,
+    baseCostMoney: 9500000,
+    costMultiplier: 1.32,
+    codePerClickBonus: 0,
+    codePerSecBonus: 68000,
+    moneyPerSecBonus: 105000,
+    multiplierBonus: 0.50
+  },
+  {
+    id: 10,
+    name: "Open Source Спонсорство",
+    category: "synergy",
+    icon: "💎",
+    description: "Гранты и донаты от IT-гигантов за открытые библиотеки студии",
+    level: 0,
+    maxLevel: 15,
+    baseCostCode: 18000000,
+    baseCostMoney: 45000000,
+    costMultiplier: 1.35,
+    codePerClickBonus: 120,
+    codePerSecBonus: 280000,
+    moneyPerSecBonus: 520000,
+    multiplierBonus: 0.75
+  },
+  {
+    id: 11,
+    name: "Квантовый Процессор Qubit-128",
+    category: "synergy",
+    icon: "🔮",
+    description: "Квантовая суперпозиция компилирует миллиарды комбинаций кода мгновенно",
+    level: 0,
+    maxLevel: 10,
+    baseCostCode: 90000000,
+    baseCostMoney: 230000000,
+    costMultiplier: 1.40,
+    codePerClickBonus: 600,
+    codePerSecBonus: 1200000,
+    moneyPerSecBonus: 2400000,
+    multiplierBonus: 1.20
+  },
+  {
+    id: 12,
+    name: "Орбитальный Спутниковый Даталинк",
+    category: "synergy",
+    icon: "🛰️",
+    description: "Космический лазерный канал связи: глобальное покрытие планеты без задержек",
+    level: 0,
+    maxLevel: 10,
+    baseCostCode: 500000000,
+    baseCostMoney: 1200000000,
+    costMultiplier: 1.45,
+    codePerClickBonus: 3000,
+    codePerSecBonus: 5500000,
+    moneyPerSecBonus: 11000000,
+    multiplierBonus: 2.00
   }
 ];
 
@@ -254,8 +350,8 @@ interface GameContextType {
   dailyDigestClaims: number;
   timeWarpRemainingSec: number;
   adBoostRemainingSec: number;
-  switchType: 'blue' | 'red' | 'brown' | 'laser';
-  setSwitchType: (t: 'blue' | 'red' | 'brown' | 'laser') => void;
+  switchType: 'blue' | 'red' | 'brown' | 'laser' | 'typewriter';
+  setSwitchType: (t: 'blue' | 'red' | 'brown' | 'laser' | 'typewriter') => void;
   themeId: ThemeId;
   setThemeId: (t: ThemeId) => void;
   activeEvent: GameRandomEvent | null;
@@ -271,6 +367,8 @@ interface GameContextType {
   dismissAchievementToast: (id: string) => void;
   isMusicPlaying: boolean;
   toggleMusic: () => boolean;
+  currentTrackName: string;
+  nextMusicTrack: () => string;
   buyInAppProduct: (productId: string) => Promise<boolean>;
   handleClick: (clientX?: number, clientY?: number) => { isCrit: boolean; codeAdded: number; moneyAdded: number };
   buyUpgrade: (id: number) => boolean;
@@ -307,7 +405,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [dailyDigestClaims, setDailyDigestClaims] = useState<number>(0);
   const [timeWarpCooldown, setTimeWarpCooldown] = useState<number>(0);
   const [adBoostEndTime, setAdBoostEndTime] = useState<number>(0);
-  const [switchType, setSwitchTypeState] = useState<'blue' | 'red' | 'brown' | 'laser'>('blue');
+  const [switchType, setSwitchTypeState] = useState<'blue' | 'red' | 'brown' | 'laser' | 'typewriter'>('blue');
   const [lang, setLangState] = useState<Language>(detectInitialLanguage());
   const [hasVipX2, setHasVipX2] = useState<boolean>(false);
   const [hasAutoClicker, setHasAutoClicker] = useState<boolean>(false);
@@ -326,6 +424,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [achievements, setAchievements] = useState<Record<string, number>>({});
   const [achievementToasts, setAchievementToasts] = useState<ToastItem[]>([]);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(musicSynth.getIsPlaying());
+  const [currentTrackName, setCurrentTrackName] = useState<string>(musicSynth.getTrackName());
   const t = TRANSLATIONS[lang];
 
   const isOverclocked = Date.now() < overclockEndTime;
@@ -375,12 +474,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {}
   };
 
-  const setSwitchType = (t: 'blue' | 'red' | 'brown' | 'laser') => {
+  const setSwitchType = (t: 'blue' | 'red' | 'brown' | 'laser' | 'typewriter') => {
     setSwitchTypeState(t);
     sounds.switchType = t;
     sounds.playKeyClick(true);
     setTestedSwitches(prev => prev.includes(t) ? prev : [...prev, t]);
   };
+
+  const nextMusicTrack = useCallback(() => {
+    const nextName = musicSynth.nextTrack();
+    setCurrentTrackName(nextName);
+    setIsMusicPlaying(true);
+    return nextName;
+  }, []);
 
   const setThemeId = (t: ThemeId) => {
     setThemeIdState(t);
@@ -469,11 +575,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const passiveTalentMult = 1.0 + 
     (unlockedSkills['skill_async_io'] || 0) * 0.20 + 
     (unlockedSkills['skill_k8s_autoscaling'] || 0) * 0.35 + 
-    (unlockedSkills['skill_quantum_threads'] || 0) * 0.50;
+    (unlockedSkills['skill_quantum_threads'] || 0) * 0.50 +
+    (unlockedSkills['skill_ai_agents'] || 0) * 0.40;
 
   const moneyTalentMult = 1.0 + 
     (unlockedSkills['skill_venture_network'] || 0) * 0.25 + 
     (unlockedSkills['skill_unicorn_status'] || 0) * 0.40;
+
+  const clickTalentMult = 1.0 +
+    (unlockedSkills['skill_prompt_engineering'] || 0) * 0.20;
+
+  const singularityMult = 1.0 +
+    (unlockedSkills['skill_agi_singularity'] || 0) * 1.50;
 
   // Расчет множителей и доходов
   const globalMultiplier = (
@@ -485,14 +598,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     (systems.find(s => s.id === 'sys_realestate')?.level || 0) * 0.40 +
     (systems.find(s => s.id === 'sys_esports')?.level || 0) * 0.15 +
     (systems.find(s => s.id === 'sys_cybersec')?.level || 0) * 0.10
-  ) * adBoostMultiplier * vipMultiplier * achievementBonusMultiplier * overclockMultiplier;
+  ) * adBoostMultiplier * vipMultiplier * achievementBonusMultiplier * overclockMultiplier * singularityMult;
 
   const flowMultiplier = isInFlow ? 3.0 : 1.0;
 
   const baseCpc = 1 + 
     upgrades.reduce((acc, u) => acc + (u.level * u.codePerClickBonus), 0) +
     (systems.find(s => s.id === 'sys_merch')?.level || 0) * 2;
-  const codePerClick = baseCpc * globalMultiplier * flowMultiplier;
+  const codePerClick = baseCpc * globalMultiplier * flowMultiplier * clickTalentMult;
 
   const baseCps = upgrades.reduce((acc, u) => acc + (u.level * u.codePerSecBonus), 0) +
     (systems.find(s => s.id === 'sys_satellite')?.level || 0) * 300;
@@ -660,9 +773,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Клик
   const handleClick = useCallback((_clientX?: number, _clientY?: number) => {
-    const critChance = Math.min(0.40, 0.12 + (unlockedSkills['skill_clean_code'] || 0) * 0.03);
+    const critChance = Math.min(0.50, 0.12 + (unlockedSkills['skill_clean_code'] || 0) * 0.03 + (unlockedSkills['skill_fine_tuning'] || 0) * 0.05);
     const isCrit = Math.random() < critChance;
-    const critMult = isCrit ? (4.0 + (unlockedSkills['skill_pixel_perfect'] || 0) * 1.0 + (unlockedSkills['skill_wasm_speed'] || 0) * 1.5) : 1.0;
+    const critMult = isCrit ? (4.0 + (unlockedSkills['skill_pixel_perfect'] || 0) * 1.0 + (unlockedSkills['skill_wasm_speed'] || 0) * 1.5 + (unlockedSkills['skill_fine_tuning'] || 0) * 2.0) : 1.0;
     const codeAdded = codePerClick * critMult;
     const moneyAdded = Math.max(0.5, codeAdded * 0.35);
 
@@ -1056,6 +1169,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dismissAchievementToast,
         isMusicPlaying,
         toggleMusic,
+        currentTrackName,
+        nextMusicTrack,
         buyInAppProduct,
         handleClick,
         buyUpgrade,

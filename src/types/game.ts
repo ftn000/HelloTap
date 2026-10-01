@@ -45,7 +45,7 @@ export interface GameSaveData {
   lastSeenTime: number;
   timeWarpCooldown: number;
   dailyDigestClaims: number;
-  switchType?: 'blue' | 'red' | 'brown' | 'laser';
+  switchType?: 'blue' | 'red' | 'brown' | 'laser' | 'typewriter';
   hasVipX2?: boolean;
   hasAutoClicker?: boolean;
   hasNoAds?: boolean;

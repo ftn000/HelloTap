@@ -20,7 +20,8 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
   const branches: { id: SkillBranch; name: string; icon: string; color: string }[] = [
     { id: 'frontend', name: 'Frontend & UX', icon: '🖥️', color: 'from-pink-500/20 to-purple-500/20 border-pink-500/40 text-pink-300' },
     { id: 'backend', name: 'Backend & DevOps', icon: '⚙️', color: 'from-cyan-500/20 to-blue-500/20 border-cyan-500/40 text-cyan-300' },
-    { id: 'business', name: 'Startup Tycoon', icon: '💼', color: 'from-amber-500/20 to-yellow-500/20 border-amber-500/40 text-amber-300' }
+    { id: 'business', name: 'Startup Tycoon', icon: '💼', color: 'from-amber-500/20 to-yellow-500/20 border-amber-500/40 text-amber-300' },
+    { id: 'ai', name: 'AI & Neural Nets', icon: '🧠', color: 'from-purple-500/20 to-emerald-500/20 border-purple-500/40 text-purple-300' }
   ];
 
   const filteredNodes = activeBranch === 'all'
