@@ -1,9 +1,12 @@
 {
   "name": "CodeTap: Симулятор Программиста",
-  "version": "2.8.2",
-  "buildDate": "2026-09-30T22:25:00.000Z",
+  "version": "2.12.1",
+  "buildDate": "2026-10-01T23:00:00.000Z",
   "platform": "yandex-games",
   "features": [
+    "Fix: Mobile bottom navigation bar (Code, Skills, Badges, Ranks, Hub OS) resolving header button clipping",
+    "Fix: Synchronous achievement tier locking preventing duplicate stacked toasts on rapid clicking",
+    "UI: Compact non-intrusive pill achievement toasts (max 2 visible) placed above code editor",
     "Fix: eliminate cat and coffee jitter on rapid typing",
     "Fix: preserve team, equipment and upgrades across IPO prestige",
     "Fix: smooth continuous energy fizz bubbles animation without glitches on rapid tapping",

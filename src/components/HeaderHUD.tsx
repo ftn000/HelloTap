@@ -134,10 +134,10 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             )}
           </div>
 
-          {/* Кнопка Достижений */}
+          {/* Кнопка Достижений (на мобильных перенесена в нижний бар) */}
           <button
             onClick={onOpenAchievements}
-            className="relative p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+            className="hidden sm:flex relative p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)]"
             title={lang === 'ru' ? 'Достижения и Награды' : 'Achievements'}
           >
             <Award className="w-4 h-4" />
@@ -148,10 +148,10 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             )}
           </button>
 
-          {/* Кнопка Дерева Талантов */}
+          {/* Кнопка Дерева Талантов (на мобильных перенесена в нижний бар) */}
           <button
             onClick={onOpenTechTree}
-            className={`relative p-2 rounded-xl border transition-all ${
+            className={`hidden sm:flex relative p-2 rounded-xl border transition-all ${
               skillPoints > 0
                 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50 shadow-[0_0_12px_rgba(99,102,241,0.3)] animate-pulse'
                 : 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:text-indigo-300'
@@ -166,10 +166,10 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             )}
           </button>
 
-          {/* Кнопка Рейтинга Лидерборда */}
+          {/* Кнопка Рейтинга Лидерборда (на мобильных перенесена в нижний бар) */}
           <button
             onClick={onOpenLeaderboard}
-            className="p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+            className="hidden sm:flex p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)]"
             title={t.leaderboardBtn}
           >
             <Trophy className="w-4 h-4 text-amber-400" />
@@ -194,10 +194,10 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             <span className="hidden sm:inline">{t.tabShop}</span>
           </button>
 
-          {/* Кнопка Hub Студии */}
+          {/* Кнопка Hub Студии (на мобильных перенесена в нижний бар) */}
           <button
             onClick={onOpenHub}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all active:scale-95"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all active:scale-95"
           >
             <Building2 className="w-4 h-4" />
             <span className="hidden sm:inline">{t.hubBtn}</span>

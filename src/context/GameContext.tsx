@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { ShopUpgrade, StudioSystem, GameSaveData, HubCategoryType } from '../types/game';
 import { sounds } from '../utils/soundEffects';
 import { yandexSdk } from '../utils/yandexSdk';
@@ -422,10 +422,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [overclockEndTime, setOverclockEndTime] = useState<number>(0);
   const [offlineReport, setOfflineReport] = useState<{ isOpen: boolean; seconds: number; codeEarned: number; moneyEarned: number } | null>(null);
   const [achievements, setAchievements] = useState<Record<string, number>>({});
+  const achievementsRef = useRef<Record<string, number>>({});
   const [achievementToasts, setAchievementToasts] = useState<ToastItem[]>([]);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(musicSynth.getIsPlaying());
   const [currentTrackName, setCurrentTrackName] = useState<string>(musicSynth.getTrackName());
   const t = TRANSLATIONS[lang];
+
+  useEffect(() => {
+    achievementsRef.current = achievements;
+  }, [achievements]);
 
   const isOverclocked = Date.now() < overclockEndTime;
   const overclockMultiplier = isOverclocked ? 3.0 : 1.0;
@@ -1002,10 +1007,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { current: currentVal, nextTarget, percent };
   }, [achievements, getStatValue]);
 
-  // Проверка прогресса ачивок и создание тостов
+  // Проверка прогресса ачивок и создание тостов без дублирования
   useEffect(() => {
     ACHIEVEMENTS.forEach(ach => {
-      const currentTier = achievements[ach.id] || 0;
+      const currentTier = achievementsRef.current[ach.id] || 0;
       if (currentTier >= 3) return;
 
       const val = getStatValue(ach.statKey);
@@ -1013,11 +1018,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (val >= nextTierDef.target) {
         const newTier = (currentTier + 1) as 1 | 2 | 3;
+        // Мгновенная синхронная блокировка во избежание дублирования тостов при высоком CPS
+        achievementsRef.current[ach.id] = newTier;
         setAchievements(prev => ({ ...prev, [ach.id]: newTier }));
 
         const toastId = `${ach.id}_${newTier}_${Date.now()}`;
         setAchievementToasts(prev => [
-          ...prev,
+          ...prev.slice(-2), // Храним не более 2 активных тостов в очереди
           {
             id: toastId,
             icon: ach.icon,
@@ -1032,10 +1039,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         setTimeout(() => {
           setAchievementToasts(prev => prev.filter(t => t.id !== toastId));
-        }, 3800);
+        }, 2800);
       }
     });
-  }, [manualClicks, critClicks, flowEnters, totalCodeEver, codePerSec, money, moneyPerSec, upgrades, systems, prestigeCount, prestigeTokens, timeWarpsUsed, testedSwitches, achievements, getStatValue, lang]);
+  }, [manualClicks, critClicks, flowEnters, totalCodeEver, codePerSec, money, moneyPerSec, upgrades, systems, prestigeCount, prestigeTokens, timeWarpsUsed, testedSwitches, getStatValue, lang]);
 
   const dismissAchievementToast = useCallback((id: string) => {
     setAchievementToasts(prev => prev.filter(t => t.id !== id));

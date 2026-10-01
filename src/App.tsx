@@ -10,6 +10,7 @@ import { AchievementToast } from './components/AchievementToast';
 import { RandomEventModal } from './components/RandomEventModal';
 import { TechTreeModal } from './components/TechTreeModal';
 import { OfflineProgressModal } from './components/OfflineProgressModal';
+import { BottomNav } from './components/BottomNav';
 import { useGame } from './context/GameContext';
 import { ThemeId } from './types/themes';
 
@@ -132,10 +133,18 @@ const GameApp: React.FC = () => {
       />
 
       {/* Основной контент */}
-      <main className="flex-1 flex flex-col items-center justify-start max-w-xl mx-auto w-full pt-2">
+      <main className="flex-1 flex flex-col items-center justify-start max-w-xl mx-auto w-full pt-2 pb-20 sm:pb-6">
         <MainClicker />
         <ShopPanel />
       </main>
+
+      {/* Нижняя мобильная панель навигации */}
+      <BottomNav
+        onOpenHub={() => openHubWithTab('systems')}
+        onOpenAchievements={() => setAchievementsOpen(true)}
+        onOpenTechTree={() => setTechTreeOpen(true)}
+        onOpenLeaderboard={() => setLeaderboardOpen(true)}
+      />
 
       {/* Модальное окно Studio Hub OS */}
       <StudioHubModal
