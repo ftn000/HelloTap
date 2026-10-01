@@ -12,7 +12,7 @@ USER = os.environ.get("VPS_USER", "root")
 PORT = int(os.environ.get("VPS_PORT", "22"))
 REMOTE_DIR = os.environ.get("VPS_REMOTE_DIR", "/opt/hellotap/webgl")
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-LOCAL_DIR = os.path.join(PROJECT_ROOT, "unity", "Builds", "WebGL")
+LOCAL_DIR = os.path.join(PROJECT_ROOT, "dist")
 
 # Load password from .env if present, otherwise environment variable
 PASS = os.environ.get("VPS_PASS")
@@ -35,10 +35,10 @@ def deploy():
     sftp = ssh.open_sftp()
     print("SFTP session opened.")
 
-    stdin, stdout, stderr = ssh.exec_command(f"mkdir -p {REMOTE_DIR}")
+    stdin, stdout, stderr = ssh.exec_command(f"mkdir -p {REMOTE_DIR} && rm -rf {REMOTE_DIR}/*")
     stdout.channel.recv_exit_status()
 
-    print(f"Syncing WebGL build files from {LOCAL_DIR} to {REMOTE_DIR}...")
+    print(f"Syncing React build files from {LOCAL_DIR} to {REMOTE_DIR}...")
     count = 0
     for root, dirs, files in os.walk(LOCAL_DIR):
         rel_dir = os.path.relpath(root, LOCAL_DIR).replace("\\", "/")
@@ -74,7 +74,7 @@ def deploy():
     print(site_out)
 
     ssh.close()
-    print("HelloTap WebGL deployment finished successfully!")
+    print("HelloTap React deployment finished successfully!")
 
 if __name__ == "__main__":
     deploy()
