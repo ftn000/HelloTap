@@ -1,6 +1,6 @@
 {
   "name": "hellotap",
-  "version": "2.9.1",
+  "version": "2.9.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "package:yandex": "node scripts/package-yandex.js",
     "build:yandex": "npm run build && npm run package:yandex",
+    "deploy:vps": "py scripts/deploy_vps.py",
     "preview": "vite preview"
   },
   "dependencies": {
