@@ -5,6 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Управляет атмосферой и визуальной эволюцией рабочего места инди-разработчика:
@@ -21,6 +22,23 @@ public class WorkplaceVisuals : MonoBehaviour
     public bool IsBugActive => bugHp > 0 && bugAlertButton != null && bugAlertButton.gameObject.activeSelf;
     public RectTransform BugAlertRectTransform => bugAlertButton != null ? bugAlertButton.GetComponent<RectTransform>() : null;
     public Button BugAlertButton => bugAlertButton;
+
+    public bool IsPointInsideBugHitbox(Vector2 screenPos)
+    {
+        if (!IsBugActive || bugAlertButton == null) return false;
+        RectTransform rt = bugAlertButton.GetComponent<RectTransform>();
+        if (rt == null) return false;
+
+        // Расширенный хитбокс (+32px по бокам, +26px сверху/снизу) для комфортного тапа с мобильных экранов
+        Vector3[] corners = new Vector3[4];
+        rt.GetWorldCorners(corners);
+        float minX = corners[0].x - 32f;
+        float maxX = corners[2].x + 32f;
+        float minY = corners[0].y - 26f;
+        float maxY = corners[2].y + 26f;
+
+        return screenPos.x >= minX && screenPos.x <= maxX && screenPos.y >= minY && screenPos.y <= maxY;
+    }
 
     private int lastBugClickFrame = -1;
 
@@ -712,7 +730,30 @@ public class WorkplaceVisuals : MonoBehaviour
             bugActiveTimer -= dt;
             if (bugAlertText != null)
             {
-                bugAlertText.text = $"⚡ ТАПАЙ БЫСТРО! БАГ ({bugHp} шт) [{bugActiveTimer:F1}с]";
+                bugAlertText.text = $"⚡ ТАПАЙ / [ПРОБЕЛ]! БАГ ({bugHp} шт) [{bugActiveTimer:F1}с]";
+            }
+
+            // Быстрый удар по багу клавишей Пробел / Enter (ПК)
+            bool spaceHit = false;
+            if (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame ||
+                                             Keyboard.current.enterKey.wasPressedThisFrame ||
+                                             Keyboard.current.numpadEnterKey.wasPressedThisFrame))
+            {
+                spaceHit = true;
+            }
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (!spaceHit && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
+            {
+                spaceHit = true;
+            }
+#endif
+            if (spaceHit)
+            {
+                OnBugClicked();
+                if (keyGlowSpace != null)
+                {
+                    StartCoroutine(IndividualKeyFlashRoutine(keyGlowSpace, new Color(1f, 0.35f, 0.45f, 0.95f), 0.16f));
+                }
             }
 
             if (bugActiveTimer <= 0f)
@@ -760,6 +801,7 @@ public class WorkplaceVisuals : MonoBehaviour
         if (bugImg != null)
         {
             bugImg.raycastTarget = true;
+            bugImg.raycastPadding = new Vector4(-24f, -20f, -24f, -20f); // Расширенный хитбокс (+48px по ширине, +40px по высоте)
         }
 
         bugAlertButton.transform.SetAsLastSibling();
@@ -767,6 +809,7 @@ public class WorkplaceVisuals : MonoBehaviour
         RectTransform rt = bugAlertButton.GetComponent<RectTransform>();
         if (rt != null)
         {
+            rt.sizeDelta = new Vector2(360f, 64f); // Увеличенный размер плашки для легкого тапа
             rt.anchoredPosition = new Vector2(Random.Range(-150f, 150f), Random.Range(-60f, 80f));
         }
 

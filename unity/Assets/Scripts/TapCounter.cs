@@ -192,7 +192,27 @@ public class TapCounter : MonoBehaviour
             return;
         }
 
-        // 1. Нажатие любой клавиши на клавиатуре (печать кода!)
+        // 1. Быстрое устранение бага по нажатию Пробела / Enter (ПК-управление)
+        bool bugSpaceHit = false;
+        if (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame ||
+                                         Keyboard.current.enterKey.wasPressedThisFrame ||
+                                         Keyboard.current.numpadEnterKey.wasPressedThisFrame))
+        {
+            bugSpaceHit = true;
+        }
+#if ENABLE_LEGACY_INPUT_MANAGER
+        if (!bugSpaceHit && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
+        {
+            bugSpaceHit = true;
+        }
+#endif
+        if (bugSpaceHit && WorkplaceVisuals.Instance != null && WorkplaceVisuals.Instance.IsBugActive)
+        {
+            WorkplaceVisuals.Instance.OnBugClicked();
+            return;
+        }
+
+        // 2. Нажатие любой клавиши на клавиатуре (печать кода!)
         bool keyPressed = false;
         if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame &&
             !Keyboard.current.escapeKey.wasPressedThisFrame)
@@ -278,11 +298,12 @@ public class TapCounter : MonoBehaviour
 
     private bool IsValidTapPosition(Vector2 screenPos)
     {
-        // 1. Приоритетная охота на баги: если активен баг и клик пришёлся в зону плашки бага
+        // 1. Приоритетная охота на баги: если активен баг и клик пришёлся в зону плашки бага (с расширенным хитбоксом)
         if (WorkplaceVisuals.Instance != null && WorkplaceVisuals.Instance.IsBugActive)
         {
             RectTransform bugRt = WorkplaceVisuals.Instance.BugAlertRectTransform;
-            if (bugRt != null && RectTransformUtility.RectangleContainsScreenPoint(bugRt, screenPos, null))
+            if (bugRt != null && (RectTransformUtility.RectangleContainsScreenPoint(bugRt, screenPos, null) ||
+                                  WorkplaceVisuals.Instance.IsPointInsideBugHitbox(screenPos)))
             {
                 WorkplaceVisuals.Instance.OnBugClicked();
                 return false;
