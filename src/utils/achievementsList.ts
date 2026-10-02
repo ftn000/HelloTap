@@ -79,6 +79,66 @@ export const ACHIEVEMENTS: AchievementDef[] = [
       { tier: 3, target: 20000, rewardDescRu: "+5% к скорости кода (МАСТЕР)", rewardDescEn: "+5% Code Speed (MASTER)", bonusMultiplier: 0.05 }
     ]
   },
+  {
+    id: "ach_lang_python",
+    icon: "🐍",
+    category: "code",
+    titleRu: "Python Пионер",
+    titleEn: "Python Pioneer",
+    descRu: "Сделайте коммиты в модуль нейросети на Python",
+    descEn: "Make commits to the Python neural network module",
+    statKey: "commits_python",
+    tiers: [
+      { tier: 1, target: 1, rewardDescRu: "+3% к силе клика (ПЕРВЫЙ КОММИТ)", rewardDescEn: "+3% Click Power (FIRST COMMIT)", bonusMultiplier: 0.03 },
+      { tier: 2, target: 10, rewardDescRu: "+5% к силе клика", rewardDescEn: "+5% Click Power", bonusMultiplier: 0.05 },
+      { tier: 3, target: 50, rewardDescRu: "+8% к силе клика (СЕНЬОР PYTHON)", rewardDescEn: "+8% Click Power (SENIOR PYTHON)", bonusMultiplier: 0.08 }
+    ]
+  },
+  {
+    id: "ach_lang_cpp",
+    icon: "⚡",
+    category: "code",
+    titleRu: "Магия Указателей",
+    titleEn: "Pointer Magic (C++)",
+    descRu: "Сделайте коммиты в Vulkan-движок на C++23",
+    descEn: "Make commits to the Vulkan engine on C++23",
+    statKey: "commits_cpp",
+    tiers: [
+      { tier: 1, target: 1, rewardDescRu: "+3% к выработке кода (ПЕРВЫЙ КОММИТ)", rewardDescEn: "+3% Code Output (FIRST COMMIT)", bonusMultiplier: 0.03 },
+      { tier: 2, target: 10, rewardDescRu: "+5% к выработке кода", rewardDescEn: "+5% Code Output", bonusMultiplier: 0.05 },
+      { tier: 3, target: 50, rewardDescRu: "+8% к выработке кода (АРХИТЕКТОР C++)", rewardDescEn: "+8% Code Output (C++ ARCHITECT)", bonusMultiplier: 0.08 }
+    ]
+  },
+  {
+    id: "ach_lang_solidity",
+    icon: "💎",
+    category: "code",
+    titleRu: "Смарт-Контракт",
+    titleEn: "Smart Contract (Solidity)",
+    descRu: "Сделайте коммиты смарт-контракта на Solidity",
+    descEn: "Make commits to the Solidity smart contract",
+    statKey: "commits_solidity",
+    tiers: [
+      { tier: 1, target: 1, rewardDescRu: "+3% к доходу в рублях (ПЕРВЫЙ КОММИТ)", rewardDescEn: "+3% Money Income (FIRST COMMIT)", bonusMultiplier: 0.03 },
+      { tier: 2, target: 10, rewardDescRu: "+5% к доходу в рублях", rewardDescEn: "+5% Money Income", bonusMultiplier: 0.05 },
+      { tier: 3, target: 50, rewardDescRu: "+8% к доходу в рублях (WEB3 КИТ)", rewardDescEn: "+8% Money Income (WEB3 WHALE)", bonusMultiplier: 0.08 }
+    ]
+  },
+  {
+    id: "ach_lang_rust",
+    icon: "🦀",
+    category: "code",
+    titleRu: "Borrow Checker Укрощен",
+    titleEn: "Borrow Checker Tamed (Rust)",
+    descRu: "Сделайте коммиты квантового ядра на Rust",
+    descEn: "Make commits to the Rust quantum core",
+    statKey: "commits_rust",
+    tiers: [
+      { tier: 1, target: 1, rewardDescRu: "+4% к общему множителю (ПЕРВЫЙ КОММИТ)", rewardDescEn: "+4% Global Multiplier (FIRST COMMIT)", bonusMultiplier: 0.04 },
+      { tier: 2, target: 10, rewardDescRu: "+6% к общему множителю", rewardDescEn: "+6% Global Multiplier", bonusMultiplier: 0.06 },
+      { tier: 3, target: 50, rewardDescRu: "+10% к общему множителю (RUSTACEAN GOD)", rewardDescEn: "+10% Global Multiplier (RUSTACEAN GOD)", bonusMultiplier: 0.10 }
+    ]
+  },
 
   // --- 3. ЭКОНОМИКА И ДОХОД ---
   {

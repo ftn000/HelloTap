@@ -25,4 +25,7 @@ export interface IdeTheme {
   syntaxNumber: string;
   syntaxComment: string;
   syntaxPunctuation: string;
+  // Sound Preset linked to theme
+  soundPreset: 'laser' | 'brown' | 'typewriter' | 'blue' | 'red';
+  soundPresetName: string;
 }

@@ -8,7 +8,7 @@ import { ACHIEVEMENTS } from '../utils/achievementsList';
 import { ToastItem } from '../components/AchievementToast';
 import { musicSynth } from '../utils/musicSynth';
 import { ThemeId } from '../types/themes';
-import { DEFAULT_THEME_ID } from '../utils/themesList';
+import { DEFAULT_THEME_ID, IDE_THEMES } from '../utils/themesList';
 import { GameRandomEvent, GameEventOption } from '../types/events';
 import { generateRandomEvent } from '../utils/eventsList';
 import { SKILL_NODES } from '../utils/skillsList';
@@ -376,6 +376,8 @@ interface GameContextType {
   claimDailyDigest: () => { bonusCode: number; bonusMoney: number };
   triggerTimeWarp: () => boolean;
   triggerPrestigeIPO: () => { gainedTokens: number; gainedSkillPoints: number };
+  langCommits: Record<string, number>;
+  recordCommit: (langKey: string) => void;
   skillPoints: number;
   unlockedSkills: Record<string, number>;
   upgradeSkill: (skillId: string, cost: number) => boolean;
@@ -416,6 +418,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [timeWarpsUsed, setTimeWarpsUsed] = useState<number>(0);
   const [testedSwitches, setTestedSwitches] = useState<string[]>(['blue']);
   const [themeId, setThemeIdState] = useState<ThemeId>(DEFAULT_THEME_ID);
+  const [langCommits, setLangCommits] = useState<Record<string, number>>({});
   const [activeEvent, setActiveEvent] = useState<GameRandomEvent | null>(null);
   const [skillPoints, setSkillPoints] = useState<number>(0);
   const [unlockedSkills, setUnlockedSkills] = useState<Record<string, number>>({});
@@ -493,8 +496,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return nextName;
   }, []);
 
+  const recordCommit = useCallback((langKey: string) => {
+    setLangCommits(prev => ({
+      ...prev,
+      [langKey]: (prev[langKey] || 0) + 1
+    }));
+  }, []);
+
   const setThemeId = (t: ThemeId) => {
     setThemeIdState(t);
+    const theme = IDE_THEMES[t];
+    if (theme && theme.soundPreset) {
+      setSwitchType(theme.soundPreset);
+    }
   };
 
   const dismissEvent = () => {
@@ -554,6 +568,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (cd.themeId) setThemeIdState(cd.themeId as ThemeId);
           if (cd.skillPoints !== undefined) setSkillPoints(cd.skillPoints);
           if (cd.unlockedSkills) setUnlockedSkills(cd.unlockedSkills);
+          if (cd.langCommits) setLangCommits(cd.langCommits);
         }
       });
 
@@ -647,6 +662,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.themeId) setThemeIdState(data.themeId as ThemeId);
         if (data.skillPoints !== undefined) setSkillPoints(data.skillPoints);
         if (data.unlockedSkills) setUnlockedSkills(data.unlockedSkills);
+        if (data.langCommits) setLangCommits(data.langCommits);
         if (data.switchType) {
           setSwitchTypeState(data.switchType);
           sounds.switchType = data.switchType;
@@ -715,7 +731,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         flowEnters,
         timeWarpsUsed,
         testedSwitches,
-        achievements
+        achievements,
+        langCommits
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
       yandexSdk.saveToCloud("hellotap_save", data);
@@ -728,7 +745,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearInterval(interval);
       window.removeEventListener("beforeunload", save);
     };
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits]);
 
   // Периодический спавн случайных мини-событий (каждые 90-120 секунд)
   useEffect(() => {
@@ -990,9 +1007,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       case 'prestigeTokens': return prestigeTokens;
       case 'timeWarpsUsed': return timeWarpsUsed;
       case 'switchesTestedCount': return testedSwitches.length;
+      case 'commits_python': return langCommits['python'] || 0;
+      case 'commits_cpp': return langCommits['cpp'] || 0;
+      case 'commits_solidity': return langCommits['solidity'] || 0;
+      case 'commits_rust': return langCommits['rust'] || 0;
       default: return 0;
     }
-  }, [manualClicks, critClicks, flowEnters, totalCodeEver, codePerSec, money, moneyPerSec, upgrades, systems, prestigeCount, prestigeTokens, timeWarpsUsed, testedSwitches]);
+  }, [manualClicks, critClicks, flowEnters, totalCodeEver, codePerSec, money, moneyPerSec, upgrades, systems, prestigeCount, prestigeTokens, timeWarpsUsed, testedSwitches, langCommits]);
 
   const getAchievementProgress = useCallback((id: string) => {
     const def = ACHIEVEMENTS.find(a => a.id === id);
@@ -1042,7 +1063,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }, 2800);
       }
     });
-  }, [manualClicks, critClicks, flowEnters, totalCodeEver, codePerSec, money, moneyPerSec, upgrades, systems, prestigeCount, prestigeTokens, timeWarpsUsed, testedSwitches, getStatValue, lang]);
+  }, [manualClicks, critClicks, flowEnters, totalCodeEver, codePerSec, money, moneyPerSec, upgrades, systems, prestigeCount, prestigeTokens, timeWarpsUsed, testedSwitches, langCommits, getStatValue, lang]);
 
   const dismissAchievementToast = useCallback((id: string) => {
     setAchievementToasts(prev => prev.filter(t => t.id !== id));
@@ -1082,11 +1103,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       flowEnters,
       timeWarpsUsed,
       testedSwitches,
-      achievements
+      achievements,
+      langCommits
     };
     const json = JSON.stringify(data);
     return "HELLOTAP_SAVE_V2:" + btoa(unescape(encodeURIComponent(json)));
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits]);
 
   // Base64 Импорт
   const importSaveBase64 = useCallback((code: string): boolean => {
@@ -1115,6 +1137,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.themeId) setThemeIdState(data.themeId as ThemeId);
       if (data.skillPoints !== undefined) setSkillPoints(data.skillPoints);
       if (data.unlockedSkills) setUnlockedSkills(data.unlockedSkills);
+      if (data.langCommits) setLangCommits(data.langCommits);
       return true;
     } catch {
       return false;
@@ -1185,6 +1208,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         claimDailyDigest,
         triggerTimeWarp,
         triggerPrestigeIPO,
+        langCommits,
+        recordCommit,
         watchAdForDoubleBoost,
         watchAdForTimeWarpReset,
         exportSaveBase64,

@@ -50,7 +50,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({ isOpen, on
             <div className="flex items-center gap-2">
               <span className="text-amber-400 font-bold text-sm">★ {totalStars} / {maxStars}</span>
               <span className="text-slate-400 font-sans">
-                ({completedCount} {lang === 'ru' ? 'из 24 закрыто' : 'of 24 mastered'})
+                ({completedCount} {lang === 'ru' ? `из ${ACHIEVEMENTS.length} закрыто` : `of ${ACHIEVEMENTS.length} mastered`})
               </span>
             </div>
             <div className="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
@@ -71,7 +71,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({ isOpen, on
           <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-0.5 text-[11px] scrollbar-none">
             {(['all', 'clicks', 'code', 'economy', 'upgrades', 'systems', 'prestige'] as const).map(cat => {
               const label = {
-                all: lang === 'ru' ? 'Все (24)' : 'All (24)',
+                all: lang === 'ru' ? `Все (${ACHIEVEMENTS.length})` : `All (${ACHIEVEMENTS.length})`,
                 clicks: lang === 'ru' ? 'Клики' : 'Clicks',
                 code: lang === 'ru' ? 'Код' : 'Code',
                 economy: lang === 'ru' ? 'Экономика' : 'Economy',

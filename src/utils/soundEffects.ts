@@ -106,6 +106,32 @@ class SoundEngine {
     osc.stop(ctx.currentTime + duration);
   }
 
+  public playQuickFix(): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    // Свежий чистый диагностический перезвон: D5 -> A5 -> D6
+    const notes = [587.33, 880.0, 1174.66];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.045;
+      const duration = 0.18;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.24, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
   public playUpgrade(): void {
     const ctx = this.getContext();
     if (!ctx) return;

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Flame, Sparkles, Terminal, Cpu, Zap, Bug, GitBranch, CheckCircle2, Lock, Volume2 } from 'lucide-react';
+import { Flame, Sparkles, Terminal, Cpu, Zap, Bug, GitBranch, CheckCircle2, Lock, Volume2, AlertTriangle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { IDE_THEMES } from '../utils/themesList';
 import { StudioDecor } from './StudioDecor';
 import { CODE_PROJECT_FILES, CodeProjectFile, tokenizeCodeLine, getTokenColor } from '../utils/codeProjects';
+import { sounds } from '../utils/soundEffects';
 
 interface Popup {
   id: number;
@@ -21,6 +22,26 @@ interface CodeBug {
   title: string;
   timeLeft: number;
 }
+
+export interface LinterWarning {
+  id: string;
+  fileId: string;
+  lineIdx: number;
+  tokenIdx: number;
+  originalText: string;
+  errorText: string;
+  message: string;
+  timeLeft: number;
+}
+
+const LINTER_ERROR_TEMPLATES = [
+  { typo: (s: string) => s + ';;', msg: 'SyntaxError: Extra semicolon or invalid token' },
+  { typo: (s: string) => s.slice(0, -1) + '??', msg: 'SyntaxError: Invalid optional chaining' },
+  { typo: (s: string) => s + '()()', msg: 'TypeError: Expression is not callable' },
+  { typo: (s: string) => s + '<T_Err>', msg: 'TypeError: Missing generic type argument' },
+  { typo: (s: string) => s + '!null', msg: 'TS2531: Object is possibly null' },
+  { typo: (s: string) => 'typo_' + s, msg: 'ReferenceError: Undefined variable name' }
+];
 
 const BUG_TYPES = [
   'NullReferenceException: Object not set at Line 42',
@@ -69,6 +90,7 @@ export const MainClicker: React.FC = () => {
     unlockedSkills,
     switchType,
     setSwitchType,
+    recordCommit,
     t 
   } = useGame();
 
@@ -76,6 +98,7 @@ export const MainClicker: React.FC = () => {
   const [popups, setPopups] = useState<Popup[]>([]);
   const [activeKey, setActiveKey] = useState<boolean>(false);
   const [activeBug, setActiveBug] = useState<CodeBug | null>(null);
+  const [linterWarning, setLinterWarning] = useState<LinterWarning | null>(null);
 
   // Динамические файлы проектов: выбор активного файла
   const [activeFileId, setActiveFileId] = useState<string>('ts_starter');
@@ -113,6 +136,44 @@ export const MainClicker: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Горячие клавиши Tab и Ctrl+P для мгновенной смены активного файла в IDE
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      const isTab = e.key === 'Tab';
+      const isCtrlP = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p';
+
+      if (isTab || isCtrlP) {
+        e.preventDefault();
+
+        const unlocked = CODE_PROJECT_FILES.filter(f => totalCodeEver >= f.requiredCodeLines);
+        if (unlocked.length <= 1) return;
+
+        const currentIdx = unlocked.findIndex(f => f.id === activeFileId);
+        let nextIdx: number;
+
+        if (e.shiftKey && isTab) {
+          nextIdx = (currentIdx - 1 + unlocked.length) % unlocked.length;
+        } else {
+          nextIdx = (currentIdx + 1) % unlocked.length;
+        }
+
+        const nextFile = unlocked[nextIdx];
+        setActiveFileId(nextFile.id);
+        setLineIdx(0);
+        sounds.playAutoClickTick();
+        setCompileLog(`📂 [${isTab ? 'TAB' : 'Ctrl+P'}] Открыт: ${nextFile.filename} (${nextFile.language})`);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [totalCodeEver, activeFileId]);
+
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -127,6 +188,12 @@ export const MainClicker: React.FC = () => {
     // Продвигаем строку живого кода в текущем файле
     setLineIdx(prevLine => {
       if (prevLine >= activeFile.codeLines.length - 1) {
+        // Полный цикл файла пройден: совершаем коммит и триггерим языковую ачивку!
+        recordCommit(activeFile.langKey);
+        setGitStatus(`git: commit [${activeFile.filename}] 🚀`);
+        setTimeout(() => {
+          setGitStatus('git: (main)*');
+        }, 750);
         return 0; // Зацикливание текущего скрипта
       }
       return prevLine + 1;
@@ -135,10 +202,12 @@ export const MainClicker: React.FC = () => {
     // Тактильный эффект сборки: обновление лога компиляции и Git-статуса
     const randomLog = COMPILE_LOGS[Math.floor(Math.random() * COMPILE_LOGS.length)];
     setCompileLog(`${randomLog} (+${formatNumber(codeAdded)} C#)`);
-    setGitStatus(`git: (shipping +${formatNumber(codeAdded)})`);
-    setTimeout(() => {
-      setGitStatus('git: (main)*');
-    }, 400);
+    if (gitStatus === 'git: (main)*') {
+      setGitStatus(`git: (shipping +${formatNumber(codeAdded)})`);
+      setTimeout(() => {
+        setGitStatus('git: (main)*');
+      }, 400);
+    }
 
     if (isCrit) {
       confetti({
@@ -196,6 +265,88 @@ export const MainClicker: React.FC = () => {
 
     return () => clearInterval(timer);
   }, [activeBug]);
+
+  // Периодический спавн синтаксических ошибок Linter Warning (каждые 20-25 секунд)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLinterWarning(prev => {
+        if (prev) return prev;
+
+        const targetLineIdx = Math.floor(Math.random() * activeFile.codeLines.length);
+        const line = activeFile.codeLines[targetLineIdx];
+        const tokens = tokenizeCodeLine(line);
+
+        const candidates = tokens
+          .map((tok, idx) => ({ tok, idx }))
+          .filter(({ tok }) => tok.type !== 'punctuation' && tok.type !== 'comment' && tok.text.trim().length > 1);
+
+        if (candidates.length === 0) return null;
+
+        const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        const template = LINTER_ERROR_TEMPLATES[Math.floor(Math.random() * LINTER_ERROR_TEMPLATES.length)];
+
+        return {
+          id: `linter_${Date.now()}`,
+          fileId: activeFile.id,
+          lineIdx: targetLineIdx,
+          tokenIdx: chosen.idx,
+          originalText: chosen.tok.text,
+          errorText: template.typo(chosen.tok.text),
+          message: template.msg,
+          timeLeft: 12
+        };
+      });
+    }, 22000);
+
+    return () => clearInterval(interval);
+  }, [activeFile.id, activeFile.codeLines]);
+
+  // Таймер обратного отсчета ошибки линтера
+  useEffect(() => {
+    if (!linterWarning) return;
+    const timer = setInterval(() => {
+      setLinterWarning(prev => {
+        if (!prev) return null;
+        if (prev.timeLeft <= 1) return null;
+        return { ...prev, timeLeft: prev.timeLeft - 1 };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [linterWarning]);
+
+  // Мгновенный фикс синтаксической ошибки линтера с бонусом к коду
+  const handleFixLinter = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!linterWarning) return;
+
+    const bountyMultiplier = 1.0 + (unlockedSkills['skill_clean_coder'] || 0) * 0.40;
+    const bonusCode = Math.round(Math.max(300, codePerClick * 25, codePerSec * 4) * bountyMultiplier);
+
+    handleClick();
+    sounds.playQuickFix();
+    sounds.triggerHaptic('success');
+
+    confetti({
+      particleCount: 35,
+      spread: 60,
+      origin: { y: 0.55 },
+      colors: ['#EF4444', '#10B981', '#38BDF8', '#F59E0B']
+    });
+
+    const newPopup: Popup = {
+      id: Date.now() + Math.random(),
+      text: `🔧 QUICK FIX! +${formatNumber(bonusCode)} C#`,
+      tag: '0 ERRORS',
+      x: 100,
+      y: 90,
+      isCrit: true
+    };
+
+    setPopups(prev => [...prev.slice(-14), newPopup]);
+    setCompileLog(`✓ [LINTER] Hotfix applied: ${linterWarning.originalText} (+${formatNumber(bonusCode)} C#)`);
+    setLinterWarning(null);
+  };
 
   const handleFixBug = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -338,7 +489,7 @@ export const MainClicker: React.FC = () => {
                       ? 'bg-slate-900/60 text-slate-400 hover:text-slate-200 border border-transparent'
                       : 'bg-slate-950/40 text-slate-600 border border-transparent cursor-not-allowed'
                   }`}
-                  title={isUnlocked ? `${file.filename} (${file.language})` : `${file.filename}: ${file.unlockRequirement}`}
+                  title={isUnlocked ? `${file.filename} (${file.language}) [Tab / Ctrl+P]` : `${file.filename}: ${file.unlockRequirement}`}
                 >
                   <span>{file.langIcon}</span>
                   <span>{file.filename}</span>
@@ -346,6 +497,9 @@ export const MainClicker: React.FC = () => {
                 </button>
               );
             })}
+            <span className="hidden sm:inline text-[9px] text-slate-500 font-mono ml-1" title="Быстрое переключение: Tab или Ctrl+P">
+              [Tab/Ctrl+P]
+            </span>
           </div>
 
           {/* Доход за клик */}
@@ -381,12 +535,13 @@ export const MainClicker: React.FC = () => {
           </button>
         )}
 
-        {/* ШАГ 2: МНОГОСТРОЧНЫЙ IDE-РЕДАКТОР С ЧЕСТНОЙ ПОДСВЕТКОЙ СИНТАКСИСА */}
+        {/* ШАГ 2: МНОГОСТРОЧНЫЙ IDE-РЕДАКТОР С ЧЕСТНОЙ ПОДСВЕТКОЙ СИНТАКСИСА И ЛИНТЕРОМ */}
         <div className="relative z-20 my-2 p-3 rounded-2xl bg-black/55 border border-slate-800/80 font-mono text-xs sm:text-[13px] space-y-1 overflow-hidden min-h-[105px] flex flex-col justify-center shadow-inner">
           {activeFile.codeLines.map((lineText, idx) => {
             const isCurrent = idx === lineIdx;
             const isPassed = idx < lineIdx;
             const tokens = tokenizeCodeLine(lineText);
+            const hasLinterErrorOnLine = linterWarning && linterWarning.fileId === activeFile.id && linterWarning.lineIdx === idx;
 
             return (
               <div 
@@ -399,20 +554,53 @@ export const MainClicker: React.FC = () => {
                   {idx + 1}
                 </span>
                 <div className="flex items-center flex-wrap truncate">
-                  {tokens.map((tok, tIdx) => (
-                    <span
-                      key={tIdx}
-                      style={{ color: getTokenColor(tok, currentTheme) }}
-                      className="whitespace-pre font-medium"
-                    >
-                      {tok.text}
-                    </span>
-                  ))}
+                  {tokens.map((tok, tIdx) => {
+                    const isErrorToken = hasLinterErrorOnLine && linterWarning.tokenIdx === tIdx;
+
+                    if (isErrorToken) {
+                      return (
+                        <span
+                          key={tIdx}
+                          onClick={handleFixLinter}
+                          title={`${linterWarning.message} — Кликните для Quick Fix!`}
+                          className="relative inline-flex items-center group cursor-pointer z-30 mx-0.5"
+                        >
+                          <span className="underline decoration-wavy decoration-red-500 decoration-2 underline-offset-4 text-red-400 bg-red-500/20 px-1 py-0.5 rounded font-bold animate-pulse hover:bg-red-500/35 transition-all">
+                            {linterWarning.errorText}
+                          </span>
+                          {/* VS Code Quick Fix Lightbulb Tooltip */}
+                          <span className="absolute -top-7 left-0 z-40 hidden group-hover:flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-400 text-slate-950 text-[10px] font-bold shadow-lg whitespace-nowrap animate-bounce">
+                            💡 Quick Fix (+бонус)
+                          </span>
+                        </span>
+                      );
+                    }
+
+                    return (
+                      <span
+                        key={tIdx}
+                        style={{ color: getTokenColor(tok, currentTheme) }}
+                        className="whitespace-pre font-medium"
+                      >
+                        {tok.text}
+                      </span>
+                    );
+                  })}
                   {isCurrent && (
                     <span 
                       style={{ backgroundColor: currentTheme.syntaxFunction }} 
                       className="ml-1 w-2 h-3.5 animate-pulse inline-block" 
                     />
+                  )}
+                  {/* Кнопка Quick Fix в строке с ошибкой линтера */}
+                  {hasLinterErrorOnLine && (
+                    <button
+                      onClick={handleFixLinter}
+                      className="ml-2 px-1.5 py-0.5 rounded bg-red-500/25 hover:bg-red-500/40 border border-red-500/60 text-[10px] text-red-200 font-mono inline-flex items-center gap-1 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)] cursor-pointer"
+                      title="Кликните для автоисправления ошибки"
+                    >
+                      <span>💡 Fix ({linterWarning.timeLeft}с)</span>
+                    </button>
                   )}
                 </div>
               </div>
@@ -447,10 +635,21 @@ export const MainClicker: React.FC = () => {
               <GitBranch className="w-3 h-3 text-cyan-400" />
               <span>{gitStatus}</span>
             </span>
-            <span className="hidden sm:flex items-center gap-1 text-emerald-400">
-              <CheckCircle2 className="w-3 h-3" />
-              <span>0 errors</span>
-            </span>
+            {linterWarning ? (
+              <button
+                onClick={handleFixLinter}
+                className="flex items-center gap-1 text-red-400 hover:text-red-300 animate-pulse font-bold cursor-pointer"
+                title="Синтаксическая ошибка: кликните для Quick Fix"
+              >
+                <AlertTriangle className="w-3 h-3 text-red-400" />
+                <span>1 error (Fix)</span>
+              </button>
+            ) : (
+              <span className="hidden sm:flex items-center gap-1 text-emerald-400">
+                <CheckCircle2 className="w-3 h-3" />
+                <span>0 errors</span>
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -490,6 +689,7 @@ export const MainClicker: React.FC = () => {
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
           {SWITCH_OPTIONS.map(sw => {
             const isSelected = switchType === sw.id;
+            const isThemePreset = currentTheme.soundPreset === sw.id;
             return (
               <button
                 key={sw.id}
@@ -502,10 +702,15 @@ export const MainClicker: React.FC = () => {
                     ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/50 shadow-[0_0_10px_rgba(6,182,212,0.3)]' 
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
                 }`}
-                title={`${sw.name} - ${sw.label}`}
+                title={`${sw.name} - ${sw.label}${isThemePreset ? ' (Пресет темы)' : ''}`}
               >
                 <span>{sw.icon}</span>
                 <span>{sw.name}</span>
+                {isThemePreset && (
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 font-mono">
+                    Тема
+                  </span>
+                )}
               </button>
             );
           })}

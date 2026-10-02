@@ -3,6 +3,7 @@ import { IdeTheme } from '../types/themes';
 
 export interface CodeProjectFile {
   id: string;
+  langKey: 'ts' | 'yml' | 'python' | 'go' | 'cpp' | 'solidity' | 'rust';
   filename: string;
   language: string;
   langIcon: string;
@@ -15,6 +16,7 @@ export interface CodeProjectFile {
 export const CODE_PROJECT_FILES: CodeProjectFile[] = [
   {
     id: 'ts_starter',
+    langKey: 'ts',
     filename: 'AppKernel.ts',
     language: 'TypeScript 5.4',
     langIcon: '🔷',
@@ -31,6 +33,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
   },
   {
     id: 'devops_ci',
+    langKey: 'yml',
     filename: 'DeployPipeline.yml',
     language: 'YAML / CI-CD',
     langIcon: '⚙️',
@@ -49,6 +52,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
   },
   {
     id: 'ai_neural',
+    langKey: 'python',
     filename: 'NeuralNetwork.py',
     language: 'Python 3.12 (PyTorch)',
     langIcon: '🐍',
@@ -65,6 +69,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
   },
   {
     id: 'go_backend',
+    langKey: 'go',
     filename: 'Microservice.go',
     language: 'Go 1.22',
     langIcon: '🦫',
@@ -82,6 +87,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
   },
   {
     id: 'cpp_engine',
+    langKey: 'cpp',
     filename: 'GamePhysics.cpp',
     language: 'C++23 (Vulkan)',
     langIcon: '⚡',
@@ -99,6 +105,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
   },
   {
     id: 'web3_solidity',
+    langKey: 'solidity',
     filename: 'SmartContract.sol',
     language: 'Solidity 0.8',
     langIcon: '💎',
@@ -117,6 +124,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
   },
   {
     id: 'rust_quantum',
+    langKey: 'rust',
     filename: 'QuantumCore.rs',
     language: 'Rust 2024',
     langIcon: '🦀',

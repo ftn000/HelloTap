@@ -576,6 +576,11 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                       <span className="text-[10px] text-slate-400 font-sans leading-tight mt-0.5">
                         {th.tagline}
                       </span>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-800/40">
+                          🔊 Звук: {th.soundPresetName}
+                        </span>
+                      </div>
                     </button>
                   ))}
                 </div>

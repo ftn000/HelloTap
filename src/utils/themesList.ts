@@ -24,7 +24,9 @@ export const IDE_THEMES: Record<string, IdeTheme> = {
     syntaxString: '#fde047',      // yellow-300
     syntaxNumber: '#fb923c',      // orange-400
     syntaxComment: '#64748b',     // slate-500
-    syntaxPunctuation: '#94a3b8'  // slate-400
+    syntaxPunctuation: '#94a3b8', // slate-400
+    soundPreset: 'laser',
+    soundPresetName: 'Неоновый лазер'
   },
   monokai: {
     id: 'monokai',
@@ -49,7 +51,9 @@ export const IDE_THEMES: Record<string, IdeTheme> = {
     syntaxString: '#e6db74',      // monokai yellow
     syntaxNumber: '#ae81ff',      // monokai violet
     syntaxComment: '#75715e',     // monokai muted gray
-    syntaxPunctuation: '#f8f8f2'  // monokai white
+    syntaxPunctuation: '#f8f8f2', // monokai white
+    soundPreset: 'brown',
+    soundPresetName: 'Мягкий тактильный'
   },
   dracula: {
     id: 'dracula',
@@ -74,7 +78,9 @@ export const IDE_THEMES: Record<string, IdeTheme> = {
     syntaxString: '#f1fa8c',      // dracula yellow
     syntaxNumber: '#bd93f9',      // dracula purple
     syntaxComment: '#6272a4',     // dracula comment blue-gray
-    syntaxPunctuation: '#f8f8f2'  // dracula foreground
+    syntaxPunctuation: '#f8f8f2', // dracula foreground
+    soundPreset: 'blue',
+    soundPresetName: 'Звонкий кликер'
   },
   matrix: {
     id: 'matrix',
@@ -99,7 +105,9 @@ export const IDE_THEMES: Record<string, IdeTheme> = {
     syntaxString: '#a7f3d0',      // emerald-200
     syntaxNumber: '#059669',      // emerald-600
     syntaxComment: '#064e3b',     // dark green
-    syntaxPunctuation: '#34d399'  // emerald-400
+    syntaxPunctuation: '#34d399', // emerald-400
+    soundPreset: 'typewriter',
+    soundPresetName: 'Винтажный стук'
   },
   nordic: {
     id: 'nordic',
@@ -124,7 +132,9 @@ export const IDE_THEMES: Record<string, IdeTheme> = {
     syntaxString: '#a3be8c',      // nord green
     syntaxNumber: '#b48ead',      // nord magenta
     syntaxComment: '#4c566a',     // nord muted gray
-    syntaxPunctuation: '#d8dee9'  // nord snow white
+    syntaxPunctuation: '#d8dee9', // nord snow white
+    soundPreset: 'red',
+    soundPresetName: 'Мягкий линейный'
   },
   tokyonight: {
     id: 'tokyonight',
@@ -149,7 +159,9 @@ export const IDE_THEMES: Record<string, IdeTheme> = {
     syntaxString: '#9ece6a',      // tokyo lime
     syntaxNumber: '#ff9e64',      // tokyo orange
     syntaxComment: '#565f89',     // tokyo muted slate
-    syntaxPunctuation: '#c0caf5'  // tokyo white
+    syntaxPunctuation: '#c0caf5', // tokyo white
+    soundPreset: 'laser',
+    soundPresetName: 'Неоновый лазер'
   }
 };
 

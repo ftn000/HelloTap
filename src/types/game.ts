@@ -58,4 +58,5 @@ export interface GameSaveData {
   themeId?: string;
   skillPoints?: number;
   unlockedSkills?: Record<string, number>;
+  langCommits?: Record<string, number>;
 }
