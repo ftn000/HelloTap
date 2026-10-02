@@ -11,6 +11,7 @@ import { RandomEventModal } from './components/RandomEventModal';
 import { TechTreeModal } from './components/TechTreeModal';
 import { OfflineProgressModal } from './components/OfflineProgressModal';
 import { BottomNav } from './components/BottomNav';
+import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { useGame } from './context/GameContext';
 import { ThemeId } from './types/themes';
 
@@ -186,6 +187,9 @@ const GameApp: React.FC = () => {
         moneyEarned={offlineReport?.moneyEarned || 0}
         onClaim={claimOfflineEarnings}
       />
+
+      {/* VS Code Command Palette (Ctrl+Shift+P / F1) */}
+      <CommandPaletteModal />
     </div>
   );
 };

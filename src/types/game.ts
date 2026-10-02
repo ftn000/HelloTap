@@ -59,4 +59,7 @@ export interface GameSaveData {
   skillPoints?: number;
   unlockedSkills?: Record<string, number>;
   langCommits?: Record<string, number>;
+  gitBranch?: string;
+  branchCodeLines?: number;
+  mergedPrCount?: number;
 }

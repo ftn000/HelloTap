@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Flame, Sparkles, Terminal, Cpu, Zap, Bug, GitBranch, CheckCircle2, Lock, Volume2, AlertTriangle } from 'lucide-react';
+import { Flame, Sparkles, Terminal, Cpu, Zap, Bug, GitBranch, GitMerge, CheckCircle2, Lock, Volume2, AlertTriangle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { IDE_THEMES } from '../utils/themesList';
 import { StudioDecor } from './StudioDecor';
@@ -75,6 +75,14 @@ const SWITCH_OPTIONS = [
   { id: 'typewriter', name: 'Typewriter', label: 'Vintage Ding', icon: '📜' },
 ] as const;
 
+const REFACTOR_TAGS = [
+  '⚡ [DRY: Deduplicate]',
+  '⚡ [SIMD: Vectorize]',
+  '⚡ [ASYNC: Non-block]',
+  '⚡ [ZERO-COPY: Buffer]',
+  '⚡ [O(1): HashMap]'
+];
+
 export const MainClicker: React.FC = () => {
   const { 
     handleClick, 
@@ -91,6 +99,15 @@ export const MainClicker: React.FC = () => {
     switchType,
     setSwitchType,
     recordCommit,
+    gitBranch,
+    branchCodeLines,
+    mergedPrCount,
+    createBranch,
+    mergePullRequest,
+    blitzRemainingSec,
+    isBlitzActive,
+    triggerRefactorBlitz,
+    setIsCommandPaletteOpen,
     t 
   } = useGame();
 
@@ -99,6 +116,11 @@ export const MainClicker: React.FC = () => {
   const [activeKey, setActiveKey] = useState<boolean>(false);
   const [activeBug, setActiveBug] = useState<CodeBug | null>(null);
   const [linterWarning, setLinterWarning] = useState<LinterWarning | null>(null);
+
+  // Мини-игра Refactor Blitz
+  const [blitzGameActive, setBlitzGameActive] = useState<boolean>(false);
+  const [blitzTimeLeft, setBlitzTimeLeft] = useState<number>(0);
+  const [refactoredLineIndices, setRefactoredLineIndices] = useState<number[]>([]);
 
   // Динамические файлы проектов: выбор активного файла
   const [activeFileId, setActiveFileId] = useState<string>('ts_starter');
@@ -377,6 +399,108 @@ export const MainClicker: React.FC = () => {
     setActiveBug(null);
   };
 
+  // Периодический спавн мини-игры Refactor Blitz (каждые 10 минут)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!blitzGameActive && !isBlitzActive) {
+        setBlitzGameActive(true);
+        setBlitzTimeLeft(15);
+        setRefactoredLineIndices([]);
+      }
+    }, 600000);
+
+    return () => clearInterval(interval);
+  }, [blitzGameActive, isBlitzActive]);
+
+  // Слушатель кастомного события для мгновенного старта мини-игры из Command Palette
+  useEffect(() => {
+    const handleStartBlitz = () => {
+      setBlitzGameActive(true);
+      setBlitzTimeLeft(15);
+      setRefactoredLineIndices([]);
+    };
+    window.addEventListener('codetap_start_blitz', handleStartBlitz);
+    return () => window.removeEventListener('codetap_start_blitz', handleStartBlitz);
+  }, []);
+
+  // Таймер обратного отсчета для активной мини-игры Refactor Blitz
+  useEffect(() => {
+    if (!blitzGameActive) return;
+    const timer = setInterval(() => {
+      setBlitzTimeLeft(prev => {
+        if (prev <= 1) {
+          setBlitzGameActive(false);
+          setRefactoredLineIndices([]);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [blitzGameActive]);
+
+  // Клик по целевой строке рефакторинга в мини-игре Refactor Blitz
+  const handleRefactorLine = (e: React.MouseEvent, targetIdx: number) => {
+    e.stopPropagation();
+    if (!blitzGameActive || refactoredLineIndices.includes(targetIdx)) return;
+
+    const nextIndices = [...refactoredLineIndices, targetIdx];
+    setRefactoredLineIndices(nextIndices);
+    sounds.playQuickFix();
+    sounds.triggerHaptic('medium');
+
+    const neededLines = Math.min(5, activeFile.codeLines.length);
+    if (nextIndices.length >= neededLines) {
+      setBlitzGameActive(false);
+      setRefactoredLineIndices([]);
+      triggerRefactorBlitz(20);
+
+      confetti({
+        particleCount: 65,
+        spread: 85,
+        origin: { y: 0.5 },
+        colors: ['#F59E0B', '#10B981', '#38BDF8', '#EC4899', '#A855F7']
+      });
+
+      const newPopup: Popup = {
+        id: Date.now() + Math.random(),
+        text: `🚀 REFACTOR BLITZ! x10 BOOST (20s)`,
+        tag: 'ALL 5 REFACTORED',
+        x: 100,
+        y: 80,
+        isCrit: true
+      };
+      setPopups(prev => [...prev.slice(-14), newPopup]);
+      setCompileLog('⚡ [BLITZ] 5x Refactors done! 10x multiplier active!');
+    }
+  };
+
+  // Слияние Pull Request
+  const handleMergePR = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const result = mergePullRequest();
+    if (result) {
+      confetti({
+        particleCount: 50,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#10B981', '#38BDF8', '#F59E0B']
+      });
+
+      const newPopup: Popup = {
+        id: Date.now() + Math.random(),
+        text: `🔀 PR MERGED! +₽${formatNumber(result.rewardMoney)} +${formatNumber(result.rewardCode)} C#`,
+        tag: `PR #${mergedPrCount + 1}`,
+        x: 90,
+        y: 80,
+        isCrit: true
+      };
+      setPopups(prev => [...prev.slice(-14), newPopup]);
+      setCompileLog(`✓ [GIT] PR merged into main: +₽${formatNumber(result.rewardMoney)}`);
+    }
+  };
+
   const onPointerUp = () => {
     setActiveKey(false);
   };
@@ -401,6 +525,12 @@ export const MainClicker: React.FC = () => {
               </span>
             )}
 
+            {isBlitzActive && (
+              <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 border border-yellow-300 text-[10px] font-black animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.8)]">
+                ⚡ 10x BLITZ ({blitzRemainingSec}с)
+              </span>
+            )}
+
             {comboInfo.label && (
               <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border animate-pulse ${comboInfo.color}`}>
                 {comboInfo.label}
@@ -418,7 +548,9 @@ export const MainClicker: React.FC = () => {
         <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-800">
           <div
             className={`h-full rounded-full transition-all duration-100 ${
-              overclockRemainingSec > 0
+              isBlitzActive
+                ? 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 shadow-[0_0_14px_rgba(245,158,11,0.9)] animate-pulse'
+                : overclockRemainingSec > 0
                 ? 'bg-gradient-to-r from-red-500 via-orange-500 to-amber-400 shadow-[0_0_12px_rgba(239,68,68,0.8)] animate-pulse'
                 : isInFlow
                 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-400 shadow-[0_0_10px_rgba(245,158,11,0.7)] animate-pulse'
@@ -535,6 +667,26 @@ export const MainClicker: React.FC = () => {
           </button>
         )}
 
+        {/* МИНИ-ИГРА: REFACTOR BLITZ БАННЕР */}
+        {blitzGameActive && (
+          <div className="relative z-30 w-full p-2.5 my-2 rounded-2xl bg-amber-950/90 border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.7)] text-left flex items-center justify-between gap-2 animate-pulse">
+            <div className="flex items-center gap-2 overflow-hidden">
+              <Zap className="w-4 h-4 text-amber-400 animate-bounce shrink-0" />
+              <div>
+                <div className="text-xs font-bold text-amber-200 font-mono">
+                  ⚡ REFACTOR BLITZ! Кликните 5 строк: ({refactoredLineIndices.length}/5)
+                </div>
+                <div className="text-[10px] text-amber-300/80 font-mono">
+                  Награда: 10x Boost на 20 секунд!
+                </div>
+              </div>
+            </div>
+            <span className="px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950 text-[10px] font-black shrink-0 tracking-wider">
+              ⏱️ {blitzTimeLeft}с
+            </span>
+          </div>
+        )}
+
         {/* ШАГ 2: МНОГОСТРОЧНЫЙ IDE-РЕДАКТОР С ЧЕСТНОЙ ПОДСВЕТКОЙ СИНТАКСИСА И ЛИНТЕРОМ */}
         <div className="relative z-20 my-2 p-3 rounded-2xl bg-black/55 border border-slate-800/80 font-mono text-xs sm:text-[13px] space-y-1 overflow-hidden min-h-[105px] flex flex-col justify-center shadow-inner">
           {activeFile.codeLines.map((lineText, idx) => {
@@ -602,6 +754,19 @@ export const MainClicker: React.FC = () => {
                       <span>💡 Fix ({linterWarning.timeLeft}с)</span>
                     </button>
                   )}
+                  {/* Кнопка рефакторинга целевой строки в мини-игре Refactor Blitz */}
+                  {blitzGameActive && idx < 5 && (
+                    <button
+                      onClick={(e) => handleRefactorLine(e, idx)}
+                      className={`ml-2 px-1.5 py-0.5 rounded text-[10px] font-mono inline-flex items-center gap-1 transition-all cursor-pointer ${
+                        refactoredLineIndices.includes(idx)
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 line-through opacity-70'
+                          : 'bg-amber-500/30 text-amber-200 border border-amber-400 font-bold animate-bounce shadow-[0_0_8px_rgba(245,158,11,0.6)] hover:bg-amber-400 hover:text-black'
+                      }`}
+                    >
+                      {refactoredLineIndices.includes(idx) ? '✓ Refactored' : REFACTOR_TAGS[idx]}
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -629,12 +794,61 @@ export const MainClicker: React.FC = () => {
         </div>
 
         {/* ШАГ 3: СТАТУСНАЯ СТРОКА IDE (IDE Status Bar) */}
-        <div className="relative z-20 mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono text-slate-400 select-none">
-          <div className="flex items-center gap-2">
+        <div className="relative z-20 mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono text-slate-400 select-none flex-wrap gap-1">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="flex items-center gap-1 text-slate-300 hover:text-cyan-400 transition-colors">
               <GitBranch className="w-3 h-3 text-cyan-400" />
-              <span>{gitStatus}</span>
+              <span className={gitBranch !== 'main' ? 'text-amber-300 font-semibold' : ''}>
+                {gitBranch !== 'main' ? gitBranch : gitStatus}
+              </span>
             </span>
+
+            {/* Git Branch Management & PR Merge */}
+            {gitBranch !== 'main' ? (
+              <div className="flex items-center gap-1">
+                <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">
+                  +25% LOC ({Math.floor(branchCodeLines)})
+                </span>
+                <button
+                  onClick={handleMergePR}
+                  disabled={branchCodeLines < 1}
+                  className={`px-1.5 py-0.5 rounded border text-[9px] flex items-center gap-0.5 transition-all cursor-pointer ${
+                    branchCodeLines >= 1
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 hover:bg-emerald-500/30 font-bold animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.4)]'
+                      : 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed'
+                  }`}
+                  title="Слить Pull Request в main и получить награду"
+                >
+                  <GitMerge className="w-2.5 h-2.5" />
+                  <span>Merge PR</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  createBranch();
+                }}
+                className="px-1.5 py-0.5 rounded bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-700/50 text-[9px] text-cyan-300 flex items-center gap-0.5 transition-colors cursor-pointer"
+                title="Создать feature-ветку (+25% к коду)"
+              >
+                <span>+Branch</span>
+              </button>
+            )}
+
+            {/* Кнопка вызова палитры команд (Command Palette) */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsCommandPaletteOpen(true);
+              }}
+              className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[9px] text-slate-300 hover:text-cyan-300 flex items-center gap-1 transition-colors cursor-pointer"
+              title="Открыть командную строку VS Code (Ctrl+Shift+P / F1)"
+            >
+              <Terminal className="w-2.5 h-2.5 text-cyan-400" />
+              <span>Palette</span>
+            </button>
+
             {linterWarning ? (
               <button
                 onClick={handleFixLinter}

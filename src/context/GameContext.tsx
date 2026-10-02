@@ -391,6 +391,16 @@ interface GameContextType {
   exportSaveBase64: () => string;
   importSaveBase64: (code: string) => boolean;
   hardReset: () => void;
+  gitBranch: string;
+  branchCodeLines: number;
+  mergedPrCount: number;
+  createBranch: (name?: string) => void;
+  mergePullRequest: () => { rewardMoney: number; rewardCode: number } | null;
+  blitzRemainingSec: number;
+  isBlitzActive: boolean;
+  triggerRefactorBlitz: (sec?: number) => void;
+  isCommandPaletteOpen: boolean;
+  setIsCommandPaletteOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -419,6 +429,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [testedSwitches, setTestedSwitches] = useState<string[]>(['blue']);
   const [themeId, setThemeIdState] = useState<ThemeId>(DEFAULT_THEME_ID);
   const [langCommits, setLangCommits] = useState<Record<string, number>>({});
+  const [gitBranch, setGitBranch] = useState<string>('main');
+  const [branchCodeLines, setBranchCodeLines] = useState<number>(0);
+  const [mergedPrCount, setMergedPrCount] = useState<number>(0);
+  const [blitzEndTime, setBlitzEndTime] = useState<number>(0);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [activeEvent, setActiveEvent] = useState<GameRandomEvent | null>(null);
   const [skillPoints, setSkillPoints] = useState<number>(0);
   const [unlockedSkills, setUnlockedSkills] = useState<Record<string, number>>({});
@@ -511,6 +526,29 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const createBranch = useCallback((customName?: string) => {
+    const BRANCH_PRESETS = [
+      'feat/neural-opt',
+      'feat/quantum-speedup',
+      'fix/memory-leak',
+      'feat/web3-staking',
+      'refactor/vulkan-pipeline',
+      'feat/microservice-workers',
+      'feat/agi-alignment'
+    ];
+    const name = customName || BRANCH_PRESETS[Math.floor(Math.random() * BRANCH_PRESETS.length)];
+    setGitBranch(name);
+    setBranchCodeLines(0);
+    sounds.playKeyClick(true);
+    sounds.triggerHaptic('medium');
+  }, []);
+
+  const triggerRefactorBlitz = useCallback((sec: number = 20) => {
+    setBlitzEndTime(Date.now() + sec * 1000);
+    sounds.playBlitzSuccess();
+    sounds.triggerHaptic('success');
+  }, []);
+
   const dismissEvent = () => {
     setActiveEvent(null);
   };
@@ -569,6 +607,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (cd.skillPoints !== undefined) setSkillPoints(cd.skillPoints);
           if (cd.unlockedSkills) setUnlockedSkills(cd.unlockedSkills);
           if (cd.langCommits) setLangCommits(cd.langCommits);
+          if (cd.gitBranch) setGitBranch(cd.gitBranch);
+          if (cd.branchCodeLines) setBranchCodeLines(cd.branchCodeLines);
+          if (cd.mergedPrCount) setMergedPrCount(cd.mergedPrCount);
         }
       });
 
@@ -608,6 +649,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const singularityMult = 1.0 +
     (unlockedSkills['skill_agi_singularity'] || 0) * 1.50;
 
+  const isBlitzActive = Date.now() < blitzEndTime;
+  const blitzMultiplier = isBlitzActive ? 10.0 : 1.0;
+  const blitzRemainingSec = Math.max(0, Math.ceil((blitzEndTime - Date.now()) / 1000));
+  const branchMultiplier = gitBranch !== 'main' ? 1.25 : 1.0;
+
   // Расчет множителей и доходов
   const globalMultiplier = (
     1.0 + 
@@ -618,7 +664,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     (systems.find(s => s.id === 'sys_realestate')?.level || 0) * 0.40 +
     (systems.find(s => s.id === 'sys_esports')?.level || 0) * 0.15 +
     (systems.find(s => s.id === 'sys_cybersec')?.level || 0) * 0.10
-  ) * adBoostMultiplier * vipMultiplier * achievementBonusMultiplier * overclockMultiplier * singularityMult;
+  ) * adBoostMultiplier * vipMultiplier * achievementBonusMultiplier * overclockMultiplier * singularityMult * blitzMultiplier * branchMultiplier;
 
   const flowMultiplier = isInFlow ? 3.0 : 1.0;
 
@@ -636,6 +682,26 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     (systems.find(s => s.id === 'sys_merch')?.level || 0) * 80 +
     (systems.find(s => s.id === 'sys_esports')?.level || 0) * 500;
   const moneyPerSec = baseMps * globalMultiplier * flowMultiplier * moneyTalentMult;
+
+  const mergePullRequest = useCallback(() => {
+    if (gitBranch === 'main' || branchCodeLines < 1) return null;
+
+    const rewardMoney = Math.round(branchCodeLines * Math.max(5, moneyPerSec * 0.25)) + 1000;
+    const rewardCode = Math.round(branchCodeLines * 2.5) + 500;
+
+    setMoney(m => m + rewardMoney);
+    setCodeLines(c => c + rewardCode);
+    setTotalCodeEver(t => t + rewardCode);
+    setMergedPrCount(c => c + 1);
+
+    sounds.playBranchMerge();
+    sounds.triggerHaptic('success');
+
+    const result = { rewardMoney, rewardCode };
+    setGitBranch('main');
+    setBranchCodeLines(0);
+    return result;
+  }, [gitBranch, branchCodeLines, moneyPerSec]);
 
   // Загрузка локальных сохранений
   useEffect(() => {
@@ -663,6 +729,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.skillPoints !== undefined) setSkillPoints(data.skillPoints);
         if (data.unlockedSkills) setUnlockedSkills(data.unlockedSkills);
         if (data.langCommits) setLangCommits(data.langCommits);
+        if (data.gitBranch) setGitBranch(data.gitBranch);
+        if (data.branchCodeLines) setBranchCodeLines(data.branchCodeLines);
+        if (data.mergedPrCount) setMergedPrCount(data.mergedPrCount);
         if (data.switchType) {
           setSwitchTypeState(data.switchType);
           sounds.switchType = data.switchType;
@@ -732,7 +801,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         timeWarpsUsed,
         testedSwitches,
         achievements,
-        langCommits
+        langCommits,
+        gitBranch,
+        branchCodeLines,
+        mergedPrCount
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
       yandexSdk.saveToCloud("hellotap_save", data);
@@ -745,7 +817,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearInterval(interval);
       window.removeEventListener("beforeunload", save);
     };
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits, gitBranch, branchCodeLines, mergedPrCount]);
 
   // Периодический спавн случайных мини-событий (каждые 90-120 секунд)
   useEffect(() => {
@@ -780,6 +852,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setMoney(m => m + autoMoney);
       }
 
+      // Накопление изменений в Git-ветке при активной разработке
+      if (gitBranch !== 'main' && codePerSec > 0) {
+        setBranchCodeLines(b => b + Math.max(0.05, codePerSec * dt * 0.04));
+      }
+
       setComboEnergy(energy => {
         if (hasAutoClicker) {
           return Math.min(1.0, energy + 0.005);
@@ -791,7 +868,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, 100);
 
     return () => clearInterval(interval);
-  }, [codePerSec, moneyPerSec, hasAutoClicker, codePerClick]);
+  }, [codePerSec, moneyPerSec, hasAutoClicker, codePerClick, gitBranch]);
 
   // Клик
   const handleClick = useCallback((_clientX?: number, _clientY?: number) => {
@@ -804,6 +881,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCodeLines(c => c + codeAdded);
     setTotalCodeEver(t => t + codeAdded);
     setMoney(m => m + moneyAdded);
+
+    if (gitBranch !== 'main') {
+      setBranchCodeLines(b => b + 1);
+    }
 
     setManualClicks(c => c + 1);
     if (isCrit) setCritClicks(c => c + 1);
@@ -821,7 +902,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sounds.triggerHaptic(isCrit ? 'heavy' : 'light');
 
     return { isCrit, codeAdded, moneyAdded };
-  }, [codePerClick, unlockedSkills]);
+  }, [codePerClick, unlockedSkills, gitBranch]);
 
   // Покупка апгрейда
   const buyUpgrade = useCallback((id: number): boolean => {
@@ -1104,11 +1185,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       timeWarpsUsed,
       testedSwitches,
       achievements,
-      langCommits
+      langCommits,
+      gitBranch,
+      branchCodeLines,
+      mergedPrCount
     };
     const json = JSON.stringify(data);
     return "HELLOTAP_SAVE_V2:" + btoa(unescape(encodeURIComponent(json)));
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits, gitBranch, branchCodeLines, mergedPrCount]);
 
   // Base64 Импорт
   const importSaveBase64 = useCallback((code: string): boolean => {
@@ -1138,6 +1222,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.skillPoints !== undefined) setSkillPoints(data.skillPoints);
       if (data.unlockedSkills) setUnlockedSkills(data.unlockedSkills);
       if (data.langCommits) setLangCommits(data.langCommits);
+      if (data.gitBranch) setGitBranch(data.gitBranch);
+      if (data.branchCodeLines) setBranchCodeLines(data.branchCodeLines);
+      if (data.mergedPrCount) setMergedPrCount(data.mergedPrCount);
       return true;
     } catch {
       return false;
@@ -1210,6 +1297,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         triggerPrestigeIPO,
         langCommits,
         recordCommit,
+        gitBranch,
+        branchCodeLines,
+        mergedPrCount,
+        createBranch,
+        mergePullRequest,
+        blitzRemainingSec,
+        isBlitzActive,
+        triggerRefactorBlitz,
+        isCommandPaletteOpen,
+        setIsCommandPaletteOpen,
         watchAdForDoubleBoost,
         watchAdForTimeWarpReset,
         exportSaveBase64,

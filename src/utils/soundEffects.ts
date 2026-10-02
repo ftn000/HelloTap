@@ -180,6 +180,58 @@ class SoundEngine {
     });
   }
 
+  public playBranchMerge(): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    // Струящийся мажорный аккорд F Major 7: F4, A4, C5, E5
+    const notes = [349.23, 440.0, 523.25, 659.25];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.04;
+      const duration = 0.28;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.20, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
+  public playBlitzSuccess(): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    // Триумфальный фанфарный каскад x10 Blitz: C5 -> E5 -> G5 -> C6 -> E6 -> G6
+    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.05;
+      const duration = 0.45;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.26, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
   public playPurchaseSuccess(): void {
     const ctx = this.getContext();
     if (!ctx) return;
