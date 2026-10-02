@@ -33,7 +33,7 @@ export const OfflineProgressModal: React.FC<OfflineProgressModalProps> = ({
       spread: 60,
       origin: { y: 0.6 }
     });
-    sounds.playRelease();
+    sounds.playOfflineReward(false);
     onClaim(false);
   };
 
@@ -44,7 +44,7 @@ export const OfflineProgressModal: React.FC<OfflineProgressModalProps> = ({
       origin: { y: 0.5 },
       colors: ['#F59E0B', '#10B981', '#06B6D4', '#8B5CF6']
     });
-    sounds.playPurchaseSuccess();
+    sounds.playOfflineReward(true);
     onClaim(true);
   };
 

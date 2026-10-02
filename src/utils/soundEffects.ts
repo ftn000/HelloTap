@@ -1,9 +1,13 @@
 /**
- * Web Audio API синтезатор звуковых эффектов для HelloTap
- * Нулевой вес файлов, отсутствие лагов загрузки и мгновенный отклик при клике
+ * Web Audio API синтезатор звуковых эффектов для HelloTap / CodeTap
+ * Процедурный аналоговый звук с нулевым весом файлов, встроенным лимитером (компрессором)
+ * и фильтром для мягкого, теплого и приятного для ушей звучания без клиппинга и пищания.
  */
 class SoundEngine {
   private ctx: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
+  private masterFilter: BiquadFilterNode | null = null;
+  private compressor: DynamicsCompressorNode | null = null;
   public isMuted: boolean = false;
   private isTabVisible: boolean = true;
 
@@ -37,306 +41,430 @@ class SoundEngine {
     }
   }
 
+  private initMasterBus(ctx: AudioContext): void {
+    if (this.masterGain && this.compressor && this.masterFilter) return;
+
+    // 1. Мастер-компрессор (лимитер): предотвращает любой клиппинг и перегруз ("бас-буст")
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.setValueAtTime(-10, ctx.currentTime);
+    comp.knee.setValueAtTime(12, ctx.currentTime);
+    comp.ratio.setValueAtTime(10, ctx.currentTime);
+    comp.attack.setValueAtTime(0.003, ctx.currentTime);
+    comp.release.setValueAtTime(0.12, ctx.currentTime);
+    this.compressor = comp;
+
+    // 2. Мягкий Low-Pass фильтр: убирает резкие высокочастотные писки выше 3500 Гц
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(3600, ctx.currentTime);
+    filter.Q.setValueAtTime(0.7, ctx.currentTime);
+    this.masterFilter = filter;
+
+    // 3. Мастер-громкость: комфортный уровень прослушивания
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.42, ctx.currentTime);
+    this.masterGain = master;
+
+    // Маршрутизация: filter -> compressor -> masterGain -> destination
+    filter.connect(comp);
+    comp.connect(master);
+    master.connect(ctx.destination);
+  }
+
   private getContext(): AudioContext | null {
     if (this.isMuted || !this.isTabVisible) return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
+        this.initMasterBus(this.ctx);
       }
     }
     if (this.ctx && this.ctx.state === 'suspended' && this.isTabVisible) {
       this.ctx.resume();
     }
+    if (this.ctx && !this.masterFilter) {
+      this.initMasterBus(this.ctx);
+    }
     return this.ctx;
+  }
+
+  private getMasterNode(): AudioNode | null {
+    if (!this.ctx) return null;
+    return this.masterFilter || this.ctx.destination;
   }
 
   public switchType: 'blue' | 'red' | 'brown' | 'laser' | 'typewriter' = 'blue';
 
+  /** Мягкий и приятный клик клавиш (ASMR стиль механической клавиатуры) */
   public playKeyClick(isCrit: boolean = false): void {
     const ctx = this.getContext();
-    if (!ctx) return;
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
     let baseFreq = 420;
-    let waveType: OscillatorType = 'sine';
-    let duration = 0.04;
+    let waveType: OscillatorType = 'triangle';
+    let duration = 0.035;
 
     switch (this.switchType) {
-      case 'blue': // Clicky & Bright
-        baseFreq = isCrit ? 920 : 540 + Math.random() * 80;
-        waveType = isCrit ? 'triangle' : 'square';
-        duration = isCrit ? 0.12 : 0.035;
-        break;
-      case 'red': // Linear & Soft
-        baseFreq = isCrit ? 700 : 260 + Math.random() * 40;
-        waveType = 'sine';
-        duration = isCrit ? 0.09 : 0.045;
-        break;
-      case 'brown': // Tactile bump
-        baseFreq = isCrit ? 800 : 380 + Math.random() * 60;
+      case 'blue': // Мягкий тактильный щелчок
+        baseFreq = isCrit ? 640 : 420 + Math.random() * 40;
         waveType = 'triangle';
-        duration = isCrit ? 0.10 : 0.04;
+        duration = isCrit ? 0.06 : 0.025;
         break;
-      case 'laser': // Cyber Synth
-        baseFreq = isCrit ? 1200 : 750 + Math.random() * 120;
-        waveType = 'sawtooth';
-        duration = isCrit ? 0.15 : 0.05;
+      case 'red': // Глухой линейный стук
+        baseFreq = isCrit ? 480 : 220 + Math.random() * 25;
+        waveType = 'sine';
+        duration = isCrit ? 0.05 : 0.03;
         break;
-      case 'typewriter': // Vintage Mechanical Strike + Ding Bell on Crit
-        baseFreq = isCrit ? 2200 : 180 + Math.random() * 50;
-        waveType = isCrit ? 'sine' : 'sawtooth';
-        duration = isCrit ? 0.40 : 0.025;
+      case 'brown': // Теплый механический отклик
+        baseFreq = isCrit ? 560 : 320 + Math.random() * 30;
+        waveType = 'triangle';
+        duration = isCrit ? 0.055 : 0.028;
+        break;
+      case 'laser': // Мягкий кибер-синт
+        baseFreq = isCrit ? 780 : 520 + Math.random() * 50;
+        waveType = 'sine';
+        duration = isCrit ? 0.08 : 0.035;
+        break;
+      case 'typewriter': // Винтажный мягкий стук
+        baseFreq = isCrit ? 880 : 260 + Math.random() * 30;
+        waveType = 'triangle';
+        duration = isCrit ? 0.09 : 0.028;
         break;
     }
 
     osc.type = waveType;
     osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.25, ctx.currentTime + duration);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, ctx.currentTime + duration);
 
-    gain.gain.setValueAtTime(isCrit ? 0.35 : 0.18, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    const targetGain = isCrit ? 0.14 : 0.07;
+    gain.gain.setValueAtTime(targetGain, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(dest);
 
     osc.start();
     osc.stop(ctx.currentTime + duration);
   }
 
+  /** Мягкий диагностический аккорд для исправления линтера / багов */
   public playQuickFix(): void {
     const ctx = this.getContext();
-    if (!ctx) return;
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
 
-    // Свежий чистый диагностический перезвон: D5 -> A5 -> D6
-    const notes = [587.33, 880.0, 1174.66];
+    // Теплый колокольчик: D5 -> A5
+    const notes = [587.33, 880.0];
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      const startTime = ctx.currentTime + idx * 0.045;
-      const duration = 0.18;
+      const startTime = ctx.currentTime + idx * 0.06;
+      const duration = 0.22;
 
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, startTime);
 
-      gain.gain.setValueAtTime(0.24, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.09, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(dest);
 
       osc.start(startTime);
       osc.stop(startTime + duration);
     });
   }
 
+  /** Награда за апгрейд студии: мягкое восходящее мажорное трезвучие */
   public playUpgrade(): void {
     const ctx = this.getContext();
-    if (!ctx) return;
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
 
-    const notes = [440, 554.37, 659.25, 880];
+    const notes = [440, 554.37, 659.25];
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      const startTime = ctx.currentTime + idx * 0.05;
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, startTime);
-
-      gain.gain.setValueAtTime(0.18, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + 0.15);
-    });
-  }
-
-  public playRelease(): void {
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    const notes = [523.25, 659.25, 783.99, 1046.50];
-    notes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const startTime = ctx.currentTime + idx * 0.07;
+      const startTime = ctx.currentTime + idx * 0.045;
+      const duration = 0.25;
 
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, startTime);
 
-      gain.gain.setValueAtTime(0.25, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.08, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(dest);
 
       osc.start(startTime);
-      osc.stop(startTime + 0.3);
+      osc.stop(startTime + duration);
     });
   }
 
+  /** Награда за релиз системы или обычный бонус */
+  public playRelease(): void {
+    const ctx = this.getContext();
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
+
+    const notes = [523.25, 659.25, 783.99];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.055;
+      const duration = 0.28;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.09, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(dest);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
+  /** Награда за офлайн-прогресс (теплый мягкий аккорд электропиано Fender Rhodes) */
+  public playOfflineReward(isDouble: boolean = false): void {
+    const ctx = this.getContext();
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
+
+    // Теплый мажорный аккорд E-Major в среднем регистре: E4, G#4, B4, E5 (без резких пищалок!)
+    const notes = isDouble 
+      ? [329.63, 415.30, 493.88, 659.25, 987.77] 
+      : [329.63, 415.30, 493.88, 659.25];
+
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.045;
+      const duration = isDouble ? 0.45 : 0.35;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      // Плавная атака без щелчка и мягкий спад
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.linearRampToValueAtTime(0.08, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(dest);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
+  /** Оповещение о редком событии студии (деликатный двойной перезвон, играет строго 1 раз) */
+  public playEventAlert(): void {
+    const ctx = this.getContext();
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
+
+    // Нежный двойной chime: F5 (698 Hz) -> A5 (880 Hz)
+    const notes = [698.46, 880.00];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.08;
+      const duration = 0.24;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.linearRampToValueAtTime(0.07, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(dest);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
+  /** Слияние ветки и PR: благородный аккорд F Major 7 */
   public playBranchMerge(): void {
     const ctx = this.getContext();
-    if (!ctx) return;
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
 
-    // Струящийся мажорный аккорд F Major 7: F4, A4, C5, E5
     const notes = [349.23, 440.0, 523.25, 659.25];
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       const startTime = ctx.currentTime + idx * 0.04;
-      const duration = 0.28;
+      const duration = 0.32;
 
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(freq, startTime);
 
-      gain.gain.setValueAtTime(0.20, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.08, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(dest);
 
       osc.start(startTime);
       osc.stop(startTime + duration);
     });
   }
 
+  /** Успех 10x Blitz: триумфальный мягкий арпеджио */
   public playBlitzSuccess(): void {
     const ctx = this.getContext();
-    if (!ctx) return;
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
 
-    // Триумфальный фанфарный каскад x10 Blitz: C5 -> E5 -> G5 -> C6 -> E6 -> G6
-    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
-    notes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const startTime = ctx.currentTime + idx * 0.05;
-      const duration = 0.45;
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, startTime);
-
-      gain.gain.setValueAtTime(0.26, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + duration);
-    });
-  }
-
-  public playPurchaseSuccess(): void {
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    // Золотой арпеджио каскад в C Major 9: C5, E5, G5, B5, C6, E6
-    const notes = [523.25, 659.25, 783.99, 987.77, 1046.50, 1318.51];
-    notes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const startTime = ctx.currentTime + idx * 0.055;
-      const duration = 0.35;
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, startTime);
-
-      gain.gain.setValueAtTime(0.22, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + duration);
-    });
-  }
-
-  public playAutoClickTick(): void {
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    // Очень мягкий и ультракороткий клик
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const duration = 0.018;
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(560, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + duration);
-
-    gain.gain.setValueAtTime(0.035, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start();
-    osc.stop(ctx.currentTime + duration);
-  }
-
-  public playPipelinePass(): void {
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    // Мажорный арпеджио успешной сборки: C5 -> E5 -> G5 -> C6
     const notes = [523.25, 659.25, 783.99, 1046.50];
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       const startTime = ctx.currentTime + idx * 0.05;
-      const duration = 0.22;
+      const duration = 0.35;
 
-      osc.type = 'triangle';
+      osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, startTime);
 
-      gain.gain.setValueAtTime(0.18, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.09, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(dest);
 
       osc.start(startTime);
       osc.stop(startTime + duration);
     });
   }
 
+  /** Покупка / Успешная крупная награда */
+  public playPurchaseSuccess(): void {
+    const ctx = this.getContext();
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
+
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.05;
+      const duration = 0.32;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.08, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(dest);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
+  /** Ультракороткий мягкий тихий клик автокликера */
+  public playAutoClickTick(): void {
+    const ctx = this.getContext();
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const duration = 0.015;
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + duration);
+
+    gain.gain.setValueAtTime(0.02, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(dest);
+
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  }
+
+  /** Успех CI/CD пайплайна: мелодичный чистый аккорд */
+  public playPipelinePass(): void {
+    const ctx = this.getContext();
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
+
+    const notes = [523.25, 659.25, 783.99];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.045;
+      const duration = 0.22;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.07, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(dest);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
+  /** Сбой в CI/CD: мягкий приглушенный диагностический двойной стук (без резкого жужжания) */
   public playPipelineFail(): void {
     const ctx = this.getContext();
-    if (!ctx) return;
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
 
-    // Тревожный диссонанс Broken Build
-    const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const duration = 0.28;
+    const notes = [220, 185];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.09;
+      const duration = 0.12;
 
-    osc1.type = 'sawtooth';
-    osc2.type = 'sawtooth';
-    osc1.frequency.setValueAtTime(145, ctx.currentTime);
-    osc2.frequency.setValueAtTime(188, ctx.currentTime);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.8, startTime + duration);
 
-    gain.gain.setValueAtTime(0.22, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.06, startTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(ctx.destination);
+      osc.connect(gain);
+      gain.connect(dest);
 
-    osc1.start();
-    osc2.start();
-    osc1.stop(ctx.currentTime + duration);
-    osc2.stop(ctx.currentTime + duration);
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
   }
 
   public triggerHaptic(type: 'light' | 'medium' | 'heavy' | 'success' = 'light'): void {
-    // 1. Проверяем Telegram WebApp HapticFeedback
     const tg = (window as unknown as { Telegram?: { WebApp?: { HapticFeedback?: { impactOccurred: (s: string) => void; notificationOccurred: (s: string) => void } } } }).Telegram?.WebApp;
     if (tg && tg.HapticFeedback) {
       if (type === 'success') {
@@ -347,12 +475,11 @@ class SoundEngine {
       return;
     }
 
-    // 2. Стандартный Web Vibration API
     if (navigator.vibrate) {
       if (type === 'light') navigator.vibrate(10);
-      else if (type === 'medium') navigator.vibrate(25);
-      else if (type === 'heavy') navigator.vibrate(45);
-      else if (type === 'success') navigator.vibrate([15, 30, 20]);
+      else if (type === 'medium') navigator.vibrate(20);
+      else if (type === 'heavy') navigator.vibrate(35);
+      else if (type === 'success') navigator.vibrate([12, 25, 18]);
     }
   }
 }

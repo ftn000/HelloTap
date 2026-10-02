@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { GameRandomEvent, GameEventOption } from '../types/events';
 import { Clock, Zap, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -12,17 +12,28 @@ interface RandomEventModalProps {
 
 export const RandomEventModal: React.FC<RandomEventModalProps> = ({ event, onSelectOption, onClose }) => {
   const [remainingSec, setRemainingSec] = useState<number>(15);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const lastEventIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!event) return;
-    setRemainingSec(event.timeoutSec);
-    sounds.playRelease();
+    if (!event) {
+      lastEventIdRef.current = null;
+      return;
+    }
+
+    // Воспроизводим деликатный звук строго один раз при появлении нового события
+    if (lastEventIdRef.current !== event.id) {
+      lastEventIdRef.current = event.id;
+      setRemainingSec(event.timeoutSec);
+      sounds.playEventAlert();
+    }
 
     const interval = setInterval(() => {
       setRemainingSec(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          onClose();
+          onCloseRef.current();
           return 0;
         }
         return prev - 1;
@@ -30,7 +41,7 @@ export const RandomEventModal: React.FC<RandomEventModalProps> = ({ event, onSel
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [event, onClose]);
+  }, [event?.id, event?.timeoutSec]);
 
   if (!event) return null;
 

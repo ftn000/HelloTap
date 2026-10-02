@@ -578,11 +578,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sounds.triggerHaptic('success');
   }, [unlockedSkills]);
 
-  const dismissEvent = () => {
+  const dismissEvent = useCallback(() => {
     setActiveEvent(null);
-  };
+  }, []);
 
-  const handleEventOption = (option: GameEventOption) => {
+  const handleEventOption = useCallback((option: GameEventOption) => {
     switch (option.actionType) {
       case 'grant_money':
         setMoney(m => m + option.value);
@@ -603,7 +603,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         break;
     }
     setActiveEvent(null);
-  };
+  }, []);
 
   const isInFlow = comboEnergy >= 1.0;
   const isAdBoostActive = Date.now() < adBoostEndTime;
