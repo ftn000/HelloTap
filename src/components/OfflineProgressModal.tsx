@@ -27,8 +27,8 @@ export const OfflineProgressModal: React.FC<OfflineProgressModalProps> = ({
   const minutes = Math.floor((offlineSec % 3600) / 60);
   const seconds = Math.floor(offlineSec % 60);
 
-  const hUnit = lang === 'ru' ? 'ч ' : 'h ';
-  const mUnit = lang === 'ru' ? 'м ' : 'm ';
+  const hUnit = `${t.hourShort} `;
+  const mUnit = `${t.minShort} `;
   const sUnit = t.secShort;
   const timeString = `${hours > 0 ? `${hours}${hUnit}` : ''}${minutes}${mUnit}${seconds}${sUnit}`;
 

@@ -500,7 +500,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
 
                 <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
                   <span className="text-slate-400">{t.ipoShares}</span>
-                  <span className="text-emerald-400 font-bold">{prestigeTokens} {t.ipoTokensInPortfolio} (+{(prestigeTokens * 5)}% {lang === 'ru' ? 'буст' : 'boost'})</span>
+                  <span className="text-emerald-400 font-bold">{prestigeTokens} {t.ipoTokensInPortfolio} (+{(prestigeTokens * 5)}% {t.boostTag})</span>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
@@ -531,7 +531,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-indigo-300 font-bold">
                     <Volume2 className="w-4 h-4 text-indigo-400" />
-                    <span>{lang === 'ru' ? 'Громкость SFX & Профили звука' : 'SFX Volume & Sound Profiles'}</span>
+                    <span>{t.sfxTitle}</span>
                   </div>
                   <span className="text-[11px] font-bold text-indigo-300 px-2 py-0.5 rounded bg-indigo-950/60 border border-indigo-800/40">
                     {soundProfile === 'mute' ? 'Muted' : `${Math.round(sfxVolume * 100)}%`}
@@ -541,13 +541,13 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                 {/* Ползунок громкости SFX */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-[10px] text-slate-400 font-sans">
-                    <span>{lang === 'ru' ? 'Громкость кликов и эффектов интерфейса:' : 'Click volume & UI sound effects:'}</span>
+                    <span>{t.sfxVolumeLabel}</span>
                     <button
                       type="button"
                       onClick={() => sounds.playKeyClick(false)}
                       className="text-indigo-400 hover:text-indigo-300 underline font-mono cursor-pointer"
                     >
-                      {lang === 'ru' ? 'Тест клика 🔊' : 'Click test 🔊'}
+                      {t.sfxTestClick}
                     </button>
                   </div>
                   <input
@@ -570,14 +570,14 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                 {/* Переключатель профилей звука */}
                 <div className="space-y-1.5">
                   <span className="text-[10px] text-slate-400 font-sans block">
-                    {lang === 'ru' ? 'Переключатель профилей звука:' : 'Sound profile preset:'}
+                    {t.sfxProfilesLabel}
                   </span>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                     {[
-                      { id: 'asmr', name: 'Soft ASMR', icon: '🍃', desc: lang === 'ru' ? 'Мягкий и глубокий' : 'Soft & deep' },
-                      { id: 'classic', name: 'Classic', icon: '⌨️', desc: lang === 'ru' ? 'Четкий звонкий' : 'Crisp clicky' },
-                      { id: 'cyber', name: 'Cyber', icon: '⚡', desc: lang === 'ru' ? 'Неоновый синт' : 'Neon synth' },
-                      { id: 'mute', name: 'Mute', icon: '🔇', desc: lang === 'ru' ? 'Без звука' : 'Muted' },
+                      { id: 'asmr', name: 'Soft ASMR', icon: '🍃', desc: t.profileAsmrDesc },
+                      { id: 'classic', name: 'Classic', icon: '⌨️', desc: t.profileClassicDesc },
+                      { id: 'cyber', name: 'Cyber', icon: '⚡', desc: t.profileCyberDesc },
+                      { id: 'mute', name: 'Mute', icon: '🔇', desc: t.profileMuteDesc },
                     ].map((p) => {
                       const isActive = soundProfile === p.id;
                       return (
@@ -612,24 +612,24 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                 <div className="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
                     <Bell className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    <span>{lang === 'ru' ? 'Стеклянный колокольчик при критах и Flow:' : 'Glass bell chime on Crits & Flow:'}</span>
+                    <span>{t.sfxBellLabel}</span>
                   </div>
                   <div className="flex items-center gap-1.5 w-full sm:w-auto">
                     <button
                       type="button"
                       onClick={() => sounds.playGlassBell('crit')}
                       className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[10px] flex items-center gap-1 font-mono transition-colors cursor-pointer"
-                      title={lang === 'ru' ? "Прослушать хрустальный колокольчик крита" : "Preview crystal crit bell"}
+                      title={t.sfxBellCrit}
                     >
-                      <span>🔔 {lang === 'ru' ? 'Крит' : 'Crit'}</span>
+                      <span>{t.sfxBellCrit}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => sounds.playGlassBell('flow')}
                       className="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[10px] flex items-center gap-1 font-mono transition-colors cursor-pointer"
-                      title={lang === 'ru' ? "Прослушать каскад колокольчиков входа в Flow" : "Preview cascade bell on Flow"}
+                      title={t.sfxBellFlow}
                     >
-                      <span>✨ Flow</span>
+                      <span>{t.sfxBellFlow}</span>
                     </button>
                   </div>
                 </div>
@@ -640,7 +640,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-cyan-300 font-bold">
                     <Music className="w-4 h-4 text-cyan-400" />
-                    <span>{lang === 'ru' ? 'Фоновая Lo-Fi музыка (Coder Beats)' : 'Background Lo-Fi Music (Coder Beats)'}</span>
+                    <span>{t.musicSectionTitle}</span>
                   </div>
                   <span className="text-[11px] font-bold text-cyan-400 px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-800/40">
                     {Math.round(musicVolume * 100)}%
@@ -655,7 +655,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                         {currentTrackName || 'Lo-Fi Coder Beats'}
                       </span>
                       <span className="text-[9px] text-slate-400 font-sans block">
-                        {lang === 'ru' ? 'Генеративный Lo-Fi синт-фон для глубокого кодинга' : 'Generative Lo-Fi synth ambient for deep coding'}
+                        {t.musicSectionDesc}
                       </span>
                     </div>
                   </div>
@@ -666,18 +666,18 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                       onClick={toggleMusic}
                       className={`px-3 py-1.5 rounded-xl font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer ${
                         isMusicPlaying
-                          ? 'bg-cyan-500 text-slate-950 shadow-[0_0_12px_rgba(6,182,212,0.4)]'
+                           ? 'bg-cyan-500 text-slate-950 shadow-[0_0_12px_rgba(6,182,212,0.4)]'
                           : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                       }`}
                     >
                       {isMusicPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                      <span>{isMusicPlaying ? (lang === 'ru' ? 'Пауза' : 'Pause') : (lang === 'ru' ? 'Слушать' : 'Play')}</span>
+                      <span>{isMusicPlaying ? t.musicPauseBtn : t.musicPlayBtn}</span>
                     </button>
                     <button
                       type="button"
                       onClick={nextMusicTrack}
                       className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition-colors cursor-pointer"
-                      title={lang === 'ru' ? 'Следующий трек' : 'Next track'}
+                      title={t.musicNextBtn}
                     >
                       <SkipForward className="w-3.5 h-3.5" />
                     </button>
@@ -687,7 +687,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                 {/* Ползунок громкости музыки */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-[10px] text-slate-400 font-sans">
-                    <span>{lang === 'ru' ? 'Громкость музыки:' : 'Music volume:'}</span>
+                    <span>{t.musicVolumeLabel}</span>
                     <span>{Math.round(musicVolume * 100)}%</span>
                   </div>
                   <input
@@ -713,10 +713,10 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
 
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { id: 'blue', name: 'Blue Clicky', desc: lang === 'ru' ? 'Громкий звонкий щелчок' : 'Loud tactile click', icon: '🔵' },
-                  { id: 'red', name: 'Red Linear', desc: lang === 'ru' ? 'Тихий мягкий ход' : 'Smooth quiet keystroke', icon: '🔴' },
-                  { id: 'brown', name: 'Brown Tactile', desc: lang === 'ru' ? 'Четкий тактильный бумп' : 'Crisp tactile bump', icon: '🟤' },
-                  { id: 'laser', name: 'Cyber Laser', desc: lang === 'ru' ? 'Синтезаторный лазер' : 'Synth laser pew', icon: '⚡' },
+                  { id: 'blue', name: 'Blue Clicky', desc: t.switchBlueDesc, icon: '🔵' },
+                  { id: 'red', name: 'Red Linear', desc: t.switchRedDesc, icon: '🔴' },
+                  { id: 'brown', name: 'Brown Tactile', desc: t.switchBrownDesc, icon: '🟤' },
+                  { id: 'laser', name: 'Cyber Laser', desc: t.switchLaserDesc, icon: '⚡' },
                 ].map(sw => (
                   <button
                     key={sw.id}
@@ -741,12 +741,10 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
               <div className="pt-3 border-t border-slate-800 space-y-2">
                 <div className="flex items-center gap-2 text-cyan-400 font-bold">
                   <Palette className="w-4 h-4" />
-                  <span>{lang === 'ru' ? 'Темы IDE и Терминала' : 'IDE & Terminal Themes'}</span>
+                  <span>{t.themesSectionTitle}</span>
                 </div>
                 <p className="text-slate-400 font-sans">
-                  {lang === 'ru' 
-                    ? 'Цветовые схемы кода, подсветка синтаксиса и неоновое свечение рабочей среды.'
-                    : 'Color schemes, syntax highlighting, and neon ambient glow of your workspace.'}
+                  {t.themesSectionDesc}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -772,7 +770,7 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                       </span>
                       <div className="flex items-center gap-1.5 mt-1">
                         <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-800/40">
-                          🔊 {lang === 'ru' ? 'Звук' : 'Sound'}: {getThemeSoundPresetName(th, lang)}
+                          🔊 {t.themeSoundLabel}: {getThemeSoundPresetName(th, lang)}
                         </span>
                       </div>
                     </button>

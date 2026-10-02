@@ -1,8 +1,20 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText, Crown, Trophy, Music, Award, GitBranch } from 'lucide-react';
+import { Flame, Sparkles, Volume2, VolumeX, Building2, Save, FileText, Crown, Trophy, Music, Award, GitBranch, ChevronDown } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
+import { Language } from '../utils/i18n';
+
+const LANGUAGES: { code: Language; flag: string; label: string; short: string }[] = [
+  { code: 'ru', flag: '🇷🇺', label: 'Русский', short: 'RU' },
+  { code: 'en', flag: '🇬🇧', label: 'English', short: 'EN' },
+  { code: 'fr', flag: '🇫🇷', label: 'Français', short: 'FR' },
+  { code: 'de', flag: '🇩🇪', label: 'Deutsch', short: 'DE' },
+  { code: 'ar', flag: '🇸🇦', label: 'العربية', short: 'AR' },
+  { code: 'zh', flag: '🇨🇳', label: '中文', short: 'ZH' },
+  { code: 'es', flag: '🇪🇸', label: 'Español', short: 'ES' },
+  { code: 'tr', flag: '🇹🇷', label: 'Türkçe', short: 'TR' },
+];
 
 interface HeaderHUDProps {
   onOpenHub: () => void;
@@ -18,6 +30,9 @@ interface HeaderHUDProps {
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard, onOpenAchievements, onOpenTechTree, onOpenHeatmap }) => {
   const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t, isMusicPlaying, toggleMusic, currentTrackName, nextMusicTrack, achievements, skillPoints, currentStreak } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
+  const [langMenuOpen, setLangMenuOpen] = React.useState(false);
+
+  const currentLangObj = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   const totalAchStars = Object.values(achievements).reduce((sum, tier) => sum + tier, 0);
 
@@ -81,14 +96,44 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             {isInFlow && <span className="text-[10px] text-amber-300 uppercase tracking-wider">FLOW</span>}
           </div>
 
-          {/* Кнопка смены языка */}
-          <button
-            onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}
-            className="px-2 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-xs font-mono font-bold text-slate-200 transition-colors"
-            title="Язык / Language"
-          >
-            {lang === 'ru' ? '🇷🇺 RU' : '🇬🇧 EN'}
-          </button>
+          {/* Меню смены языка (8 языков) */}
+          <div className="relative">
+            <button
+              onClick={() => setLangMenuOpen(!langMenuOpen)}
+              className="px-2 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-xs font-mono font-bold text-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Язык / Language"
+            >
+              <span>{currentLangObj.flag}</span>
+              <span>{currentLangObj.short}</span>
+              <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${langMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {langMenuOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setLangMenuOpen(false)} 
+                />
+                <div className="absolute right-0 top-full mt-1.5 w-36 py-1 bg-slate-900/95 border border-slate-700 rounded-xl shadow-2xl backdrop-blur-md z-50 flex flex-col text-xs font-sans">
+                  {LANGUAGES.map((l) => (
+                    <button
+                      key={l.code}
+                      onClick={() => {
+                        setLang(l.code);
+                        setLangMenuOpen(false);
+                      }}
+                      className={`px-3 py-1.5 text-left flex items-center gap-2 hover:bg-slate-800 transition-colors cursor-pointer ${
+                        lang === l.code ? 'text-cyan-400 font-bold bg-cyan-950/40' : 'text-slate-300'
+                      }`}
+                    >
+                      <span>{l.flag}</span>
+                      <span>{l.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Кнопка Mute */}
           <button

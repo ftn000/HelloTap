@@ -618,23 +618,30 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setOfflineReport(null);
   }, [offlineReport]);
 
+  const TITLES: Record<Language, string> = {
+    ru: 'CodeTap: Симулятор Программиста — Gamedev Clicker & Tycoon',
+    en: 'CodeTap: Programmer Simulator — Gamedev Clicker & Tycoon',
+    fr: 'CodeTap: Simulateur de Programmeur — Gamedev Clicker & Tycoon',
+    de: 'CodeTap: Programmierer-Simulator — Gamedev Clicker & Tycoon',
+    ar: 'CodeTap: محاكي المبرمج — نقار وتطوير ألعاب',
+    zh: 'CodeTap: 程序员模拟器 — 游戏开发放置大亨',
+    es: 'CodeTap: Simulador de Programador — Gamedev Clicker & Tycoon',
+    tr: 'CodeTap: Programcı Simülatörü — Gamedev Clicker & Tycoon',
+  };
+
   const setLang = (l: Language) => {
     setLangState(l);
     try {
       localStorage.setItem("HELLOTAP_LANG", l);
       document.documentElement.lang = l;
-      document.title = l === 'ru' 
-        ? 'CodeTap: Симулятор Программиста — Gamedev Clicker & Tycoon' 
-        : 'CodeTap: Programmer Simulator — Gamedev Clicker & Tycoon';
+      document.title = TITLES[l] || TITLES.en;
     } catch {}
   };
 
   useEffect(() => {
     try {
       document.documentElement.lang = lang;
-      document.title = lang === 'ru' 
-        ? 'CodeTap: Симулятор Программиста — Gamedev Clicker & Tycoon' 
-        : 'CodeTap: Programmer Simulator — Gamedev Clicker & Tycoon';
+      document.title = TITLES[lang] || TITLES.en;
     } catch {}
   }, [lang]);
 

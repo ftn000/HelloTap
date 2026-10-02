@@ -469,7 +469,7 @@ export const MainClicker: React.FC = () => {
       const newPopup: Popup = {
         id: Date.now() + Math.random(),
         text: `🚀 REFACTOR BLITZ! x10 BOOST (20${t.secShort})`,
-        tag: lang === 'ru' ? 'ВСЕ 5 СТРОК ОТРЕФАКТОРЕНЫ' : 'ALL 5 REFACTORED',
+        tag: t.refactorDoneTag,
         x: 100,
         y: 80,
         isCrit: true
@@ -493,7 +493,7 @@ export const MainClicker: React.FC = () => {
 
       const newPopup: Popup = {
         id: Date.now() + Math.random(),
-        text: `🔀 ${lang === 'ru' ? 'PR СЛИТ!' : 'PR MERGED!'} +₽${formatNumber(result.rewardMoney)} +${formatNumber(result.rewardCode)} C#`,
+        text: `🔀 ${t.prMergedPopup} +₽${formatNumber(result.rewardMoney)} +${formatNumber(result.rewardCode)} C#`,
         tag: `PR #${mergedPrCount + 1}`,
         x: 90,
         y: 80,
@@ -632,7 +632,7 @@ export const MainClicker: React.FC = () => {
                 </button>
               );
             })}
-            <span className="hidden sm:inline text-[9px] text-slate-500 font-mono ml-1" title={lang === 'ru' ? "Быстрое переключение: Tab или Ctrl+P" : "Quick switch: Tab or Ctrl+P"}>
+            <span className="hidden sm:inline text-[9px] text-slate-500 font-mono ml-1" title={t.fastSwitchHint}>
               [Tab/Ctrl+P]
             </span>
           </div>
@@ -717,7 +717,7 @@ export const MainClicker: React.FC = () => {
                         <span
                           key={tIdx}
                           onClick={handleFixLinter}
-                          title={`${linterWarning.message} — ${lang === 'ru' ? 'Кликните для Quick Fix!' : 'Click for Quick Fix!'}`}
+                          title={`${linterWarning.message} ${t.quickFixTooltip}`}
                           className="relative inline-flex items-center group cursor-pointer z-30 mx-0.5"
                         >
                           <span className="underline decoration-wavy decoration-red-500 decoration-2 underline-offset-4 text-red-400 bg-red-500/20 px-1 py-0.5 rounded font-bold animate-pulse hover:bg-red-500/35 transition-all">
@@ -767,7 +767,7 @@ export const MainClicker: React.FC = () => {
                           : 'bg-amber-500/30 text-amber-200 border border-amber-400 font-bold animate-bounce shadow-[0_0_8px_rgba(245,158,11,0.6)] hover:bg-amber-400 hover:text-black'
                       }`}
                     >
-                      {refactoredLineIndices.includes(idx) ? (lang === 'ru' ? '✓ Отрефакторено' : '✓ Refactored') : REFACTOR_TAGS[idx]}
+                      {refactoredLineIndices.includes(idx) ? t.refactoredLine : REFACTOR_TAGS[idx]}
                     </button>
                   )}
                 </div>
@@ -875,7 +875,7 @@ export const MainClicker: React.FC = () => {
               <button
                 onClick={handleFixLinter}
                 className="flex items-center gap-1 text-red-400 hover:text-red-300 animate-pulse font-bold cursor-pointer"
-                title={lang === 'ru' ? "Синтаксическая ошибка: кликните для Quick Fix" : "Syntax error: click for Quick Fix"}
+                title={t.linterErrorTooltip}
               >
                 <AlertTriangle className="w-3 h-3 text-red-400" />
                 <span>1 error (Fix)</span>

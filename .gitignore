@@ -24,3 +24,15 @@ credentials.json
 .vscode/
 *.swp
 *.DS_Store
+.vsconfig
+
+# Unity artifacts & logs
+*.csproj
+*.sln
+*.slnx
+Library/
+Logs/
+Builds/
+UserSettings/
+*.log
+unity/

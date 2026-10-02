@@ -21,8 +21,8 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
     { id: 'frontend', name: 'Frontend & UX', icon: '🖥️', color: 'from-pink-500/20 to-purple-500/20 border-pink-500/40 text-pink-300' },
     { id: 'backend', name: 'Backend & Cloud', icon: '⚙️', color: 'from-cyan-500/20 to-blue-500/20 border-cyan-500/40 text-cyan-300' },
     { id: 'devops', name: 'DevOps & CI/CD', icon: '🚀', color: 'from-emerald-500/20 to-teal-500/20 border-emerald-500/40 text-emerald-300' },
-    { id: 'business', name: lang === 'ru' ? 'Стартап-магнат' : 'Startup Tycoon', icon: '💼', color: 'from-amber-500/20 to-yellow-500/20 border-amber-500/40 text-amber-300' },
-    { id: 'ai', name: lang === 'ru' ? 'ИИ и нейросети' : 'AI & Neural Nets', icon: '🧠', color: 'from-purple-500/20 to-emerald-500/20 border-purple-500/40 text-purple-300' }
+    { id: 'business', name: t.branchBusiness, icon: '💼', color: 'from-amber-500/20 to-yellow-500/20 border-amber-500/40 text-amber-300' },
+    { id: 'ai', name: t.branchAI, icon: '🧠', color: 'from-purple-500/20 to-emerald-500/20 border-purple-500/40 text-purple-300' }
   ];
 
   const filteredNodes = activeBranch === 'all'
@@ -202,7 +202,7 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
                     ) : (
                       <>
                         <Zap className="w-3.5 h-3.5 text-amber-400" />
-                        <span>{t.upgradeSkill} ({node.costPerLevel} {lang === 'ru' ? 'очк.' : 'pts'})</span>
+                        <span>{t.upgradeSkill} ({node.costPerLevel} {t.ptsShort})</span>
                       </>
                     )}
                   </button>
