@@ -18,7 +18,8 @@ import {
   Sparkles, 
   Search, 
   X, 
-  CornerDownLeft 
+  CornerDownLeft,
+  RotateCw 
 } from 'lucide-react';
 
 interface PaletteCommand {
@@ -133,7 +134,44 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
       }
     });
 
-    // --- 2. IDE & Рефакторинг ---
+    list.push({
+      id: 'git_activity_heatmap',
+      category: 'Git',
+      title: 'GitHub: Открыть график контрибуций (Heatmap)',
+      subtitle: '365-дневная сетка коммитов и расчет репутации',
+      icon: <GitBranch className="w-4 h-4 text-emerald-400" />,
+      badge: 'PROFILE',
+      action: () => {
+        window.dispatchEvent(new CustomEvent('codetap_open_heatmap'));
+      }
+    });
+
+    // --- 2. CI/CD & GitHub Actions ---
+    list.push({
+      id: 'cicd_run_pipeline',
+      category: 'CI/CD',
+      title: 'CI/CD: Запустить полный пайплайн сборки',
+      subtitle: 'Принудительный запуск 4 шагов GitHub Actions',
+      icon: <RotateCw className="w-4 h-4 text-cyan-400" />,
+      badge: 'RUN',
+      action: () => {
+        window.dispatchEvent(new CustomEvent('codetap_run_pipeline'));
+      }
+    });
+
+    list.push({
+      id: 'cicd_fix_build',
+      category: 'CI/CD',
+      title: 'CI/CD: Исправить Broken Build (Hotfix)',
+      subtitle: 'Устранение упавшего шага сборки с наградой',
+      icon: <Zap className="w-4 h-4 text-red-400" />,
+      badge: 'HOTFIX',
+      action: () => {
+        window.dispatchEvent(new CustomEvent('codetap_fix_pipeline'));
+      }
+    });
+
+    // --- 3. IDE & Рефакторинг ---
     list.push({
       id: 'ide_refactor_blitz',
       category: 'IDE',

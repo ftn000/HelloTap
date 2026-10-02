@@ -195,5 +195,54 @@ export const SKILL_NODES: SkillNode[] = [
     effectType: 'singularity',
     valuePerLevel: 1.5,
     reqSkillId: 'skill_fine_tuning'
+  },
+
+  // ВЕТКА: DEVOPS & CI/CD
+  {
+    id: 'skill_gitops',
+    name: 'GitOps & Trunk-Based Dev',
+    branch: 'devops',
+    icon: '🔀',
+    description: 'Непрерывная интеграция: слияние Pull Request приносит на +50% больше денег ₽ и кода',
+    maxLevel: 5,
+    costPerLevel: 1,
+    effectType: 'pr_boost',
+    valuePerLevel: 0.50
+  },
+  {
+    id: 'skill_github_actions',
+    name: 'GitHub Actions Matrix',
+    branch: 'devops',
+    icon: '⚙️',
+    description: 'Автоматизированный CI/CD: ускоряет пайплайн тестов и увеличивает награду за Broken Build на +50%',
+    maxLevel: 4,
+    costPerLevel: 2,
+    effectType: 'pipeline_haste',
+    valuePerLevel: 0.50,
+    reqSkillId: 'skill_gitops'
+  },
+  {
+    id: 'skill_blitz_compiler',
+    name: 'LLVM JIT-Оптимизатор',
+    branch: 'devops',
+    icon: '⚡',
+    description: 'Векторизация машинного кода: продлевает действие 10x Refactor Blitz на +5 секунд за уровень',
+    maxLevel: 3,
+    costPerLevel: 2,
+    effectType: 'blitz_duration',
+    valuePerLevel: 5,
+    reqSkillId: 'skill_gitops'
+  },
+  {
+    id: 'skill_auto_deploy',
+    name: 'Zero-Downtime Blue-Green',
+    branch: 'devops',
+    icon: '🚀',
+    description: 'Бесшовный автодеплой без простоя: пассивный доход +30% и дивиденд при каждом успешном билде',
+    maxLevel: 3,
+    costPerLevel: 3,
+    effectType: 'passive_boost',
+    valuePerLevel: 0.30,
+    reqSkillId: 'skill_github_actions'
   }
 ];

@@ -62,4 +62,6 @@ export interface GameSaveData {
   gitBranch?: string;
   branchCodeLines?: number;
   mergedPrCount?: number;
+  contributions?: Record<string, number>;
+  pipelinesPassed?: number;
 }

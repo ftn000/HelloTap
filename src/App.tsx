@@ -12,6 +12,7 @@ import { TechTreeModal } from './components/TechTreeModal';
 import { OfflineProgressModal } from './components/OfflineProgressModal';
 import { BottomNav } from './components/BottomNav';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
+import { GitHubHeatmapModal } from './components/GitHubHeatmapModal';
 import { useGame } from './context/GameContext';
 import { ThemeId } from './types/themes';
 
@@ -35,6 +36,7 @@ const GameApp: React.FC = () => {
   const [leaderboardOpen, setLeaderboardOpen] = useState<boolean>(false);
   const [achievementsOpen, setAchievementsOpen] = useState<boolean>(false);
   const [techTreeOpen, setTechTreeOpen] = useState<boolean>(false);
+  const [heatmapOpen, setHeatmapOpen] = useState<boolean>(false);
 
   const openHubWithTab = (tab: 'systems' | 'shop' | 'digest' | 'prestige' | 'custom' | 'save') => {
     setHubTab(tab);
@@ -43,6 +45,9 @@ const GameApp: React.FC = () => {
 
   // Полноценная поддержка физической клавиатуры и горячих клавиш (True Coder Mode)
   useEffect(() => {
+    const handleOpenHeatmapEvent = () => setHeatmapOpen(true);
+    window.addEventListener('codetap_open_heatmap', handleOpenHeatmapEvent);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
@@ -54,6 +59,7 @@ const GameApp: React.FC = () => {
         setLeaderboardOpen(false);
         setAchievementsOpen(false);
         setTechTreeOpen(false);
+        setHeatmapOpen(false);
         dismissEvent();
         return;
       }
@@ -111,8 +117,11 @@ const GameApp: React.FC = () => {
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [hubOpen, leaderboardOpen, achievementsOpen, techTreeOpen, activeEvent, offlineReport, themeId, handleClick, toggleMusic, setThemeId, dismissEvent]);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('codetap_open_heatmap', handleOpenHeatmapEvent);
+    };
+  }, [hubOpen, leaderboardOpen, achievementsOpen, techTreeOpen, heatmapOpen, activeEvent, offlineReport, themeId, handleClick, toggleMusic, setThemeId, dismissEvent]);
 
   return (
     <div className="min-h-screen bg-cyber-bg text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
@@ -131,6 +140,7 @@ const GameApp: React.FC = () => {
         onOpenLeaderboard={() => setLeaderboardOpen(true)}
         onOpenAchievements={() => setAchievementsOpen(true)}
         onOpenTechTree={() => setTechTreeOpen(true)}
+        onOpenHeatmap={() => setHeatmapOpen(true)}
       />
 
       {/* Основной контент */}
@@ -186,6 +196,12 @@ const GameApp: React.FC = () => {
         codeEarned={offlineReport?.codeEarned || 0}
         moneyEarned={offlineReport?.moneyEarned || 0}
         onClaim={claimOfflineEarnings}
+      />
+
+      {/* GitHub Contribution Heatmap */}
+      <GitHubHeatmapModal
+        isOpen={heatmapOpen}
+        onClose={() => setHeatmapOpen(false)}
       />
 
       {/* VS Code Command Palette (Ctrl+Shift+P / F1) */}

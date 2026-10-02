@@ -281,6 +281,60 @@ class SoundEngine {
     osc.stop(ctx.currentTime + duration);
   }
 
+  public playPipelinePass(): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    // Мажорный арпеджио успешной сборки: C5 -> E5 -> G5 -> C6
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + idx * 0.05;
+      const duration = 0.22;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.18, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    });
+  }
+
+  public playPipelineFail(): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    // Тревожный диссонанс Broken Build
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const duration = 0.28;
+
+    osc1.type = 'sawtooth';
+    osc2.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(145, ctx.currentTime);
+    osc2.frequency.setValueAtTime(188, ctx.currentTime);
+
+    gain.gain.setValueAtTime(0.22, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc1.start();
+    osc2.start();
+    osc1.stop(ctx.currentTime + duration);
+    osc2.stop(ctx.currentTime + duration);
+  }
+
   public triggerHaptic(type: 'light' | 'medium' | 'heavy' | 'success' = 'light'): void {
     // 1. Проверяем Telegram WebApp HapticFeedback
     const tg = (window as unknown as { Telegram?: { WebApp?: { HapticFeedback?: { impactOccurred: (s: string) => void; notificationOccurred: (s: string) => void } } } }).Telegram?.WebApp;

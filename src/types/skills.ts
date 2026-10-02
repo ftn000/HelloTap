@@ -1,4 +1,4 @@
-export type SkillBranch = 'frontend' | 'backend' | 'business' | 'ai';
+export type SkillBranch = 'frontend' | 'backend' | 'business' | 'ai' | 'devops';
 
 export interface SkillNode {
   id: string;
@@ -18,7 +18,10 @@ export interface SkillNode {
     | 'money_boost'        // +% к заработку рублей ₽
     | 'bug_reward_boost'   // +% к награде за дебаггинг багов
     | 'click_boost'        // +% к коду за клик
-    | 'singularity';       // глобальный множитель ко всему
+    | 'singularity'        // глобальный множитель ко всему
+    | 'pr_boost'           // +% к награде за слияние PR
+    | 'blitz_duration'     // +сек к длительности Refactor Blitz
+    | 'pipeline_haste';    // ускорение CI/CD и награда за Broken Build fix
   valuePerLevel: number;
   reqSkillId?: string;     // Требуемый предыдущий навык в ветке
 }

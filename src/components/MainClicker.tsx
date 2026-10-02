@@ -5,6 +5,7 @@ import { Flame, Sparkles, Terminal, Cpu, Zap, Bug, GitBranch, GitMerge, CheckCir
 import confetti from 'canvas-confetti';
 import { IDE_THEMES } from '../utils/themesList';
 import { StudioDecor } from './StudioDecor';
+import { CICDPipeline } from './CICDPipeline';
 import { CODE_PROJECT_FILES, CodeProjectFile, tokenizeCodeLine, getTokenColor } from '../utils/codeProjects';
 import { sounds } from '../utils/soundEffects';
 
@@ -89,25 +90,26 @@ export const MainClicker: React.FC = () => {
     comboEnergy, 
     isInFlow, 
     codePerClick, 
-    codePerSec,
+    codePerSec, 
     hasAutoClicker, 
     themeId, 
-    totalCodeEver,
-    overclockRemainingSec,
-    triggerOverclock,
-    unlockedSkills,
-    switchType,
-    setSwitchType,
-    recordCommit,
-    gitBranch,
-    branchCodeLines,
-    mergedPrCount,
-    createBranch,
-    mergePullRequest,
-    blitzRemainingSec,
-    isBlitzActive,
-    triggerRefactorBlitz,
-    setIsCommandPaletteOpen,
+    totalCodeEver, 
+    overclockRemainingSec, 
+    triggerOverclock, 
+    unlockedSkills, 
+    switchType, 
+    setSwitchType, 
+    recordCommit, 
+    gitBranch, 
+    branchCodeLines, 
+    mergedPrCount, 
+    createBranch, 
+    mergePullRequest, 
+    blitzRemainingSec, 
+    isBlitzActive, 
+    triggerRefactorBlitz, 
+    setIsCommandPaletteOpen, 
+    currentStreak, 
     t 
   } = useGame();
 
@@ -793,6 +795,11 @@ export const MainClicker: React.FC = () => {
           </div>
         </div>
 
+        {/* ШАГ 5: CI/CD PIPELINE & GITHUB ACTIONS */}
+        <div className="relative z-20 w-full">
+          <CICDPipeline />
+        </div>
+
         {/* ШАГ 3: СТАТУСНАЯ СТРОКА IDE (IDE Status Bar) */}
         <div className="relative z-20 mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono text-slate-400 select-none flex-wrap gap-1">
           <div className="flex items-center gap-2 flex-wrap">
@@ -847,6 +854,20 @@ export const MainClicker: React.FC = () => {
             >
               <Terminal className="w-2.5 h-2.5 text-cyan-400" />
               <span>Palette</span>
+            </button>
+
+            {/* Кнопка вызова GitHub Heatmap */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                window.dispatchEvent(new CustomEvent('codetap_open_heatmap'));
+              }}
+              className="px-1.5 py-0.5 rounded bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/50 text-[9px] text-emerald-300 flex items-center gap-1 transition-colors cursor-pointer"
+              title="Открыть GitHub Contribution Heatmap"
+            >
+              <span>🐙</span>
+              <span>Heatmap</span>
+              {currentStreak > 0 && <span className="text-amber-400 font-bold">{currentStreak}🔥</span>}
             </button>
 
             {linterWarning ? (

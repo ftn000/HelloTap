@@ -12,10 +12,11 @@ interface HeaderHUDProps {
   onOpenLeaderboard: () => void;
   onOpenAchievements: () => void;
   onOpenTechTree: () => void;
+  onOpenHeatmap?: () => void;
 }
 
-export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard, onOpenAchievements, onOpenTechTree }) => {
-  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t, isMusicPlaying, toggleMusic, currentTrackName, nextMusicTrack, achievements, skillPoints } = useGame();
+export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard, onOpenAchievements, onOpenTechTree, onOpenHeatmap }) => {
+  const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t, isMusicPlaying, toggleMusic, currentTrackName, nextMusicTrack, achievements, skillPoints, currentStreak } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
 
   const totalAchStars = Object.values(achievements).reduce((sum, tier) => sum + tier, 0);
@@ -174,6 +175,22 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
           >
             <Trophy className="w-4 h-4 text-amber-400" />
           </button>
+
+          {/* Кнопка GitHub Heatmap */}
+          {onOpenHeatmap && (
+            <button
+              onClick={onOpenHeatmap}
+              className="relative p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+              title="GitHub Contribution Heatmap (График вкладов)"
+            >
+              <span className="text-sm">🐙</span>
+              {currentStreak > 0 && (
+                <span className="absolute -top-1 -right-1 px-1 min-w-[15px] h-3.5 rounded-full bg-emerald-500 text-slate-950 font-mono font-bold text-[9px] flex items-center justify-center">
+                  {currentStreak}🔥
+                </span>
+              )}
+            </button>
+          )}
 
           {/* Кнопка Сохранений */}
           <button

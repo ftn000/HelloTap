@@ -12,6 +12,7 @@ import { DEFAULT_THEME_ID, IDE_THEMES } from '../utils/themesList';
 import { GameRandomEvent, GameEventOption } from '../types/events';
 import { generateRandomEvent } from '../utils/eventsList';
 import { SKILL_NODES } from '../utils/skillsList';
+import { generateBaselineContributions, getTodayKey, calculateStreak } from '../utils/githubHeatmap';
 
 const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
@@ -401,6 +402,13 @@ interface GameContextType {
   triggerRefactorBlitz: (sec?: number) => void;
   isCommandPaletteOpen: boolean;
   setIsCommandPaletteOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  contributions: Record<string, number>;
+  recordContribution: (amount?: number) => void;
+  totalContributions: number;
+  currentStreak: number;
+  devReputationBonus: number;
+  pipelinesPassed: number;
+  recordPipelinePass: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -434,6 +442,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [mergedPrCount, setMergedPrCount] = useState<number>(0);
   const [blitzEndTime, setBlitzEndTime] = useState<number>(0);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
+  const [contributions, setContributions] = useState<Record<string, number>>(generateBaselineContributions);
+  const [pipelinesPassed, setPipelinesPassed] = useState<number>(0);
   const [activeEvent, setActiveEvent] = useState<GameRandomEvent | null>(null);
   const [skillPoints, setSkillPoints] = useState<number>(0);
   const [unlockedSkills, setUnlockedSkills] = useState<Record<string, number>>({});
@@ -511,12 +521,30 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return nextName;
   }, []);
 
+  const recordContribution = useCallback((amount: number = 1) => {
+    const today = getTodayKey();
+    setContributions(prev => ({
+      ...prev,
+      [today]: (prev[today] || 0) + amount
+    }));
+  }, []);
+
+  const recordPipelinePass = useCallback(() => {
+    setPipelinesPassed(p => p + 1);
+    recordContribution(1);
+    const deployDividend = (unlockedSkills['skill_auto_deploy'] || 0) * 2000;
+    if (deployDividend > 0) {
+      setMoney(m => m + deployDividend);
+    }
+  }, [recordContribution, unlockedSkills]);
+
   const recordCommit = useCallback((langKey: string) => {
     setLangCommits(prev => ({
       ...prev,
       [langKey]: (prev[langKey] || 0) + 1
     }));
-  }, []);
+    recordContribution(1);
+  }, [recordContribution]);
 
   const setThemeId = (t: ThemeId) => {
     setThemeIdState(t);
@@ -544,10 +572,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const triggerRefactorBlitz = useCallback((sec: number = 20) => {
-    setBlitzEndTime(Date.now() + sec * 1000);
+    const extraDuration = (unlockedSkills['skill_blitz_compiler'] || 0) * 5;
+    setBlitzEndTime(Date.now() + (sec + extraDuration) * 1000);
     sounds.playBlitzSuccess();
     sounds.triggerHaptic('success');
-  }, []);
+  }, [unlockedSkills]);
 
   const dismissEvent = () => {
     setActiveEvent(null);
@@ -610,6 +639,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (cd.gitBranch) setGitBranch(cd.gitBranch);
           if (cd.branchCodeLines) setBranchCodeLines(cd.branchCodeLines);
           if (cd.mergedPrCount) setMergedPrCount(cd.mergedPrCount);
+          if (cd.contributions) setContributions(cd.contributions);
+          if (cd.pipelinesPassed) setPipelinesPassed(cd.pipelinesPassed);
         }
       });
 
@@ -637,7 +668,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     (unlockedSkills['skill_async_io'] || 0) * 0.20 + 
     (unlockedSkills['skill_k8s_autoscaling'] || 0) * 0.35 + 
     (unlockedSkills['skill_quantum_threads'] || 0) * 0.50 +
-    (unlockedSkills['skill_ai_agents'] || 0) * 0.40;
+    (unlockedSkills['skill_ai_agents'] || 0) * 0.40 +
+    (unlockedSkills['skill_auto_deploy'] || 0) * 0.30;
 
   const moneyTalentMult = 1.0 + 
     (unlockedSkills['skill_venture_network'] || 0) * 0.25 + 
@@ -654,6 +686,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const blitzRemainingSec = Math.max(0, Math.ceil((blitzEndTime - Date.now()) / 1000));
   const branchMultiplier = gitBranch !== 'main' ? 1.25 : 1.0;
 
+  // Расчет статистики контрибуций GitHub и репутационного бонуса
+  const { total: totalContributions, currentStreak } = calculateStreak(contributions);
+  const devReputationBonus = Math.min(0.50, Math.floor(totalContributions / 20) * 0.01);
+  const devReputationMultiplier = 1.0 + devReputationBonus;
+
   // Расчет множителей и доходов
   const globalMultiplier = (
     1.0 + 
@@ -664,7 +701,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     (systems.find(s => s.id === 'sys_realestate')?.level || 0) * 0.40 +
     (systems.find(s => s.id === 'sys_esports')?.level || 0) * 0.15 +
     (systems.find(s => s.id === 'sys_cybersec')?.level || 0) * 0.10
-  ) * adBoostMultiplier * vipMultiplier * achievementBonusMultiplier * overclockMultiplier * singularityMult * blitzMultiplier * branchMultiplier;
+  ) * adBoostMultiplier * vipMultiplier * achievementBonusMultiplier * overclockMultiplier * singularityMult * blitzMultiplier * branchMultiplier * devReputationMultiplier;
 
   const flowMultiplier = isInFlow ? 3.0 : 1.0;
 
@@ -686,13 +723,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const mergePullRequest = useCallback(() => {
     if (gitBranch === 'main' || branchCodeLines < 1) return null;
 
-    const rewardMoney = Math.round(branchCodeLines * Math.max(5, moneyPerSec * 0.25)) + 1000;
-    const rewardCode = Math.round(branchCodeLines * 2.5) + 500;
+    const prSkillBonus = 1.0 + (unlockedSkills['skill_gitops'] || 0) * 0.50;
+    const rewardMoney = Math.round((branchCodeLines * Math.max(5, moneyPerSec * 0.25) + 1000) * prSkillBonus);
+    const rewardCode = Math.round((branchCodeLines * 2.5 + 500) * prSkillBonus);
 
     setMoney(m => m + rewardMoney);
     setCodeLines(c => c + rewardCode);
     setTotalCodeEver(t => t + rewardCode);
     setMergedPrCount(c => c + 1);
+    recordContribution(3);
 
     sounds.playBranchMerge();
     sounds.triggerHaptic('success');
@@ -701,7 +740,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setGitBranch('main');
     setBranchCodeLines(0);
     return result;
-  }, [gitBranch, branchCodeLines, moneyPerSec]);
+  }, [gitBranch, branchCodeLines, moneyPerSec, unlockedSkills, recordContribution]);
 
   // Загрузка локальных сохранений
   useEffect(() => {
@@ -732,6 +771,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.gitBranch) setGitBranch(data.gitBranch);
         if (data.branchCodeLines) setBranchCodeLines(data.branchCodeLines);
         if (data.mergedPrCount) setMergedPrCount(data.mergedPrCount);
+        if (data.contributions) setContributions(data.contributions);
+        if (data.pipelinesPassed) setPipelinesPassed(data.pipelinesPassed);
         if (data.switchType) {
           setSwitchTypeState(data.switchType);
           sounds.switchType = data.switchType;
@@ -804,7 +845,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         langCommits,
         gitBranch,
         branchCodeLines,
-        mergedPrCount
+        mergedPrCount,
+        contributions,
+        pipelinesPassed
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
       yandexSdk.saveToCloud("hellotap_save", data);
@@ -817,7 +860,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearInterval(interval);
       window.removeEventListener("beforeunload", save);
     };
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits, gitBranch, branchCodeLines, mergedPrCount]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits, gitBranch, branchCodeLines, mergedPrCount, contributions, pipelinesPassed]);
 
   // Периодический спавн случайных мини-событий (каждые 90-120 секунд)
   useEffect(() => {
@@ -949,11 +992,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setMoney(m => m + bonusMoney);
     setComboEnergy(1.0);
     setDailyDigestClaims(d => d + 1);
+    recordContribution(5);
 
     sounds.playRelease();
     sounds.triggerHaptic('success');
     return { bonusCode, bonusMoney };
-  }, [globalMultiplier]);
+  }, [globalMultiplier, recordContribution]);
 
   // Time Warp
   const triggerTimeWarp = useCallback((): boolean => {
@@ -1188,11 +1232,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       langCommits,
       gitBranch,
       branchCodeLines,
-      mergedPrCount
+      mergedPrCount,
+      contributions,
+      pipelinesPassed
     };
     const json = JSON.stringify(data);
     return "HELLOTAP_SAVE_V2:" + btoa(unescape(encodeURIComponent(json)));
-  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits, gitBranch, branchCodeLines, mergedPrCount]);
+  }, [codeLines, money, totalCodeEver, prestigeCount, prestigeTokens, upgrades, systems, timeWarpCooldown, dailyDigestClaims, switchType, themeId, skillPoints, unlockedSkills, hasVipX2, hasAutoClicker, hasNoAds, manualClicks, critClicks, flowEnters, timeWarpsUsed, testedSwitches, achievements, langCommits, gitBranch, branchCodeLines, mergedPrCount, contributions, pipelinesPassed]);
 
   // Base64 Импорт
   const importSaveBase64 = useCallback((code: string): boolean => {
@@ -1225,6 +1271,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.gitBranch) setGitBranch(data.gitBranch);
       if (data.branchCodeLines) setBranchCodeLines(data.branchCodeLines);
       if (data.mergedPrCount) setMergedPrCount(data.mergedPrCount);
+      if (data.contributions) setContributions(data.contributions);
+      if (data.pipelinesPassed) setPipelinesPassed(data.pipelinesPassed);
       return true;
     } catch {
       return false;
@@ -1307,6 +1355,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         triggerRefactorBlitz,
         isCommandPaletteOpen,
         setIsCommandPaletteOpen,
+        contributions,
+        recordContribution,
+        totalContributions,
+        currentStreak,
+        devReputationBonus,
+        pipelinesPassed,
+        recordPipelinePass,
         watchAdForDoubleBoost,
         watchAdForTimeWarpReset,
         exportSaveBase64,
