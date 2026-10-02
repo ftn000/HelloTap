@@ -30,7 +30,22 @@ export interface SynthTrack {
 }
 
 export const SYNTH_TRACKS: SynthTrack[] = [
-  // 1. Chill Lo-Fi: Ночной кодинг
+  // 1. Lo-Fi Coder Beats: Глубокое погружение в программирование
+  {
+    id: 'lofi_beats',
+    name: 'Lo-Fi Coder Beats',
+    genre: 'Generative Lo-Fi Ambient',
+    bpm: 72,
+    filterCutoff: 680,
+    stepDuration: 3.6,
+    progression: [
+      { bass: 'D2', pad: ['D3', 'F3', 'A3', 'C4', 'E4'], pluckNotes: ['A4', 'C5', 'E5', 'G5', 'E5', 'C5'] },
+      { bass: 'G1', pad: ['G2', 'B2', 'F3', 'A3', 'E4'], pluckNotes: ['B4', 'D5', 'E5', 'G5', 'E5', 'D5'] },
+      { bass: 'C2', pad: ['C3', 'E3', 'G3', 'B3', 'D4'], pluckNotes: ['G4', 'B4', 'D5', 'E5', 'D5', 'B4'] },
+      { bass: 'A1', pad: ['A2', 'C3', 'E3', 'G3', 'B3'], pluckNotes: ['E4', 'G4', 'A4', 'C5', 'B4', 'G4'] }
+    ]
+  },
+  // 2. Chill Lo-Fi: Ночной кодинг
   {
     id: 'midnight',
     name: 'Midnight Coding',
@@ -45,7 +60,7 @@ export const SYNTH_TRACKS: SynthTrack[] = [
       { bass: 'E2', pad: ['E2', 'B2', 'D3', 'G3', 'B3'], pluckNotes: ['E4', 'G4', 'B4', 'D5', 'B4', 'G4'] }
     ]
   },
-  // 2. Synthwave: Неоновый киберпанк
+  // 3. Synthwave: Неоновый киберпанк
   {
     id: 'cyberpunk',
     name: 'Neon Cyberpunk Rain',
@@ -60,7 +75,7 @@ export const SYNTH_TRACKS: SynthTrack[] = [
       { bass: 'A2', pad: ['A2', 'C3', 'E3', 'G3'], pluckNotes: ['E4', 'A4', 'C5', 'E5', 'C5', 'A4'] }
     ]
   },
-  // 3. Warm Acoustic: Утренний кофе и чистый код
+  // 4. Warm Acoustic: Утренний кофе и чистый код
   {
     id: 'coffee',
     name: 'Coffee & Clean Code',
@@ -87,6 +102,7 @@ class LoFiSynthwaveEngine {
   private isTabVisible: boolean = true;
   private userMuted: boolean = false;
   public currentTrackIndex: number = 0;
+  public musicVolume: number = 0.35;
 
   constructor() {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
@@ -94,6 +110,11 @@ class LoFiSynthwaveEngine {
         const saved = localStorage.getItem("CODETAP_MUSIC_MUTED");
         if (saved === 'true') {
           this.userMuted = true;
+        }
+        const savedVol = localStorage.getItem("CODETAP_MUSIC_VOLUME");
+        if (savedVol !== null) {
+          const parsed = parseFloat(savedVol);
+          if (!isNaN(parsed)) this.musicVolume = Math.max(0, Math.min(1, parsed));
         }
       } catch {}
 
@@ -235,6 +256,56 @@ class LoFiSynthwaveEngine {
       osc.start(pluckTime);
       osc.stop(pluckTime + 0.5);
     });
+
+    // 4. Мягкий Lo-Fi ритм для Coder Beats (теплый саб-кик и деликатный виниловый щелчок)
+    if (track.id === 'lofi_beats') {
+      // Суб-кик на сильную долю (низкий бархатный бас-толчок)
+      const kickOsc = this.ctx.createOscillator();
+      const kickGain = this.ctx.createGain();
+      kickOsc.type = 'sine';
+      kickOsc.frequency.setValueAtTime(85, now);
+      kickOsc.frequency.exponentialRampToValueAtTime(38, now + 0.16);
+
+      kickGain.gain.setValueAtTime(0.001, now);
+      kickGain.gain.linearRampToValueAtTime(0.04, now + 0.015);
+      kickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+
+      kickOsc.connect(kickGain);
+      kickGain.connect(this.filterNode);
+      kickOsc.start(now);
+      kickOsc.stop(now + 0.25);
+
+      // Теплый мягкий снейр/щелчок в середине такта
+      const snareTime = now + stepDuration * 0.5;
+      const snareOsc = this.ctx.createOscillator();
+      const snareGain = this.ctx.createGain();
+      snareOsc.type = 'triangle';
+      snareOsc.frequency.setValueAtTime(260, snareTime);
+      snareOsc.frequency.exponentialRampToValueAtTime(130, snareTime + 0.08);
+
+      snareGain.gain.setValueAtTime(0.001, snareTime);
+      snareGain.gain.linearRampToValueAtTime(0.022, snareTime + 0.01);
+      snareGain.gain.exponentialRampToValueAtTime(0.0001, snareTime + 0.12);
+
+      snareOsc.connect(snareGain);
+      snareGain.connect(this.filterNode);
+      snareOsc.start(snareTime);
+      snareOsc.stop(snareTime + 0.15);
+    }
+  }
+
+  public setVolume(vol: number): void {
+    this.musicVolume = Math.max(0, Math.min(1, vol));
+    try {
+      localStorage.setItem("CODETAP_MUSIC_VOLUME", this.musicVolume.toString());
+    } catch {}
+    if (this.masterGain && this.ctx && this.isPlaying) {
+      this.masterGain.gain.setValueAtTime(this.musicVolume * 0.4, this.ctx.currentTime);
+    }
+  }
+
+  public getVolume(): number {
+    return this.musicVolume;
   }
 
   public start(): boolean {
@@ -248,7 +319,8 @@ class LoFiSynthwaveEngine {
 
     this.isPlaying = true;
     if (this.masterGain && this.ctx) {
-      this.masterGain.gain.linearRampToValueAtTime(0.35, this.ctx.currentTime + 1.2);
+      const targetGain = this.musicVolume * 0.4;
+      this.masterGain.gain.linearRampToValueAtTime(targetGain, this.ctx.currentTime + 1.2);
     }
 
     const track = SYNTH_TRACKS[this.currentTrackIndex % SYNTH_TRACKS.length];

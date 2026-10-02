@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { ShopUpgrade, StudioSystem, GameSaveData, HubCategoryType } from '../types/game';
-import { sounds } from '../utils/soundEffects';
+import { sounds, SoundProfile } from '../utils/soundEffects';
 import { yandexSdk } from '../utils/yandexSdk';
 import { yandexPayments } from '../utils/yandexPayments';
 import { Language, TranslationDictionary, TRANSLATIONS, detectInitialLanguage } from '../utils/i18n';
@@ -409,6 +409,13 @@ interface GameContextType {
   devReputationBonus: number;
   pipelinesPassed: number;
   recordPipelinePass: () => void;
+  recordPipelineFix: (bonusCode: number, bonusMoney: number) => void;
+  soundProfile: SoundProfile;
+  setSoundProfile: (p: SoundProfile) => void;
+  sfxVolume: number;
+  setSfxVolume: (v: number) => void;
+  musicVolume: number;
+  setMusicVolume: (v: number) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -441,6 +448,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [branchCodeLines, setBranchCodeLines] = useState<number>(0);
   const [mergedPrCount, setMergedPrCount] = useState<number>(0);
   const [blitzEndTime, setBlitzEndTime] = useState<number>(0);
+  const [soundProfile, setSoundProfileState] = useState<SoundProfile>(sounds.getProfile());
+  const [sfxVolume, setSfxVolumeState] = useState<number>(sounds.getVolume());
+  const [musicVolume, setMusicVolumeState] = useState<number>(musicSynth.getVolume());
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [contributions, setContributions] = useState<Record<string, number>>(generateBaselineContributions);
   const [pipelinesPassed, setPipelinesPassed] = useState<number>(0);
@@ -537,6 +547,33 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setMoney(m => m + deployDividend);
     }
   }, [recordContribution, unlockedSkills]);
+
+  const recordPipelineFix = useCallback((bonusCode: number, bonusMoney: number) => {
+    setCodeLines(c => c + bonusCode);
+    setTotalCodeEver(t => t + bonusCode);
+    setMoney(m => m + bonusMoney);
+    setPipelinesPassed(p => p + 1);
+    recordContribution(2);
+    const deployDividend = (unlockedSkills['skill_auto_deploy'] || 0) * 2000;
+    if (deployDividend > 0) {
+      setMoney(m => m + deployDividend);
+    }
+  }, [recordContribution, unlockedSkills]);
+
+  const setSoundProfile = useCallback((profile: SoundProfile) => {
+    sounds.setProfile(profile);
+    setSoundProfileState(profile);
+  }, []);
+
+  const setSfxVolume = useCallback((val: number) => {
+    sounds.setVolume(val);
+    setSfxVolumeState(val);
+  }, []);
+
+  const setMusicVolume = useCallback((val: number) => {
+    musicSynth.setVolume(val);
+    setMusicVolumeState(val);
+  }, []);
 
   const recordCommit = useCallback((langKey: string) => {
     setLangCommits(prev => ({
@@ -937,11 +974,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const next = Math.min(1.0, e + flowStep);
       if (next >= 1.0 && e < 1.0) {
         setFlowEnters(f => f + 1);
+        sounds.playGlassBell('flow');
       }
       return next;
     });
 
     sounds.playKeyClick(isCrit);
+    if (isCrit) {
+      sounds.playGlassBell('crit');
+    }
     sounds.triggerHaptic(isCrit ? 'heavy' : 'light');
 
     return { isCrit, codeAdded, moneyAdded };
@@ -1362,6 +1403,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         devReputationBonus,
         pipelinesPassed,
         recordPipelinePass,
+        recordPipelineFix,
+        soundProfile,
+        setSoundProfile,
+        sfxVolume,
+        setSfxVolume,
+        musicVolume,
+        setMusicVolume,
         watchAdForDoubleBoost,
         watchAdForTimeWarpReset,
         exportSaveBase64,

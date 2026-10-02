@@ -64,4 +64,8 @@ export interface GameSaveData {
   mergedPrCount?: number;
   contributions?: Record<string, number>;
   pipelinesPassed?: number;
+  soundProfile?: 'asmr' | 'classic' | 'cyber' | 'mute';
+  sfxVolume?: number;
+  musicVolume?: number;
 }
+

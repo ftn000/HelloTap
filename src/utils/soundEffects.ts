@@ -3,6 +3,8 @@
  * Процедурный аналоговый звук с нулевым весом файлов, встроенным лимитером (компрессором)
  * и фильтром для мягкого, теплого и приятного для ушей звучания без клиппинга и пищания.
  */
+export type SoundProfile = 'asmr' | 'classic' | 'cyber' | 'mute';
+
 class SoundEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
@@ -10,9 +12,24 @@ class SoundEngine {
   private compressor: DynamicsCompressorNode | null = null;
   public isMuted: boolean = false;
   private isTabVisible: boolean = true;
+  public soundProfile: SoundProfile = 'asmr';
+  public sfxVolume: number = 0.5;
 
   constructor() {
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      try {
+        const savedVol = localStorage.getItem("CODETAP_SFX_VOLUME");
+        if (savedVol !== null) {
+          const parsed = parseFloat(savedVol);
+          if (!isNaN(parsed)) this.sfxVolume = Math.max(0, Math.min(1, parsed));
+        }
+        const savedProf = localStorage.getItem("CODETAP_SOUND_PROFILE") as SoundProfile;
+        if (savedProf && ['asmr', 'classic', 'cyber', 'mute'].includes(savedProf)) {
+          this.soundProfile = savedProf;
+          this.isMuted = savedProf === 'mute';
+        }
+      } catch {}
+
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
           this.isTabVisible = false;
@@ -53,22 +70,136 @@ class SoundEngine {
     comp.release.setValueAtTime(0.12, ctx.currentTime);
     this.compressor = comp;
 
-    // 2. Мягкий Low-Pass фильтр: убирает резкие высокочастотные писки выше 3500 Гц
+    // 2. Мягкий Low-Pass фильтр: срез высоких частот в зависимости от звукового профиля
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(3600, ctx.currentTime);
-    filter.Q.setValueAtTime(0.7, ctx.currentTime);
+    filter.frequency.setValueAtTime(this.soundProfile === 'asmr' ? 2200 : this.soundProfile === 'cyber' ? 5200 : 3600, ctx.currentTime);
+    filter.Q.setValueAtTime(this.soundProfile === 'cyber' ? 1.4 : 0.7, ctx.currentTime);
     this.masterFilter = filter;
 
-    // 3. Мастер-громкость: комфортный уровень прослушивания
+    // 3. Мастер-громкость с учетом SFX громкости и профиля
     const master = ctx.createGain();
-    master.gain.setValueAtTime(0.42, ctx.currentTime);
+    const effectiveGain = this.isMuted ? 0 : this.sfxVolume * 0.45;
+    master.gain.setValueAtTime(effectiveGain, ctx.currentTime);
     this.masterGain = master;
 
     // Маршрутизация: filter -> compressor -> masterGain -> destination
     filter.connect(comp);
     comp.connect(master);
     master.connect(ctx.destination);
+  }
+
+  private applyProfileSettings(): void {
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    if (this.masterFilter) {
+      switch (this.soundProfile) {
+        case 'asmr':
+          this.masterFilter.frequency.setValueAtTime(2200, now);
+          this.masterFilter.Q.setValueAtTime(0.5, now);
+          break;
+        case 'classic':
+          this.masterFilter.frequency.setValueAtTime(3600, now);
+          this.masterFilter.Q.setValueAtTime(0.7, now);
+          break;
+        case 'cyber':
+          this.masterFilter.frequency.setValueAtTime(5200, now);
+          this.masterFilter.Q.setValueAtTime(1.4, now);
+          break;
+        case 'mute':
+          break;
+      }
+    }
+    if (this.masterGain) {
+      const effectiveGain = this.isMuted ? 0 : this.sfxVolume * 0.45;
+      this.masterGain.gain.setValueAtTime(effectiveGain, now);
+    }
+  }
+
+  public setVolume(val: number): void {
+    this.sfxVolume = Math.max(0, Math.min(1, val));
+    try {
+      localStorage.setItem("CODETAP_SFX_VOLUME", this.sfxVolume.toString());
+    } catch {}
+    if (this.masterGain && this.ctx) {
+      const effectiveGain = this.isMuted ? 0 : this.sfxVolume * 0.45;
+      this.masterGain.gain.setValueAtTime(effectiveGain, this.ctx.currentTime);
+    }
+  }
+
+  public getVolume(): number {
+    return this.sfxVolume;
+  }
+
+  public setProfile(profile: SoundProfile): void {
+    this.soundProfile = profile;
+    this.isMuted = profile === 'mute';
+    try {
+      localStorage.setItem("CODETAP_SOUND_PROFILE", profile);
+    } catch {}
+    this.applyProfileSettings();
+  }
+
+  public getProfile(): SoundProfile {
+    return this.soundProfile;
+  }
+
+  /**
+   * Приятный хрустальный / стеклянный колокольчик при проке крита или входе в состояние Flow.
+   * Физически смоделированный звон хрустального бокала/колокола с чистыми синусоидальными обертонами.
+   */
+  public playGlassBell(type: 'crit' | 'flow' = 'crit'): void {
+    const ctx = this.getContext();
+    const dest = this.getMasterNode();
+    if (!ctx || !dest) return;
+
+    if (type === 'crit') {
+      // Изящный звонкий хрустальный колокольчик (A6 1760 Гц + E7 2637 Гц + кристальный обертон ~3950 Гц)
+      const freqs = [1760.0, 2637.0, 3951.0];
+      const gains = [0.08, 0.05, 0.025];
+      const decay = 0.55;
+
+      freqs.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const startTime = ctx.currentTime;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+
+        gain.gain.setValueAtTime(0.0001, startTime);
+        gain.gain.linearRampToValueAtTime(gains[idx], startTime + 0.002);
+        gain.gain.exponentialRampToValueAtTime(0.00001, startTime + decay);
+
+        osc.connect(gain);
+        gain.connect(dest);
+
+        osc.start(startTime);
+        osc.stop(startTime + decay);
+      });
+    } else {
+      // Восходящий кристальный каскад колокольчиков при входе в состояние Flow (C6, E6, G6, C7, E7)
+      const notes = [1046.5, 1318.5, 1567.98, 2093.0, 2637.0];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const startTime = ctx.currentTime + idx * 0.045;
+        const decay = 0.7;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+
+        gain.gain.setValueAtTime(0.0001, startTime);
+        gain.gain.linearRampToValueAtTime(0.065, startTime + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.00001, startTime + decay);
+
+        osc.connect(gain);
+        gain.connect(dest);
+
+        osc.start(startTime);
+        osc.stop(startTime + decay);
+      });
+    }
   }
 
   private getContext(): AudioContext | null {

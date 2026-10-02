@@ -24,10 +24,10 @@ export const CICDPipeline: React.FC = () => {
     codePerSec, 
     codePerClick, 
     moneyPerSec, 
-    handleClick, 
     unlockedSkills, 
     recordContribution, 
     recordPipelinePass, 
+    recordPipelineFix,
     pipelinesPassed,
     t 
   } = useGame();
@@ -85,7 +85,7 @@ export const CICDPipeline: React.FC = () => {
           setJobs(prev => prev.map((j, i) => i === idx ? { ...j, status: 'failed' } : j));
           setPipelineState('broken');
           setFailedJobName(INITIAL_JOBS[idx].name);
-          setStatusMessage(`❌ Broken Build: Pipeline #${newRunId} failed at [${INITIAL_JOBS[idx].name}]`);
+          setStatusMessage(`❌ Broken Build: Pipeline #${newRunId} failed at [${INITIAL_JOBS[idx].name}] — кликните для починки!`);
           isRunningRef.current = false;
           sounds.playPipelineFail();
           sounds.triggerHaptic('heavy');
@@ -130,30 +130,39 @@ export const CICDPipeline: React.FC = () => {
   }, [pipelineState]);
 
   // Фикс сломанной сборки
-  const handleFixBrokenBuild = () => {
+  const handleFixBrokenBuild = (e?: React.SyntheticEvent) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (pipelineState !== 'broken') return;
+
     const bountyCode = Math.round(Math.max(400, codePerClick * 30, codePerSec * 6) * bountyBonus);
     const bountyMoney = Math.round(Math.max(500, moneyPerSec * 8) * bountyBonus);
 
-    handleClick();
+    // Зачисляем награду напрямую в баланс игрока без кликов по обычному счетчику
+    recordPipelineFix(bountyCode, bountyMoney);
     sounds.playQuickFix();
     sounds.triggerHaptic('success');
 
     confetti({
-      particleCount: 55,
-      spread: 75,
+      particleCount: 65,
+      spread: 80,
       origin: { y: 0.65 },
       colors: ['#EF4444', '#10B981', '#38BDF8', '#F59E0B']
     });
 
     setJobs(prev => prev.map(j => ({ ...j, status: 'success' })));
     setPipelineState('success');
-    setStatusMessage(`✓ Hotfix deployed: Pipeline #${pipelineRunId} restored (+₽${formatNumber(bountyMoney)})`);
-    recordContribution(2);
-    recordPipelinePass();
+    setStatusMessage(`✓ Hotfix deployed: Pipeline #${pipelineRunId} restored (+₽${formatNumber(bountyMoney)}, +${formatNumber(bountyCode)} LOC)`);
   };
 
   return (
-    <div className="w-full my-2 p-2.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 font-mono select-none">
+    <div 
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+      className="w-full my-2 p-2.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 font-mono select-none"
+    >
       {/* Шапка статуса пайплайна */}
       <div className="flex items-center justify-between text-[11px] mb-2 px-1">
         <div className="flex items-center gap-1.5 overflow-hidden">
@@ -167,14 +176,17 @@ export const CICDPipeline: React.FC = () => {
         <div className="flex items-center gap-1.5 shrink-0">
           {pipelineState === 'broken' ? (
             <button
+              onPointerDown={(e) => e.stopPropagation()}
               onClick={handleFixBrokenBuild}
-              className="px-2 py-0.5 rounded-lg bg-red-500 hover:bg-red-400 text-black font-black text-[10px] tracking-wider animate-bounce shadow-[0_0_12px_rgba(239,68,68,0.7)] flex items-center gap-1 cursor-pointer"
+              className="px-2.5 py-1 rounded-lg bg-red-500 hover:bg-red-400 text-black font-black text-[10px] tracking-wider animate-bounce shadow-[0_0_14px_rgba(239,68,68,0.8)] flex items-center gap-1 cursor-pointer transition-transform active:scale-95"
+              title="Устранить аварию CI/CD и получить награду за хотфикс"
             >
-              <AlertTriangle className="w-3 h-3 text-black" />
+              <AlertTriangle className="w-3.5 h-3.5 text-black shrink-0" />
               <span>FIX BUILD!</span>
             </button>
           ) : (
             <button
+              onPointerDown={(e) => e.stopPropagation()}
               onClick={() => runPipeline()}
               disabled={pipelineState === 'running'}
               className="px-2 py-0.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-cyan-300 text-[10px] font-semibold flex items-center gap-1 border border-slate-700/60 transition-colors disabled:opacity-50 cursor-pointer"
@@ -192,6 +204,7 @@ export const CICDPipeline: React.FC = () => {
         {jobs.map((job) => {
           let statusStyle = 'bg-slate-900/60 border-slate-800/60 text-slate-400';
           let iconBadge = null;
+          const isFailed = job.status === 'failed';
 
           if (job.status === 'running') {
             statusStyle = 'bg-cyan-950/70 border-cyan-500/50 text-cyan-300 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.3)]';
@@ -200,14 +213,21 @@ export const CICDPipeline: React.FC = () => {
             statusStyle = 'bg-emerald-950/50 border-emerald-500/40 text-emerald-300 shadow-[0_0_6px_rgba(16,185,129,0.2)]';
             iconBadge = <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />;
           } else if (job.status === 'failed') {
-            statusStyle = 'bg-red-950/80 border-red-500 text-red-200 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]';
+            statusStyle = 'bg-red-950/90 border-red-500 text-red-200 animate-pulse shadow-[0_0_14px_rgba(239,68,68,0.7)] ring-2 ring-red-500/60';
             iconBadge = <XCircle className="w-2.5 h-2.5 text-red-400" />;
           }
 
           return (
             <div
               key={job.id}
-              className={`p-1.5 rounded-xl border flex flex-col items-center justify-center text-center transition-all ${statusStyle}`}
+              onClick={isFailed ? handleFixBrokenBuild : undefined}
+              onPointerDown={isFailed ? (e) => e.stopPropagation() : undefined}
+              role={isFailed ? "button" : undefined}
+              tabIndex={isFailed ? 0 : undefined}
+              title={isFailed ? "Кликните здесь, чтобы устранить сбой сборки!" : undefined}
+              className={`p-1.5 rounded-xl border flex flex-col items-center justify-center text-center transition-all ${statusStyle} ${
+                isFailed ? 'cursor-pointer hover:scale-105 active:scale-95' : ''
+              }`}
             >
               <div className="flex items-center gap-1">
                 <span className="text-[11px]">{job.icon}</span>
@@ -216,6 +236,11 @@ export const CICDPipeline: React.FC = () => {
               <span className="text-[9px] font-bold mt-0.5 truncate w-full">
                 {job.name}
               </span>
+              {isFailed && (
+                <span className="text-[7.5px] bg-red-500 text-black font-black px-1 rounded uppercase tracking-wider mt-0.5 animate-bounce">
+                  FIX ME
+                </span>
+              )}
             </div>
           );
         })}
