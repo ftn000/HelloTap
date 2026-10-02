@@ -12,7 +12,7 @@ interface TechTreeModalProps {
 }
 
 export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose }) => {
-  const { skillPoints, unlockedSkills, upgradeSkill, resetSkills } = useGame();
+  const { skillPoints, unlockedSkills, upgradeSkill, resetSkills, lang, t } = useGame();
   const [activeBranch, setActiveBranch] = useState<SkillBranch | 'all'>('all');
 
   if (!isOpen) return null;
@@ -21,8 +21,8 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
     { id: 'frontend', name: 'Frontend & UX', icon: '🖥️', color: 'from-pink-500/20 to-purple-500/20 border-pink-500/40 text-pink-300' },
     { id: 'backend', name: 'Backend & Cloud', icon: '⚙️', color: 'from-cyan-500/20 to-blue-500/20 border-cyan-500/40 text-cyan-300' },
     { id: 'devops', name: 'DevOps & CI/CD', icon: '🚀', color: 'from-emerald-500/20 to-teal-500/20 border-emerald-500/40 text-emerald-300' },
-    { id: 'business', name: 'Startup Tycoon', icon: '💼', color: 'from-amber-500/20 to-yellow-500/20 border-amber-500/40 text-amber-300' },
-    { id: 'ai', name: 'AI & Neural Nets', icon: '🧠', color: 'from-purple-500/20 to-emerald-500/20 border-purple-500/40 text-purple-300' }
+    { id: 'business', name: lang === 'ru' ? 'Стартап-магнат' : 'Startup Tycoon', icon: '💼', color: 'from-amber-500/20 to-yellow-500/20 border-amber-500/40 text-amber-300' },
+    { id: 'ai', name: lang === 'ru' ? 'ИИ и нейросети' : 'AI & Neural Nets', icon: '🧠', color: 'from-purple-500/20 to-emerald-500/20 border-purple-500/40 text-purple-300' }
   ];
 
   const filteredNodes = activeBranch === 'all'
@@ -52,7 +52,7 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
   };
 
   const handleReset = () => {
-    if (window.confirm('Сбросить все вложенные очки талантов и вернуть их на баланс?')) {
+    if (window.confirm(t.resetSkillsConfirm)) {
       resetSkills();
       sounds.playRelease();
     }
@@ -67,10 +67,10 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
             <GitBranch className="w-5 h-5 text-indigo-400" />
             <div>
               <h2 className="text-sm sm:text-base font-bold text-white tracking-wide">
-                ДЕРЕВО IT-НАВЫКОВ И ТАЛАНТОВ
+                {t.techTreeTitle}
               </h2>
               <p className="text-[10px] text-slate-400 font-sans">
-                Очки талантов начисляются при выходе на IPO и закрытии ачивок
+                {t.techTreeSubtitle}
               </p>
             </div>
           </div>
@@ -78,7 +78,7 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
           <div className="flex items-center gap-3">
             <div className="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-xs text-indigo-300 font-bold flex items-center gap-1.5 shadow-[0_0_12px_rgba(99,102,241,0.3)]">
               <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Очков: {skillPoints}</span>
+              <span>{t.pointsCount}: {skillPoints}</span>
             </div>
 
             <button
@@ -99,7 +99,7 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
                 activeBranch === 'all' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Все ветки
+              {t.allBranches}
             </button>
             {branches.map(b => (
               <button
@@ -118,10 +118,10 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
           <button
             onClick={handleReset}
             className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-red-400 text-[11px] flex items-center gap-1 transition-colors shrink-0"
-            title="Сбросить все навыки и вернуть очки"
+            title={t.resetSkillsBtn}
           >
             <RotateCcw className="w-3 h-3" />
-            <span className="hidden sm:inline">Сброс</span>
+            <span className="hidden sm:inline">{t.resetSkillsBtn}</span>
           </button>
         </div>
 
@@ -134,6 +134,9 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
               const reqMet = !node.reqSkillId || (unlockedSkills[node.reqSkillId] || 0) > 0;
               const canAfford = skillPoints >= node.costPerLevel;
               const canUpgrade = !isMax && reqMet && canAfford;
+
+              const nName = lang === 'ru' ? (node.nameRu || node.name) : (node.nameEn || node.name);
+              const nDesc = lang === 'ru' ? (node.descriptionRu || node.description) : (node.descriptionEn || node.description);
 
               return (
                 <div
@@ -152,10 +155,10 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
                         <span className="text-xl">{node.icon}</span>
                         <div>
                           <h3 className="font-bold text-slate-100 text-xs sm:text-sm">
-                            {node.name}
+                            {nName}
                           </h3>
                           <span className="text-[10px] text-indigo-400 font-mono">
-                            Уровень {currentLvl}/{node.maxLevel}
+                            {t.levelPrefix} {currentLvl}/{node.maxLevel}
                           </span>
                         </div>
                       </div>
@@ -173,12 +176,12 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
                     </div>
 
                     <p className="text-[11px] text-slate-400 font-sans leading-relaxed pt-1">
-                      {node.description}
+                      {nDesc}
                     </p>
 
                     {!reqMet && node.reqSkillId && (
                       <p className="text-[10px] text-amber-400/80 font-mono">
-                        🔒 Требуется открыть базовый навык ветки
+                        🔒 {t.reqBaseSkill}
                       </p>
                     )}
                   </div>
@@ -195,11 +198,11 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
                     }`}
                   >
                     {isMax ? (
-                      'МАКСИМУМ'
+                      t.maxedSkill
                     ) : (
                       <>
                         <Zap className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Прокачать ({node.costPerLevel} очк.)</span>
+                        <span>{t.upgradeSkill} ({node.costPerLevel} {lang === 'ru' ? 'очк.' : 'pts'})</span>
                       </>
                     )}
                   </button>

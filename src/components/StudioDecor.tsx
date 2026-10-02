@@ -4,7 +4,7 @@ import { Coffee, Server, Heart } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 export const StudioDecor: React.FC = () => {
-  const { systems, isInFlow } = useGame();
+  const { systems, isInFlow, t } = useGame();
   const catLevel = systems.find(s => s.id === 'sys_cathaven')?.level || 0;
   const serverLevel = systems.find(s => s.id === 'sys_satellite')?.level || 0;
 
@@ -47,11 +47,11 @@ export const StudioDecor: React.FC = () => {
           <button
             onClick={handleCatClick}
             className="group relative flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-950/30 border border-amber-500/30 hover:border-amber-400 transition-all active:scale-95"
-            title="Офисный кот-талисман (кликни погладить!)"
+            title={t.catTitle}
           >
             <span className="text-base group-hover:scale-110 transition-transform">🐱</span>
             <span className="text-[11px] font-bold text-amber-300">
-              {catPurring ? 'Мурр! ❤️' : 'Барсик'}
+              {catPurring ? t.catPurr : t.catName}
             </span>
             {catPurring && (
               <Heart className="absolute -top-3 right-0 w-3.5 h-3.5 text-pink-400 animate-bounce" />
@@ -59,7 +59,7 @@ export const StudioDecor: React.FC = () => {
           </button>
         ) : (
           <div className="text-[10px] text-slate-500 italic">
-            Котик спит (прокачай приют в Hub)
+            {t.catSleeping}
           </div>
         )}
       </div>
@@ -68,7 +68,7 @@ export const StudioDecor: React.FC = () => {
       <button
         onClick={handleCoffeeClick}
         className="flex items-center gap-1 px-2 py-1 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-amber-300 transition-all active:scale-95"
-        title="Кофе программиста"
+        title={t.coffeeTooltip}
       >
         <Coffee className={`w-3.5 h-3.5 ${isInFlow ? 'text-amber-400 animate-bounce' : 'text-slate-400'}`} />
         <span className="text-[10px] text-slate-400">

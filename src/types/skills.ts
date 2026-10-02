@@ -3,9 +3,13 @@ export type SkillBranch = 'frontend' | 'backend' | 'business' | 'ai' | 'devops';
 export interface SkillNode {
   id: string;
   name: string;
+  nameRu?: string;
+  nameEn?: string;
   branch: SkillBranch;
   icon: string;
   description: string;
+  descriptionRu?: string;
+  descriptionEn?: string;
   maxLevel: number;
   costPerLevel: number;
   effectType: 

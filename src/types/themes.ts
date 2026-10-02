@@ -4,6 +4,8 @@ export interface IdeTheme {
   id: ThemeId;
   name: string;
   tagline: string;
+  taglineRu?: string;
+  taglineEn?: string;
   icon: string;
   terminalBg: string;
   terminalBorder: string;
@@ -28,4 +30,6 @@ export interface IdeTheme {
   // Sound Preset linked to theme
   soundPreset: 'laser' | 'brown' | 'typewriter' | 'blue' | 'red';
   soundPresetName: string;
+  soundPresetNameRu?: string;
+  soundPresetNameEn?: string;
 }

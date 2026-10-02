@@ -1,9 +1,13 @@
 export interface ShopUpgrade {
   id: number;
   name: string;
+  nameRu?: string;
+  nameEn?: string;
   category: 'click' | 'idle' | 'synergy';
   icon: string;
   description: string;
+  descriptionRu?: string;
+  descriptionEn?: string;
   level: number;
   maxLevel: number;
   baseCostCode: number;
@@ -20,13 +24,19 @@ export type HubCategoryType = 'office' | 'business' | 'tech' | 'culture';
 export interface StudioSystem {
   id: string;
   title: string;
+  titleRu?: string;
+  titleEn?: string;
   icon: string;
   category: HubCategoryType;
   description: string;
+  descriptionRu?: string;
+  descriptionEn?: string;
   level: number;
   maxLevel: number;
   reqCode: number;
   bonusDesc: string;
+  bonusDescRu?: string;
+  bonusDescEn?: string;
   cooldownSec?: number;
   lastActionTimestamp?: number;
 }
@@ -68,4 +78,3 @@ export interface GameSaveData {
   sfxVolume?: number;
   musicVolume?: number;
 }
-

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useGame } from '../context/GameContext';
 import { GameRandomEvent, GameEventOption } from '../types/events';
 import { Clock, Zap, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -11,6 +12,7 @@ interface RandomEventModalProps {
 }
 
 export const RandomEventModal: React.FC<RandomEventModalProps> = ({ event, onSelectOption, onClose }) => {
+  const { t } = useGame();
   const [remainingSec, setRemainingSec] = useState<number>(15);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -83,7 +85,7 @@ export const RandomEventModal: React.FC<RandomEventModalProps> = ({ event, onSel
 
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-white/10 text-xs text-amber-300 font-bold shrink-0">
             <Clock className="w-3.5 h-3.5 text-amber-400 animate-spin" />
-            <span>{remainingSec}с</span>
+            <span>{remainingSec}{t.secShort}</span>
           </div>
         </div>
 
@@ -131,13 +133,13 @@ export const RandomEventModal: React.FC<RandomEventModalProps> = ({ event, onSel
         <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1">
           <span className="flex items-center gap-1">
             <Sparkles className="w-3 h-3 text-cyan-400" />
-            Быстрый выбор дает преимущество студии
+            {t.eventHint}
           </span>
           <button
             onClick={onClose}
-            className="hover:text-slate-300 underline underline-offset-2 transition-colors"
+            className="hover:text-slate-300 underline underline-offset-2 transition-colors cursor-pointer"
           >
-            Пропустить
+            {t.eventSkip}
           </button>
         </div>
       </div>

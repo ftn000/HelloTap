@@ -1,6 +1,7 @@
 import React from 'react';
+import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Moon, Sparkles, Zap, ArrowRight } from 'lucide-react';
+import { Moon, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sounds } from '../utils/soundEffects';
 
@@ -19,13 +20,17 @@ export const OfflineProgressModal: React.FC<OfflineProgressModalProps> = ({
   moneyEarned,
   onClaim
 }) => {
+  const { lang, t } = useGame();
   if (!isOpen) return null;
 
   const hours = Math.floor(offlineSec / 3600);
   const minutes = Math.floor((offlineSec % 3600) / 60);
   const seconds = Math.floor(offlineSec % 60);
 
-  const timeString = `${hours > 0 ? `${hours}ч ` : ''}${minutes}м ${seconds}с`;
+  const hUnit = lang === 'ru' ? 'ч ' : 'h ';
+  const mUnit = lang === 'ru' ? 'м ' : 'm ';
+  const sUnit = t.secShort;
+  const timeString = `${hours > 0 ? `${hours}${hUnit}` : ''}${minutes}${mUnit}${seconds}${sUnit}`;
 
   const handleClaimNormal = () => {
     confetti({
@@ -60,22 +65,22 @@ export const OfflineProgressModal: React.FC<OfflineProgressModalProps> = ({
 
         <div>
           <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide">
-            С ВОЗВРАЩЕНИЕМ В ОФИС!
+            {t.offlineWelcome}
           </h2>
           <p className="text-xs text-slate-400 font-sans mt-1">
-            Пока вас не было (<span className="text-cyan-300 font-mono font-bold">{timeString}</span>), серверы студии продолжали компилировать код!
+            {t.offlineAwayDesc.replace('{0}', timeString)}
           </p>
         </div>
 
         {/* Карточки начисленных ресурсов */}
         <div className="grid grid-cols-2 gap-2.5 my-1">
           <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex flex-col items-center justify-center gap-1">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider">Код C#</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider">{t.offlineCodeLabel}</span>
             <span className="text-base font-bold text-cyan-400">+{formatNumber(codeEarned)}</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex flex-col items-center justify-center gap-1">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider">Выручка</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider">{t.offlineRevenueLabel}</span>
             <span className="text-base font-bold text-emerald-400">+{formatNumber(moneyEarned)} ₽</span>
           </div>
         </div>
@@ -87,14 +92,14 @@ export const OfflineProgressModal: React.FC<OfflineProgressModalProps> = ({
             className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(245,158,11,0.4)] active:scale-98 transition-all"
           >
             <Sparkles className="w-4 h-4 animate-spin" />
-            <span>УДВОИТЬ БОНУС (x2)</span>
+            <span>{t.offlineDoubleBtn}</span>
           </button>
 
           <button
             onClick={handleClaimNormal}
             className="w-full py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 font-semibold text-xs tracking-wider border border-slate-700 active:scale-98 transition-all"
           >
-            Забрать обычный бонус
+            {t.offlineClaimBtn}
           </button>
         </div>
       </div>

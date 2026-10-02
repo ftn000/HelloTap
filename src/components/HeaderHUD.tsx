@@ -40,7 +40,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
               <span className="text-xs text-cyan-400/80 font-mono">C#</span>
             </div>
             <span className="text-[11px] text-slate-400 font-mono">
-              +{formatNumber(codePerSec)}/сек
+              +{formatNumber(codePerSec)}{t.codePerSecShort}
             </span>
           </div>
 
@@ -55,7 +55,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
               <span className="text-xs text-emerald-500/80 font-mono">₽</span>
             </div>
             <span className="text-[11px] text-slate-400 font-mono">
-              +{formatNumber(moneyPerSec)}/сек
+              +{formatNumber(moneyPerSec)}{t.codePerSecShort}
             </span>
           </div>
         </div>
@@ -66,7 +66,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
           {adBoostRemainingSec > 0 && (
             <div className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 animate-pulse">
               <span className="text-xs">📺</span>
-              <span>x2 ({adBoostRemainingSec}с)</span>
+              <span>x2 ({adBoostRemainingSec}{t.secShort})</span>
             </div>
           )}
 
@@ -94,7 +94,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
           <button
             onClick={toggleMute}
             className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-300 transition-colors"
-            title="Звук"
+            title={t.soundBtn}
           >
             {muted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-slate-300" />}
           </button>
@@ -117,7 +117,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
                   ? 'bg-purple-500/25 text-purple-300 border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.4)] animate-pulse'
                   : 'bg-transparent text-slate-400 border-transparent hover:text-slate-200'
               }`}
-              title={isMusicPlaying ? `Сейчас играет: ${currentTrackName} (Клик для паузы)` : (lang === 'ru' ? 'Включить Lo-Fi Synthwave Музыку' : 'Play Lo-Fi Ambient')}
+              title={isMusicPlaying ? t.musicNowPlaying.replace('{0}', currentTrackName) : t.musicTurnOn}
             >
               <Music className="w-3.5 h-3.5" />
             </button>
@@ -128,7 +128,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
                   nextMusicTrack();
                 }}
                 className="px-1 py-0.5 rounded text-[10px] text-purple-300 hover:text-white hover:bg-purple-500/20 font-mono transition-colors"
-                title={`След. трек (${currentTrackName})`}
+                title={t.musicNextTrack.replace('{0}', currentTrackName)}
               >
                 ⏭️
               </button>
@@ -139,7 +139,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
           <button
             onClick={onOpenAchievements}
             className="hidden sm:flex relative p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)]"
-            title={lang === 'ru' ? 'Достижения и Награды' : 'Achievements'}
+            title={t.achievementsBtn}
           >
             <Award className="w-4 h-4" />
             {totalAchStars > 0 && (
@@ -157,7 +157,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
                 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50 shadow-[0_0_12px_rgba(99,102,241,0.3)] animate-pulse'
                 : 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:text-indigo-300'
             }`}
-            title="Дерево IT-навыков и талантов [K]"
+            title={t.techTreeBtn}
           >
             <GitBranch className="w-4 h-4" />
             {skillPoints > 0 && (
@@ -181,7 +181,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             <button
               onClick={onOpenHeatmap}
               className="relative p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)]"
-              title="GitHub Contribution Heatmap (График вкладов)"
+              title={t.heatmapBtn}
             >
               <span className="text-sm">🐙</span>
               {currentStreak > 0 && (

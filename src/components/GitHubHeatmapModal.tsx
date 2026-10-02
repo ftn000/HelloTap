@@ -89,6 +89,10 @@ export const GitHubHeatmapModal: React.FC<GitHubHeatmapModalProps> = ({ isOpen, 
     });
   };
 
+  const weekDays = lang === 'ru' 
+    ? ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'] 
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-150 font-mono">
       <div className="relative w-full max-w-3xl bg-cyber-card border border-cyber-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
@@ -122,7 +126,7 @@ export const GitHubHeatmapModal: React.FC<GitHubHeatmapModalProps> = ({ isOpen, 
         {/* Профиль разработчика и сводка */}
         <div className="p-4 bg-slate-950/60 border-b border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <div className="p-2.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col">
-            <span className="text-[10px] text-slate-400">Ранг разработчика</span>
+            <span className="text-[10px] text-slate-400">{lang === 'ru' ? 'Ранг разработчика' : 'Developer rank'}</span>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="text-base">{devRank.badge}</span>
               <span className={`text-xs font-bold truncate ${devRank.color}`}>{devRank.title}</span>
@@ -130,7 +134,7 @@ export const GitHubHeatmapModal: React.FC<GitHubHeatmapModalProps> = ({ isOpen, 
           </div>
 
           <div className="p-2.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col">
-            <span className="text-[10px] text-slate-400">Всего вкладов (365д)</span>
+            <span className="text-[10px] text-slate-400">{lang === 'ru' ? 'Всего вкладов (365д)' : 'Total contributions (365d)'}</span>
             <div className="flex items-center gap-1.5 mt-0.5">
               <GitCommit className="w-4 h-4 text-emerald-400" />
               <span className="text-sm font-bold text-emerald-300">{totalContributions} commits</span>
@@ -138,15 +142,15 @@ export const GitHubHeatmapModal: React.FC<GitHubHeatmapModalProps> = ({ isOpen, 
           </div>
 
           <div className="p-2.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col">
-            <span className="text-[10px] text-slate-400">Активный стрик дней</span>
+            <span className="text-[10px] text-slate-400">{lang === 'ru' ? 'Активный стрик дней' : 'Active day streak'}</span>
             <div className="flex items-center gap-1.5 mt-0.5">
               <Flame className="w-4 h-4 text-amber-400" />
-              <span className="text-sm font-bold text-amber-300">{currentStreak} дн. (макс: {longestStreak})</span>
+              <span className="text-sm font-bold text-amber-300">{currentStreak} {lang === 'ru' ? 'дн.' : 'days'} ({lang === 'ru' ? 'макс' : 'max'}: {longestStreak})</span>
             </div>
           </div>
 
           <div className="p-2.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col">
-            <span className="text-[10px] text-slate-400">CI/CD Пайплайнов</span>
+            <span className="text-[10px] text-slate-400">{lang === 'ru' ? 'CI/CD Пайплайнов' : 'CI/CD Pipelines'}</span>
             <div className="flex items-center gap-1.5 mt-0.5">
               <CheckCircle2 className="w-4 h-4 text-cyan-400" />
               <span className="text-sm font-bold text-cyan-300">{pipelinesPassed} passed</span>
@@ -175,13 +179,9 @@ export const GitHubHeatmapModal: React.FC<GitHubHeatmapModalProps> = ({ isOpen, 
               <div className="flex items-start gap-1.5">
                 {/* Лейблы дней недели */}
                 <div className="flex flex-col gap-[3px] text-[8px] text-slate-500 pt-0.5 w-5 text-right select-none">
-                  <span className="h-[10px] leading-[10px]">Вс</span>
-                  <span className="h-[10px] leading-[10px]">Пн</span>
-                  <span className="h-[10px] leading-[10px]">Вт</span>
-                  <span className="h-[10px] leading-[10px]">Ср</span>
-                  <span className="h-[10px] leading-[10px]">Чт</span>
-                  <span className="h-[10px] leading-[10px]">Пт</span>
-                  <span className="h-[10px] leading-[10px]">Сб</span>
+                  {weekDays.map((dName, dIdx) => (
+                    <span key={dIdx} className="h-[10px] leading-[10px]">{dName}</span>
+                  ))}
                 </div>
 
                 {/* 52 колонки недель */}
@@ -196,7 +196,7 @@ export const GitHubHeatmapModal: React.FC<GitHubHeatmapModalProps> = ({ isOpen, 
                             onMouseEnter={() => setHoveredDay({ date: day.date, count: day.count })}
                             onMouseLeave={() => setHoveredDay(null)}
                             className={`w-[10px] h-[10px] rounded-[2px] border transition-transform hover:scale-125 cursor-pointer ${colorClass}`}
-                            title={`${day.date}: ${day.count} контрибуций`}
+                            title={lang === 'ru' ? `${day.date}: ${day.count} контрибуций` : `${day.date}: ${day.count} contributions`}
                           />
                         );
                       })}
@@ -212,22 +212,22 @@ export const GitHubHeatmapModal: React.FC<GitHubHeatmapModalProps> = ({ isOpen, 
             <div>
               {hoveredDay ? (
                 <span className="text-cyan-300 font-semibold">
-                  📌 {hoveredDay.date}: <strong className="text-white">{hoveredDay.count}</strong> вкладов в код
+                  📌 {hoveredDay.date}: <strong className="text-white">{hoveredDay.count}</strong> {lang === 'ru' ? 'вкладов в код' : 'code contributions'}
                 </span>
               ) : (
-                <span className="text-slate-500">Наведите на ячейку для просмотра деталей</span>
+                <span className="text-slate-500">{lang === 'ru' ? 'Наведите на ячейку для просмотра деталей' : 'Hover over a cell to view details'}</span>
               )}
             </div>
 
             {/* Легенда цветов */}
             <div className="flex items-center gap-1 font-sans">
-              <span className="text-[10px] text-slate-500 mr-1">Меньше</span>
+              <span className="text-[10px] text-slate-500 mr-1">{lang === 'ru' ? 'Меньше' : 'Less'}</span>
               <div className="w-2.5 h-2.5 rounded-[2px] bg-slate-900 border border-slate-800" />
               <div className="w-2.5 h-2.5 rounded-[2px] bg-[#0e4429]" />
               <div className="w-2.5 h-2.5 rounded-[2px] bg-[#006d32]" />
               <div className="w-2.5 h-2.5 rounded-[2px] bg-[#26a641]" />
               <div className="w-2.5 h-2.5 rounded-[2px] bg-[#39d353]" />
-              <span className="text-[10px] text-slate-500 ml-1">Больше</span>
+              <span className="text-[10px] text-slate-500 ml-1">{lang === 'ru' ? 'Больше' : 'More'}</span>
             </div>
           </div>
 
@@ -238,7 +238,7 @@ export const GitHubHeatmapModal: React.FC<GitHubHeatmapModalProps> = ({ isOpen, 
               className="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.4)] active:scale-95 transition-all cursor-pointer"
             >
               <GitCommit className="w-4 h-4" />
-              <span>Совершить коммит активности (+1 вклад)</span>
+              <span>{lang === 'ru' ? 'Совершить коммит активности (+1 вклад)' : 'Make activity commit (+1 contribution)'}</span>
             </button>
           </div>
         </div>

@@ -171,7 +171,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({ isOpen, on
                         }`}
                       >
                         <div className="flex items-center justify-between font-mono font-bold">
-                          <span>{tDef.tier === 1 ? '★ Ур.1' : tDef.tier === 2 ? '★★ Ур.2' : '★★★ Ур.3'}</span>
+                          <span>{tDef.tier === 1 ? `★ ${t.tierPrefix}1` : tDef.tier === 2 ? `★★ ${t.tierPrefix}2` : `★★★ ${t.tierPrefix}3`}</span>
                           {isTierUnlocked && <CheckCircle2 className="w-3 h-3 text-amber-400" />}
                         </div>
                         <div className="text-[10px] font-mono text-slate-300">

@@ -4,7 +4,7 @@ import { formatNumber } from '../utils/numberFormatter';
 import { ShoppingBag, ArrowUpRight, Check } from 'lucide-react';
 
 export const ShopPanel: React.FC = () => {
-  const { upgrades, buyUpgrade, codeLines, money, unlockedSkills, t } = useGame();
+  const { upgrades, buyUpgrade, codeLines, money, unlockedSkills, lang, t } = useGame();
 
   const discountMultiplier = Math.max(0.65, 1.0 - ((unlockedSkills['skill_negotiation'] || 0) * 0.05 + (unlockedSkills['skill_unicorn_status'] || 0) * 0.08));
 
@@ -24,6 +24,9 @@ export const ShopPanel: React.FC = () => {
           const canAfford = codeLines >= costCode && money >= costMoney && u.level < u.maxLevel;
           const isMax = u.level >= u.maxLevel;
 
+          const uName = lang === 'ru' ? (u.nameRu || u.name) : (u.nameEn || u.name);
+          const uDesc = lang === 'ru' ? (u.descriptionRu || u.description) : (u.descriptionEn || u.description);
+
           return (
             <div
               key={u.id}
@@ -42,18 +45,18 @@ export const ShopPanel: React.FC = () => {
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-slate-200 truncate">{u.name}</span>
+                    <span className="font-semibold text-sm text-slate-200 truncate">{uName}</span>
                     <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 shrink-0">
                       {t.lvlPrefix} {u.level}/{u.maxLevel}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 truncate mt-0.5">{u.description}</p>
+                  <p className="text-xs text-slate-400 truncate mt-0.5">{uDesc}</p>
                   
                   {/* Бонусы апгрейда */}
                   <div className="flex items-center gap-2 mt-1 text-[11px] font-mono text-cyan-400">
-                    {u.codePerClickBonus > 0 && <span>+{u.codePerClickBonus} C#/кл</span>}
-                    {u.codePerSecBonus > 0 && <span>+{u.codePerSecBonus} C#/сек</span>}
-                    {u.moneyPerSecBonus > 0 && <span className="text-emerald-400">+{u.moneyPerSecBonus} ₽/сек</span>}
+                    {u.codePerClickBonus > 0 && <span>+{u.codePerClickBonus} {t.locPerClick}</span>}
+                    {u.codePerSecBonus > 0 && <span>+{u.codePerSecBonus} {t.locPerSec}</span>}
+                    {u.moneyPerSecBonus > 0 && <span className="text-emerald-400">+{u.moneyPerSecBonus} {t.rubPerSec}</span>}
                   </div>
                 </div>
               </div>

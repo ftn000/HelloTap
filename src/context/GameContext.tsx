@@ -18,9 +18,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 1,
     name: "Эспрессо из Кении",
+    nameRu: "Эспрессо из Кении",
+    nameEn: "Kenyan Espresso",
     category: "click",
     icon: "☕",
     description: "Двойной шот кофеина повышает скорость набора кода",
+    descriptionRu: "Двойной шот кофеина повышает скорость набора кода",
+    descriptionEn: "Double espresso shot boosts typing speed",
     level: 0,
     maxLevel: 50,
     baseCostCode: 15,
@@ -34,9 +38,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 2,
     name: "Механика Custom 75%",
+    nameRu: "Механика Custom 75%",
+    nameEn: "Custom 75% Mechanical",
     category: "click",
     icon: "⌨️",
     description: "Тактильные свитчи Lubed Tealios для сверхбыстрого ввода",
+    descriptionRu: "Тактильные свитчи Lubed Tealios для сверхбыстрого ввода",
+    descriptionEn: "Lubed Tealios tactile switches for ultra-fast typing",
     level: 0,
     maxLevel: 40,
     baseCostCode: 80,
@@ -50,9 +58,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 3,
     name: "Авто-CI/CD Робот",
+    nameRu: "Авто-CI/CD Робот",
+    nameEn: "Auto CI/CD Bot",
     category: "idle",
     icon: "🤖",
     description: "Автоматическая сборка релизов и непрерывный деплой",
+    descriptionRu: "Автоматическая сборка релизов и непрерывный деплой",
+    descriptionEn: "Automated release builds and continuous deployment",
     level: 0,
     maxLevel: 40,
     baseCostCode: 350,
@@ -66,9 +78,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 4,
     name: "AI Copilot Ассистент",
+    nameRu: "AI Copilot Ассистент",
+    nameEn: "AI Copilot Assistant",
     category: "idle",
     icon: "🧠",
     description: "Нейросеть автодополняет функции и рефакторит спагетти",
+    descriptionRu: "Нейросеть автодополняет функции и рефакторит спагетти",
+    descriptionEn: "Neural assistant autocompletes functions and refactors spaghetti code",
     level: 0,
     maxLevel: 35,
     baseCostCode: 1500,
@@ -82,9 +98,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 5,
     name: "Серверная Стойка Ubuntu",
+    nameRu: "Серверная Стойка Ubuntu",
+    nameEn: "Ubuntu Server Rack",
     category: "idle",
     icon: "🖧",
     description: "Собственный микросерверный кластер студии",
+    descriptionRu: "Собственный микросерверный кластер студии",
+    descriptionEn: "Dedicated studio microserver cluster",
     level: 0,
     maxLevel: 30,
     baseCostCode: 7500,
@@ -98,9 +118,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 6,
     name: "Квантовый Дата-Центр",
+    nameRu: "Квантовый Дата-Центр",
+    nameEn: "Quantum Data Center",
     category: "synergy",
     icon: "⚛️",
     description: "Квантовая суперпозиция параллельных вычислений",
+    descriptionRu: "Квантовая суперпозиция параллельных вычислений",
+    descriptionEn: "Quantum superposition of parallel computations",
     level: 0,
     maxLevel: 25,
     baseCostCode: 38000,
@@ -114,9 +138,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 7,
     name: "Нейросеть AI Copilot Pro",
+    nameRu: "Нейросеть AI Copilot Pro",
+    nameEn: "AI Copilot Pro LLM",
     category: "idle",
     icon: "🧠",
     description: "LLM-ассистент генерирует микросервисы и пишет тесты",
+    descriptionRu: "LLM-ассистент генерирует микросервисы и пишет тесты",
+    descriptionEn: "LLM assistant generates microservices and writes tests",
     level: 0,
     maxLevel: 25,
     baseCostCode: 150000,
@@ -130,9 +158,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 8,
     name: "Тензорный GPU Кластер H100",
+    nameRu: "Тензорный GPU Кластер H100",
+    nameEn: "Tensor GPU Cluster H100",
     category: "idle",
     icon: "⚡",
     description: "Стойка из 8x H100 с жидкостным охлаждением для обучения моделей",
+    descriptionRu: "Стойка из 8x H100 с жидкостным охлаждением для обучения моделей",
+    descriptionEn: "Liquid-cooled 8x H100 rack for massive AI model training",
     level: 0,
     maxLevel: 20,
     baseCostCode: 750000,
@@ -146,9 +178,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 9,
     name: "Автономный Дев-Рой Агентов",
+    nameRu: "Автономный Дев-Рой Агентов",
+    nameEn: "Autonomous Dev Agent Swarm",
     category: "idle",
     icon: "🤖",
     description: "Рой AI-агентов закрывает тикеты на GitHub и рефакторит код 24/7",
+    descriptionRu: "Рой AI-агентов закрывает тикеты на GitHub и рефакторит код 24/7",
+    descriptionEn: "AI agent swarm resolves GitHub issues and refactors code 24/7",
     level: 0,
     maxLevel: 20,
     baseCostCode: 3800000,
@@ -162,9 +198,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 10,
     name: "Open Source Спонсорство",
+    nameRu: "Open Source Спонсорство",
+    nameEn: "Open Source Sponsorship",
     category: "synergy",
     icon: "💎",
     description: "Гранты и донаты от IT-гигантов за открытые библиотеки студии",
+    descriptionRu: "Гранты и донаты от IT-гигантов за открытые библиотеки студии",
+    descriptionEn: "Grants and sponsorships from tech giants for open-source libraries",
     level: 0,
     maxLevel: 15,
     baseCostCode: 18000000,
@@ -178,9 +218,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 11,
     name: "Квантовый Процессор Qubit-128",
+    nameRu: "Квантовый Процессор Qubit-128",
+    nameEn: "Qubit-128 Quantum Processor",
     category: "synergy",
     icon: "🔮",
     description: "Квантовая суперпозиция компилирует миллиарды комбинаций кода мгновенно",
+    descriptionRu: "Квантовая суперпозиция компилирует миллиарды комбинаций кода мгновенно",
+    descriptionEn: "Quantum superposition compiles billions of code paths simultaneously",
     level: 0,
     maxLevel: 10,
     baseCostCode: 90000000,
@@ -194,9 +238,13 @@ const INITIAL_UPGRADES: ShopUpgrade[] = [
   {
     id: 12,
     name: "Орбитальный Спутниковый Даталинк",
+    nameRu: "Орбитальный Спутниковый Даталинк",
+    nameEn: "Orbital Satellite Datalink",
     category: "synergy",
     icon: "🛰️",
     description: "Космический лазерный канал связи: глобальное покрытие планеты без задержек",
+    descriptionRu: "Космический лазерный канал связи: глобальное покрытие планеты без задержек",
+    descriptionEn: "Space laser uplink: zero-latency global planet coverage",
     level: 0,
     maxLevel: 10,
     baseCostCode: 500000000,
@@ -214,118 +262,178 @@ const INITIAL_SYSTEMS: StudioSystem[] = [
   {
     id: "sys_dailydigest",
     title: "Утренний Дайджест и Сбор Доходов",
+    titleRu: "Утренний Дайджест и Сбор Доходов",
+    titleEn: "Morning Digest & Yield Claim",
     icon: "📋",
     category: "office",
     description: "Сводный отчет за сессию и быстрый сбор наград студии в 1 клик",
+    descriptionRu: "Сводный отчет за сессию и быстрый сбор наград студии в 1 клик",
+    descriptionEn: "Summary session report and quick 1-click reward collection",
     level: 1,
     maxLevel: 1,
     reqCode: 0,
-    bonusDesc: "Сбор всех дивидендов студии"
+    bonusDesc: "Сбор всех дивидендов студии",
+    bonusDescRu: "Сбор всех дивидендов студии",
+    bonusDescEn: "Claim all studio dividends"
   },
   {
     id: "sys_saveexport",
     title: "Облако и Экспорт Сохранений",
+    titleRu: "Облако и Экспорт Сохранений",
+    titleEn: "Cloud & Save Export",
     icon: "💾",
     category: "office",
     description: "Резервное копирование и перенос прогресса между устройствами",
+    descriptionRu: "Резервное копирование и перенос прогресса между устройствами",
+    descriptionEn: "Backup and cross-device progress transfer",
     level: 1,
     maxLevel: 1,
     reqCode: 0,
-    bonusDesc: "Поддержка Яндекс Облака"
+    bonusDesc: "Поддержка Яндекс Облака",
+    bonusDescRu: "Поддержка Яндекс Облака",
+    bonusDescEn: "Yandex Cloud Backup"
   },
   {
     id: "sys_realestate",
     title: "Студийная Недвижимость",
+    titleRu: "Студийная Недвижимость",
+    titleEn: "Studio Real Estate",
     icon: "🏢",
     category: "office",
     description: "Переезд из гаража в open-space лофт и небоскреб Silicon Tower",
+    descriptionRu: "Переезд из гаража в open-space лофт и небоскреб Silicon Tower",
+    descriptionEn: "Move from garage to open-space loft and Silicon Tower skyscraper",
     level: 0,
     maxLevel: 5,
     reqCode: 6000,
-    bonusDesc: "+40% к глобальному множителю за уровень"
+    bonusDesc: "+40% к глобальному множителю за уровень",
+    bonusDescRu: "+40% к глобальному множителю за уровень",
+    bonusDescEn: "+40% Global Multiplier per level"
   },
 
   // --- 2. БИЗНЕС И РЫНОК ---
   {
     id: "sys_assetstore",
     title: "Маркетплейс Ассетов",
+    titleRu: "Маркетплейс Ассетов",
+    titleEn: "Asset Marketplace",
     icon: "🏪",
     category: "business",
     description: "Публикация шейдеров, 3D-моделей и C#-скриптов на маркетплейс",
+    descriptionRu: "Публикация шейдеров, 3D-моделей и C#-скриптов на маркетплейс",
+    descriptionEn: "Publish shaders, 3D assets, and C# packages to marketplaces",
     level: 0,
     maxLevel: 10,
     reqCode: 3500,
-    bonusDesc: "+150 ₽/сек пассивных роялти за уровень"
+    bonusDesc: "+150 ₽/сек пассивных роялти за уровень",
+    bonusDescRu: "+150 ₽/сек пассивных роялти за уровень",
+    bonusDescEn: "+150 ₽/sec passive royalties per level"
   },
   {
     id: "sys_venture",
     title: "Венчурные Инвестиции",
+    titleRu: "Венчурные Инвестиции",
+    titleEn: "Venture Investments",
     icon: "💼",
     category: "business",
     description: "Питч-сессии перед венчурными фондами Кремниевой Долины",
+    descriptionRu: "Питч-сессии перед венчурными фондами Кремниевой Долины",
+    descriptionEn: "Pitch sessions with Silicon Valley venture capital firms",
     level: 0,
     maxLevel: 5,
     reqCode: 15000,
-    bonusDesc: "Гранты инвесторов и +25% к дивидендам"
+    bonusDesc: "Гранты инвесторов и +25% к дивидендам",
+    bonusDescRu: "Гранты инвесторов и +25% к дивидендам",
+    bonusDescEn: "Investor grants and +25% dividends"
   },
   {
     id: "sys_merch",
     title: "Студийный Мерч-Стор",
+    titleRu: "Студийный Мерч-Стор",
+    titleEn: "Studio Merch Store",
     icon: "👕",
     category: "business",
     description: "Худи, механические кейкапы и коллекционные фигурки маскотов",
+    descriptionRu: "Худи, механические кейкапы и коллекционные фигурки маскотов",
+    descriptionEn: "Hoodies, artisan keycaps, and mascot figurines",
     level: 0,
     maxLevel: 8,
     reqCode: 8500,
-    bonusDesc: "+80 ₽/сек и +5% к клику"
+    bonusDesc: "+80 ₽/сек и +5% к клику",
+    bonusDescRu: "+80 ₽/сек и +5% к клику",
+    bonusDescEn: "+80 ₽/sec and +5% click power"
   },
 
   // --- 3. ТЕХНОЛОГИИ И ИНФРАСТРУКТУРА ---
   {
     id: "sys_satellite",
     title: "Орбитальный Спутник Uplink",
+    titleRu: "Орбитальный Спутник Uplink",
+    titleEn: "Orbital Satellite Uplink",
     icon: "🛰️",
     category: "tech",
     description: "Низкоорбитальная спутниковая связь с минимальным пингом",
+    descriptionRu: "Низкоорбитальная спутниковая связь с минимальным пингом",
+    descriptionEn: "Low-orbit satellite communication with ultra-low latency",
     level: 0,
     maxLevel: 5,
     reqCode: 25000,
-    bonusDesc: "+300 C#/сек и ускорение комбо"
+    bonusDesc: "+300 C#/сек и ускорение комбо",
+    bonusDescRu: "+300 C#/сек и ускорение комбо",
+    bonusDescEn: "+300 C#/sec and faster combo"
   },
   {
     id: "sys_cybersec",
     title: "Кибербезопасность & Защита",
+    titleRu: "Кибербезопасность & Защита",
+    titleEn: "Cybersecurity & Defense",
     icon: "🛡️",
     category: "tech",
     description: "Античит, аппаратный файрвол и аудит уязвимостей смарт-контрактов",
+    descriptionRu: "Античит, аппаратный файрвол и аудит уязвимостей смарт-контрактов",
+    descriptionEn: "Anti-cheat, hardware firewall, and smart contract vulnerability audits",
     level: 0,
     maxLevel: 6,
     reqCode: 12000,
-    bonusDesc: "+15% к защите от багов и стабильности"
+    bonusDesc: "+15% к защите от багов и стабильности",
+    bonusDescRu: "+15% к защите от багов и стабильности",
+    bonusDescEn: "+15% bug resistance & stability"
   },
 
   // --- 4. КУЛЬТУРА И КОМАНДА ---
   {
     id: "sys_cathaven",
     title: "Офисный Котоприют",
+    titleRu: "Офисный Котоприют",
+    titleEn: "Office Cat Haven",
     icon: "🐱",
     category: "culture",
     description: "Котики-талисманы, антистресс и постоянный пассивный буст",
+    descriptionRu: "Котики-талисманы, антистресс и постоянный пассивный буст",
+    descriptionEn: "Mascot kitties, anti-stress comfort, and permanent passive boost",
     level: 0,
     maxLevel: 10,
     reqCode: 2000,
-    bonusDesc: "+6% ко всем доходам за каждого котика"
+    bonusDesc: "+6% ко всем доходам за каждого котика",
+    bonusDescRu: "+6% ко всем доходам за каждого котика",
+    bonusDescEn: "+6% to all earnings per cat"
   },
   {
     id: "sys_esports",
     title: "Киберспортивная Арена",
+    titleRu: "Киберспортивная Арена",
+    titleEn: "Esports Championship Arena",
     icon: "🏆",
     category: "culture",
     description: "Организация мировых чемпионатов по играм вашей студии",
+    descriptionRu: "Организация мировых чемпионатов по играм вашей студии",
+    descriptionEn: "Hosting world championships for your studio's game titles",
     level: 0,
     maxLevel: 5,
     reqCode: 35000,
-    bonusDesc: "+500 ₽/сек и +15% к силе клика"
+    bonusDesc: "+500 ₽/сек и +15% к силе клика",
+    bonusDescRu: "+500 ₽/сек и +15% к силе клика",
+    bonusDescEn: "+500 ₽/sec and +15% click power"
   }
 ];
 
@@ -514,8 +622,21 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLangState(l);
     try {
       localStorage.setItem("HELLOTAP_LANG", l);
+      document.documentElement.lang = l;
+      document.title = l === 'ru' 
+        ? 'CodeTap: Симулятор Программиста — Gamedev Clicker & Tycoon' 
+        : 'CodeTap: Programmer Simulator — Gamedev Clicker & Tycoon';
     } catch {}
   };
+
+  useEffect(() => {
+    try {
+      document.documentElement.lang = lang;
+      document.title = lang === 'ru' 
+        ? 'CodeTap: Симулятор Программиста — Gamedev Clicker & Tycoon' 
+        : 'CodeTap: Programmer Simulator — Gamedev Clicker & Tycoon';
+    } catch {}
+  }, [lang]);
 
   const setSwitchType = (t: 'blue' | 'red' | 'brown' | 'laser' | 'typewriter') => {
     setSwitchTypeState(t);
@@ -904,12 +1025,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const timer = setInterval(() => {
       setActiveEvent(prev => {
         if (prev) return prev;
-        return generateRandomEvent(codePerSec, moneyPerSec);
+        return generateRandomEvent(codePerSec, moneyPerSec, lang);
       });
     }, 95000);
 
     return () => clearInterval(timer);
-  }, [codePerSec, moneyPerSec]);
+  }, [codePerSec, moneyPerSec, lang]);
 
   // Основной цикл
   useEffect(() => {

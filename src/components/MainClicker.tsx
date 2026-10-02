@@ -6,7 +6,7 @@ import confetti from 'canvas-confetti';
 import { IDE_THEMES } from '../utils/themesList';
 import { StudioDecor } from './StudioDecor';
 import { CICDPipeline } from './CICDPipeline';
-import { CODE_PROJECT_FILES, CodeProjectFile, tokenizeCodeLine, getTokenColor } from '../utils/codeProjects';
+import { CODE_PROJECT_FILES, CodeProjectFile, tokenizeCodeLine, getTokenColor, getUnlockRequirement } from '../utils/codeProjects';
 import { sounds } from '../utils/soundEffects';
 
 interface Popup {
@@ -110,6 +110,7 @@ export const MainClicker: React.FC = () => {
     triggerRefactorBlitz, 
     setIsCommandPaletteOpen, 
     currentStreak, 
+    lang,
     t 
   } = useGame();
 
@@ -190,7 +191,7 @@ export const MainClicker: React.FC = () => {
         setActiveFileId(nextFile.id);
         setLineIdx(0);
         sounds.playAutoClickTick();
-        setCompileLog(`📂 [${isTab ? 'TAB' : 'Ctrl+P'}] Открыт: ${nextFile.filename} (${nextFile.language})`);
+        setCompileLog(`📂 [${isTab ? 'TAB' : 'Ctrl+P'}] ${lang === 'ru' ? 'Открыт' : 'Opened'}: ${nextFile.filename} (${nextFile.language})`);
       }
     };
 
@@ -391,7 +392,7 @@ export const MainClicker: React.FC = () => {
 
     const newPopup: Popup = {
       id: Date.now() + Math.random(),
-      text: `🐞 БАГ ИСПРАВЛЕН! +${formatNumber(bonusCode)} C# [OVERCLOCK x3.0]`,
+      text: t.bugFixedToast.replace('{0}', formatNumber(bonusCode)),
       tag: 'HOTFIX',
       x: 80,
       y: 80,
@@ -467,8 +468,8 @@ export const MainClicker: React.FC = () => {
 
       const newPopup: Popup = {
         id: Date.now() + Math.random(),
-        text: `🚀 REFACTOR BLITZ! x10 BOOST (20s)`,
-        tag: 'ALL 5 REFACTORED',
+        text: `🚀 REFACTOR BLITZ! x10 BOOST (20${t.secShort})`,
+        tag: lang === 'ru' ? 'ВСЕ 5 СТРОК ОТРЕФАКТОРЕНЫ' : 'ALL 5 REFACTORED',
         x: 100,
         y: 80,
         isCrit: true
@@ -492,7 +493,7 @@ export const MainClicker: React.FC = () => {
 
       const newPopup: Popup = {
         id: Date.now() + Math.random(),
-        text: `🔀 PR MERGED! +₽${formatNumber(result.rewardMoney)} +${formatNumber(result.rewardCode)} C#`,
+        text: `🔀 ${lang === 'ru' ? 'PR СЛИТ!' : 'PR MERGED!'} +₽${formatNumber(result.rewardMoney)} +${formatNumber(result.rewardCode)} C#`,
         tag: `PR #${mergedPrCount + 1}`,
         x: 90,
         y: 80,
@@ -523,13 +524,13 @@ export const MainClicker: React.FC = () => {
 
             {overclockRemainingSec > 0 && (
               <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/40 text-[10px] font-bold animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.4)]">
-                🔥 OVERCLOCK x3.0 ({overclockRemainingSec}с)
+                🔥 OVERCLOCK x3.0 ({overclockRemainingSec}{t.secShort})
               </span>
             )}
 
             {isBlitzActive && (
               <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 border border-yellow-300 text-[10px] font-black animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.8)]">
-                ⚡ 10x BLITZ ({blitzRemainingSec}с)
+                ⚡ 10x BLITZ ({blitzRemainingSec}{t.secShort})
               </span>
             )}
 
@@ -623,7 +624,7 @@ export const MainClicker: React.FC = () => {
                       ? 'bg-slate-900/60 text-slate-400 hover:text-slate-200 border border-transparent'
                       : 'bg-slate-950/40 text-slate-600 border border-transparent cursor-not-allowed'
                   }`}
-                  title={isUnlocked ? `${file.filename} (${file.language}) [Tab / Ctrl+P]` : `${file.filename}: ${file.unlockRequirement}`}
+                  title={isUnlocked ? `${file.filename} (${file.language}) [Tab / Ctrl+P]` : `${file.filename}: ${getUnlockRequirement(file, lang)}`}
                 >
                   <span>{file.langIcon}</span>
                   <span>{file.filename}</span>
@@ -631,7 +632,7 @@ export const MainClicker: React.FC = () => {
                 </button>
               );
             })}
-            <span className="hidden sm:inline text-[9px] text-slate-500 font-mono ml-1" title="Быстрое переключение: Tab или Ctrl+P">
+            <span className="hidden sm:inline text-[9px] text-slate-500 font-mono ml-1" title={lang === 'ru' ? "Быстрое переключение: Tab или Ctrl+P" : "Quick switch: Tab or Ctrl+P"}>
               [Tab/Ctrl+P]
             </span>
           </div>
@@ -664,7 +665,7 @@ export const MainClicker: React.FC = () => {
               </span>
             </div>
             <span className="px-2.5 py-1 rounded-xl bg-red-500 text-black text-[10px] font-black shrink-0 tracking-wider">
-              ДЕБАЖИТЬ! ({activeBug.timeLeft}с)
+              {t.bugButton.replace('{0}', activeBug.timeLeft.toString())}
             </span>
           </button>
         )}
@@ -676,15 +677,15 @@ export const MainClicker: React.FC = () => {
               <Zap className="w-4 h-4 text-amber-400 animate-bounce shrink-0" />
               <div>
                 <div className="text-xs font-bold text-amber-200 font-mono">
-                  ⚡ REFACTOR BLITZ! Кликните 5 строк: ({refactoredLineIndices.length}/5)
+                  ⚡ {t.refactorBlitzBanner.replace('{0}', refactoredLineIndices.length.toString())}
                 </div>
                 <div className="text-[10px] text-amber-300/80 font-mono">
-                  Награда: 10x Boost на 20 секунд!
+                  {t.refactorBlitzReward}
                 </div>
               </div>
             </div>
             <span className="px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950 text-[10px] font-black shrink-0 tracking-wider">
-              ⏱️ {blitzTimeLeft}с
+              ⏱️ {blitzTimeLeft}{t.secShort}
             </span>
           </div>
         )}
@@ -716,7 +717,7 @@ export const MainClicker: React.FC = () => {
                         <span
                           key={tIdx}
                           onClick={handleFixLinter}
-                          title={`${linterWarning.message} — Кликните для Quick Fix!`}
+                          title={`${linterWarning.message} — ${lang === 'ru' ? 'Кликните для Quick Fix!' : 'Click for Quick Fix!'}`}
                           className="relative inline-flex items-center group cursor-pointer z-30 mx-0.5"
                         >
                           <span className="underline decoration-wavy decoration-red-500 decoration-2 underline-offset-4 text-red-400 bg-red-500/20 px-1 py-0.5 rounded font-bold animate-pulse hover:bg-red-500/35 transition-all">
@@ -724,7 +725,7 @@ export const MainClicker: React.FC = () => {
                           </span>
                           {/* VS Code Quick Fix Lightbulb Tooltip */}
                           <span className="absolute -top-7 left-0 z-40 hidden group-hover:flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-400 text-slate-950 text-[10px] font-bold shadow-lg whitespace-nowrap animate-bounce">
-                            💡 Quick Fix (+бонус)
+                            {t.quickFixButton}
                           </span>
                         </span>
                       );
@@ -751,9 +752,9 @@ export const MainClicker: React.FC = () => {
                     <button
                       onClick={handleFixLinter}
                       className="ml-2 px-1.5 py-0.5 rounded bg-red-500/25 hover:bg-red-500/40 border border-red-500/60 text-[10px] text-red-200 font-mono inline-flex items-center gap-1 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)] cursor-pointer"
-                      title="Кликните для автоисправления ошибки"
+                      title={t.quickFixTooltipAttr}
                     >
-                      <span>💡 Fix ({linterWarning.timeLeft}с)</span>
+                      <span>💡 Fix ({linterWarning.timeLeft}{t.secShort})</span>
                     </button>
                   )}
                   {/* Кнопка рефакторинга целевой строки в мини-игре Refactor Blitz */}
@@ -766,7 +767,7 @@ export const MainClicker: React.FC = () => {
                           : 'bg-amber-500/30 text-amber-200 border border-amber-400 font-bold animate-bounce shadow-[0_0_8px_rgba(245,158,11,0.6)] hover:bg-amber-400 hover:text-black'
                       }`}
                     >
-                      {refactoredLineIndices.includes(idx) ? '✓ Refactored' : REFACTOR_TAGS[idx]}
+                      {refactoredLineIndices.includes(idx) ? (lang === 'ru' ? '✓ Отрефакторено' : '✓ Refactored') : REFACTOR_TAGS[idx]}
                     </button>
                   )}
                 </div>
@@ -824,7 +825,7 @@ export const MainClicker: React.FC = () => {
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 hover:bg-emerald-500/30 font-bold animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.4)]'
                       : 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed'
                   }`}
-                  title="Слить Pull Request в main и получить награду"
+                  title={t.mergePrTooltip}
                 >
                   <GitMerge className="w-2.5 h-2.5" />
                   <span>Merge PR</span>
@@ -837,7 +838,7 @@ export const MainClicker: React.FC = () => {
                   createBranch();
                 }}
                 className="px-1.5 py-0.5 rounded bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-700/50 text-[9px] text-cyan-300 flex items-center gap-0.5 transition-colors cursor-pointer"
-                title="Создать feature-ветку (+25% к коду)"
+                title={t.createBranchTooltip}
               >
                 <span>+Branch</span>
               </button>
@@ -850,7 +851,7 @@ export const MainClicker: React.FC = () => {
                 setIsCommandPaletteOpen(true);
               }}
               className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[9px] text-slate-300 hover:text-cyan-300 flex items-center gap-1 transition-colors cursor-pointer"
-              title="Открыть командную строку VS Code (Ctrl+Shift+P / F1)"
+              title={t.cmdPaletteTooltip}
             >
               <Terminal className="w-2.5 h-2.5 text-cyan-400" />
               <span>Palette</span>
@@ -863,7 +864,7 @@ export const MainClicker: React.FC = () => {
                 window.dispatchEvent(new CustomEvent('codetap_open_heatmap'));
               }}
               className="px-1.5 py-0.5 rounded bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/50 text-[9px] text-emerald-300 flex items-center gap-1 transition-colors cursor-pointer"
-              title="Открыть GitHub Contribution Heatmap"
+              title={t.heatmapTooltip}
             >
               <span>🐙</span>
               <span>Heatmap</span>
@@ -874,7 +875,7 @@ export const MainClicker: React.FC = () => {
               <button
                 onClick={handleFixLinter}
                 className="flex items-center gap-1 text-red-400 hover:text-red-300 animate-pulse font-bold cursor-pointer"
-                title="Синтаксическая ошибка: кликните для Quick Fix"
+                title={lang === 'ru' ? "Синтаксическая ошибка: кликните для Quick Fix" : "Syntax error: click for Quick Fix"}
               >
                 <AlertTriangle className="w-3 h-3 text-red-400" />
                 <span>1 error (Fix)</span>
@@ -919,7 +920,7 @@ export const MainClicker: React.FC = () => {
       <div className="w-full mt-2.5 flex items-center justify-between gap-1 p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-[11px] font-mono">
         <span className="text-slate-400 text-[10px] px-1.5 flex items-center gap-1 shrink-0">
           <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
-          Свитчи:
+          {t.switchesHeader}
         </span>
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
           {SWITCH_OPTIONS.map(sw => {
@@ -937,13 +938,13 @@ export const MainClicker: React.FC = () => {
                     ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/50 shadow-[0_0_10px_rgba(6,182,212,0.3)]' 
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
                 }`}
-                title={`${sw.name} - ${sw.label}${isThemePreset ? ' (Пресет темы)' : ''}`}
+                title={`${sw.name} - ${sw.label}${isThemePreset ? ` (${t.themePreset})` : ''}`}
               >
                 <span>{sw.icon}</span>
                 <span>{sw.name}</span>
                 {isThemePreset && (
                   <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 font-mono">
-                    Тема
+                    {t.themeBadge}
                   </span>
                 )}
               </button>
