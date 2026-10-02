@@ -1,4 +1,4 @@
-export type ThemeId = 'cyberpunk' | 'monokai' | 'dracula' | 'matrix';
+export type ThemeId = 'cyberpunk' | 'monokai' | 'dracula' | 'matrix' | 'nordic' | 'tokyonight';
 
 export interface IdeTheme {
   id: ThemeId;
@@ -17,4 +17,12 @@ export interface IdeTheme {
   btnActiveBg: string;
   popupColor: string;
   crtScanline?: boolean;
+  // Syntax Highlighting Colors
+  syntaxKeyword: string;
+  syntaxType: string;
+  syntaxFunction: string;
+  syntaxString: string;
+  syntaxNumber: string;
+  syntaxComment: string;
+  syntaxPunctuation: string;
 }

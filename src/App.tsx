@@ -82,7 +82,7 @@ const GameApp: React.FC = () => {
         return;
       }
       if (e.code === 'KeyT') {
-        const themeKeys: ThemeId[] = ['cyberpunk', 'monokai', 'dracula', 'matrix'];
+        const themeKeys: ThemeId[] = ['cyberpunk', 'monokai', 'dracula', 'matrix', 'nordic', 'tokyonight'];
         const currentIdx = themeKeys.indexOf(themeId);
         const nextTheme = themeKeys[(currentIdx + 1) % themeKeys.length];
         setThemeId(nextTheme);

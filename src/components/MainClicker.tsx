@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/numberFormatter';
-import { Flame, Sparkles, Terminal, Cpu, Zap, Bug, Radio, Volume2 } from 'lucide-react';
+import { Flame, Sparkles, Terminal, Cpu, Zap, Bug, GitBranch, CheckCircle2, Lock, Volume2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { IDE_THEMES } from '../utils/themesList';
 import { StudioDecor } from './StudioDecor';
+import { CODE_PROJECT_FILES, CodeProjectFile, tokenizeCodeLine, getTokenColor } from '../utils/codeProjects';
 
 interface Popup {
   id: number;
@@ -36,31 +37,13 @@ const CODE_PARTICLES = [
   'TODO: sleep', 'return win;'
 ];
 
-const CODE_BLOCKS = [
-  [
-    'import { neuralCore } from "@ai/tensor";',
-    'const model = await neuralCore.load("gpt-quantum");',
-    'const result = await model.generate({ stream: true });',
-    'return <Game title="HelloTap CodeTap" active={true} />;'
-  ],
-  [
-    'async function deployProduction() {',
-    '  await git.commit("-m", "feat: hyper code v2.11");',
-    '  const server = await k8s.scale({ replicas: 128 });',
-    '  return server.publish("https://109.69.17.170/");',
-  ],
-  [
-    'class QuantumCompiler extends Engine {',
-    '  optimize(bytecode) { return bytecode.vectorize(); }',
-    '  compile() { return WebAssembly.instantiate(this); }',
-    '  run() { console.log("🚀 0 errors, 0 warnings!"); }'
-  ],
-  [
-    'const developer = new IndieHacker({ coffee: 100 });',
-    'while (developer.isCoding()) {',
-    '  developer.writeLines(Math.floor(Math.random() * 50));',
-    '  await developer.shipNextFeature();',
-  ]
+const COMPILE_LOGS = [
+  '✓ [BUILD] bundle emitted in 8ms',
+  '⚡ [HMR] fast refresh complete',
+  '✓ [TYPECHECK] 0 errors, 0 warnings',
+  '🚀 [VITE] optimized chunk dependencies',
+  '✓ [TESTS] 48 passed in 12ms',
+  '📦 [ASSETS] compressed gzip stream'
 ];
 
 const SWITCH_OPTIONS = [
@@ -80,6 +63,7 @@ export const MainClicker: React.FC = () => {
     codePerSec,
     hasAutoClicker, 
     themeId, 
+    totalCodeEver,
     overclockRemainingSec,
     triggerOverclock,
     unlockedSkills,
@@ -93,13 +77,19 @@ export const MainClicker: React.FC = () => {
   const [activeKey, setActiveKey] = useState<boolean>(false);
   const [activeBug, setActiveBug] = useState<CodeBug | null>(null);
 
-  // Живой IDE-терминал: блок кода и прогресс печати
-  const [programIdx, setProgramIdx] = useState<number>(0);
+  // Динамические файлы проектов: выбор активного файла
+  const [activeFileId, setActiveFileId] = useState<string>('ts_starter');
   const [lineIdx, setLineIdx] = useState<number>(0);
+  const [gitStatus, setGitStatus] = useState<string>('git: (main)*');
+  const [compileLog, setCompileLog] = useState<string>('✓ Ready to build');
 
   // Комбо-стрик по скорости клика
   const clickTimesRef = useRef<number[]>([]);
   const [currentCps, setCurrentCps] = useState<number>(0);
+
+  // Вычисление доступных файлов по прогрессу игрока
+  const activeFile: CodeProjectFile = 
+    CODE_PROJECT_FILES.find(f => f.id === activeFileId) || CODE_PROJECT_FILES[0];
 
   // Вычисление динамического комбо-множителя от CPS
   const getComboMultiplier = (cpsVal: number): { mult: number; label: string; color: string } => {
@@ -134,14 +124,21 @@ export const MainClicker: React.FC = () => {
     const { isCrit, codeAdded } = handleClick(e.clientX, e.clientY);
     setActiveKey(true);
 
-    // Продвигаем строку живого кода в терминале
+    // Продвигаем строку живого кода в текущем файле
     setLineIdx(prevLine => {
-      if (prevLine >= CODE_BLOCKS[programIdx].length - 1) {
-        setProgramIdx(p => (p + 1) % CODE_BLOCKS.length);
-        return 0;
+      if (prevLine >= activeFile.codeLines.length - 1) {
+        return 0; // Зацикливание текущего скрипта
       }
       return prevLine + 1;
     });
+
+    // Тактильный эффект сборки: обновление лога компиляции и Git-статуса
+    const randomLog = COMPILE_LOGS[Math.floor(Math.random() * COMPILE_LOGS.length)];
+    setCompileLog(`${randomLog} (+${formatNumber(codeAdded)} C#)`);
+    setGitStatus(`git: (shipping +${formatNumber(codeAdded)})`);
+    setTimeout(() => {
+      setGitStatus('git: (main)*');
+    }, 400);
 
     if (isCrit) {
       confetti({
@@ -233,16 +230,14 @@ export const MainClicker: React.FC = () => {
     setActiveKey(false);
   };
 
-  const currentProgram = CODE_BLOCKS[programIdx];
-
   return (
     <div className="flex flex-col items-center justify-center p-3 sm:p-4 w-full max-w-md mx-auto">
       {/* Интерактивный декор и питомцы студии */}
       <StudioDecor />
 
       {/* Шкала Комбо «В Потоке», CPS Стрик и Overclock */}
-      <div className="w-full mb-3">
-        <div className="flex items-center justify-between text-xs font-mono mb-1.5 px-1">
+      <div className="w-full mb-2.5">
+        <div className="flex items-center justify-between text-xs font-mono mb-1 px-1">
           <div className="flex items-center gap-1.5 text-slate-300">
             <Flame className={`w-3.5 h-3.5 ${isInFlow ? 'text-amber-400 animate-bounce' : 'text-slate-500'}`} />
             <span className={isInFlow ? 'text-amber-400 font-bold' : ''}>
@@ -269,7 +264,7 @@ export const MainClicker: React.FC = () => {
           </div>
         </div>
 
-        <div className="h-2.5 w-full bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-800">
+        <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-800">
           <div
             className={`h-full rounded-full transition-all duration-100 ${
               overclockRemainingSec > 0
@@ -285,7 +280,7 @@ export const MainClicker: React.FC = () => {
         </div>
       </div>
 
-      {/* Интерактивная Клавиатура / IDE Терминал */}
+      {/* Интерактивная IDE-Консоль с вкладками файлов и честной подсветкой синтаксиса */}
       <div
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
@@ -297,7 +292,7 @@ export const MainClicker: React.FC = () => {
             ? '0 0 35px rgba(245,158,11,0.35)'
             : `0 10px 30px rgba(0,0,0,0.5), 0 0 18px ${currentTheme.terminalGlow}`
         }}
-        className={`relative w-full rounded-3xl p-5 flex flex-col justify-between cursor-pointer select-none transition-all duration-75 overflow-hidden border ${
+        className={`relative w-full rounded-3xl p-4 sm:p-5 flex flex-col justify-between cursor-pointer select-none transition-all duration-75 overflow-hidden border ${
           activeKey
             ? `scale-[0.985] ${currentTheme.terminalBorder} bg-gradient-to-b ${currentTheme.terminalBg}`
             : isInFlow
@@ -310,30 +305,60 @@ export const MainClicker: React.FC = () => {
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.35)_50%)] bg-[length:100%_4px] opacity-40 z-10" />
         )}
 
-        {/* Верхняя строка терминала */}
-        <div className="relative z-20 flex items-center justify-between border-b border-slate-800/80 pb-2.5">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-              <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-            </div>
-            <span className="text-xs font-mono text-slate-400 ml-2 flex items-center gap-1">
-              <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-              AppKernel.ts
-            </span>
+        {/* ШАГ 1: Вкладки файлов проекта в шапке редактора (IDE Tabs) */}
+        <div className="relative z-20 flex items-center justify-between border-b border-slate-800/80 pb-2 mb-2 gap-2">
+          {/* Кнопки светофора macOS / Linux */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+            <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Скроллируемые вкладки открытых файлов */}
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
+            {CODE_PROJECT_FILES.map(file => {
+              const isUnlocked = totalCodeEver >= file.requiredCodeLines;
+              const isSelected = activeFileId === file.id;
+
+              return (
+                <button
+                  key={file.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isUnlocked) {
+                      setActiveFileId(file.id);
+                      setLineIdx(0);
+                    }
+                  }}
+                  disabled={!isUnlocked}
+                  className={`px-2 py-0.5 rounded-lg text-[10px] font-mono flex items-center gap-1 transition-all whitespace-nowrap ${
+                    isSelected
+                      ? 'bg-slate-800 text-cyan-300 border border-cyan-500/40 shadow-sm'
+                      : isUnlocked
+                      ? 'bg-slate-900/60 text-slate-400 hover:text-slate-200 border border-transparent'
+                      : 'bg-slate-950/40 text-slate-600 border border-transparent cursor-not-allowed'
+                  }`}
+                  title={isUnlocked ? `${file.filename} (${file.language})` : `${file.filename}: ${file.unlockRequirement}`}
+                >
+                  <span>{file.langIcon}</span>
+                  <span>{file.filename}</span>
+                  {!isUnlocked && <Lock className="w-2.5 h-2.5 text-slate-600 ml-0.5" />}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Доход за клик */}
+          <div className="flex items-center gap-1.5 shrink-0">
             {hasAutoClicker && (
-              <div className="flex items-center gap-1 text-[10px] font-mono text-cyan-300 bg-cyan-500/15 px-2 py-0.5 rounded-full border border-cyan-500/40 shadow-[0_0_8px_rgba(6,182,212,0.3)] animate-pulse">
-                <Zap className="w-3 h-3 text-cyan-400" />
+              <div className="hidden sm:flex items-center gap-1 text-[10px] font-mono text-cyan-300 bg-cyan-500/15 px-1.5 py-0.5 rounded-full border border-cyan-500/40 shadow-[0_0_8px_rgba(6,182,212,0.3)] animate-pulse">
+                <Zap className="w-2.5 h-2.5 text-cyan-400" />
                 <span>10 CPS</span>
               </div>
             )}
-            <div className="flex items-center gap-1.5 text-[11px] font-mono text-cyan-400/90 bg-cyan-950/40 px-2 py-0.5 rounded-md border border-cyan-800/30">
+            <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-mono text-cyan-400/90 bg-cyan-950/50 px-2 py-0.5 rounded-md border border-cyan-800/40">
               <Cpu className="w-3 h-3 text-cyan-400" />
-              <span>+{formatNumber(codePerClick)} C#/клик</span>
+              <span>+{formatNumber(codePerClick)} C#</span>
             </div>
           </div>
         </div>
@@ -356,28 +381,38 @@ export const MainClicker: React.FC = () => {
           </button>
         )}
 
-        {/* МНОГОСТРОЧНЫЙ ИНТЕРАКТИВНЫЙ IDE-РЕДАКТОР С НОМЕРАМИ СТРОК */}
-        <div className="relative z-20 my-3.5 p-3 rounded-2xl bg-black/45 border border-slate-800/80 font-mono text-xs sm:text-sm space-y-1 overflow-hidden min-h-[96px] flex flex-col justify-center shadow-inner">
-          {currentProgram.map((lineText, idx) => {
+        {/* ШАГ 2: МНОГОСТРОЧНЫЙ IDE-РЕДАКТОР С ЧЕСТНОЙ ПОДСВЕТКОЙ СИНТАКСИСА */}
+        <div className="relative z-20 my-2 p-3 rounded-2xl bg-black/55 border border-slate-800/80 font-mono text-xs sm:text-[13px] space-y-1 overflow-hidden min-h-[105px] flex flex-col justify-center shadow-inner">
+          {activeFile.codeLines.map((lineText, idx) => {
             const isCurrent = idx === lineIdx;
             const isPassed = idx < lineIdx;
+            const tokens = tokenizeCodeLine(lineText);
 
             return (
               <div 
                 key={idx} 
                 className={`flex items-center gap-2.5 transition-opacity ${
-                  isCurrent ? 'opacity-100' : isPassed ? 'opacity-70' : 'opacity-35'
+                  isCurrent ? 'opacity-100' : isPassed ? 'opacity-70' : 'opacity-40'
                 }`}
               >
                 <span className="text-slate-600 select-none text-[10px] sm:text-xs w-4 text-right">
                   {idx + 1}
                 </span>
-                <div className="flex items-center truncate">
-                  <span className={`${isCurrent ? currentTheme.codeColor : 'text-slate-300'} font-medium`}>
-                    {lineText}
-                  </span>
+                <div className="flex items-center flex-wrap truncate">
+                  {tokens.map((tok, tIdx) => (
+                    <span
+                      key={tIdx}
+                      style={{ color: getTokenColor(tok, currentTheme) }}
+                      className="whitespace-pre font-medium"
+                    >
+                      {tok.text}
+                    </span>
+                  ))}
                   {isCurrent && (
-                    <span className="ml-1 w-2 h-4 bg-cyan-400 animate-pulse inline-block" />
+                    <span 
+                      style={{ backgroundColor: currentTheme.syntaxFunction }} 
+                      className="ml-1 w-2 h-3.5 animate-pulse inline-block" 
+                    />
                   )}
                 </div>
               </div>
@@ -385,16 +420,46 @@ export const MainClicker: React.FC = () => {
           })}
         </div>
 
-        {/* Большая кнопка компиляции / свитча */}
-        <div className={`relative z-20 w-full py-3.5 rounded-2xl border text-center font-mono font-bold tracking-wider text-sm transition-all duration-75 flex items-center justify-center gap-2 shadow-inner ${
-          activeKey
-            ? `${currentTheme.btnActiveBg} translate-y-1`
-            : isInFlow
-            ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-[0_4px_0_#b45309]'
-            : `${currentTheme.btnBg} ${currentTheme.btnText} ${currentTheme.btnBorder} ${currentTheme.btnShadow}`
-        }`}>
-          <span>{t.compileBtn}</span>
-          {isInFlow && <Sparkles className="w-4 h-4 animate-spin text-slate-950" />}
+        {/* ШАГ 4: ТАКТИЛЬНАЯ КНОПКА КОМПИЛЯЦИИ С БЕГУЩИМ ЛОГОМ СБОРКИ */}
+        <div className="relative z-20 w-full mt-1">
+          <div className={`w-full py-3 sm:py-3.5 rounded-2xl border text-center font-mono font-bold tracking-wider text-xs sm:text-sm transition-all duration-75 flex flex-col items-center justify-center gap-0.5 shadow-inner ${
+            activeKey
+              ? `${currentTheme.btnActiveBg} translate-y-1`
+              : isInFlow
+              ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-[0_4px_0_#b45309]'
+              : `${currentTheme.btnBg} ${currentTheme.btnText} ${currentTheme.btnBorder} ${currentTheme.btnShadow}`
+          }`}>
+            <div className="flex items-center gap-1.5">
+              <span>{t.compileBtn}</span>
+              {isInFlow && <Sparkles className="w-3.5 h-3.5 animate-spin text-slate-950" />}
+            </div>
+            {/* Микро-лог компиляции */}
+            <span className="text-[10px] font-normal opacity-80 tracking-normal font-mono truncate max-w-[90%]">
+              {compileLog}
+            </span>
+          </div>
+        </div>
+
+        {/* ШАГ 3: СТАТУСНАЯ СТРОКА IDE (IDE Status Bar) */}
+        <div className="relative z-20 mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono text-slate-400 select-none">
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-slate-300 hover:text-cyan-400 transition-colors">
+              <GitBranch className="w-3 h-3 text-cyan-400" />
+              <span>{gitStatus}</span>
+            </span>
+            <span className="hidden sm:flex items-center gap-1 text-emerald-400">
+              <CheckCircle2 className="w-3 h-3" />
+              <span>0 errors</span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <span className="text-slate-500">Ln {lineIdx + 1}, Col {(lineIdx + 1) * 14}</span>
+            <span className="hidden sm:inline text-slate-500">UTF-8</span>
+            <span className={`px-1.5 py-0.2 rounded bg-slate-800/80 border border-slate-700/60 font-semibold ${activeFile.langColor}`}>
+              {activeFile.language}
+            </span>
+          </div>
         </div>
 
         {/* Парящие частицы кода и комбо */}
@@ -417,7 +482,7 @@ export const MainClicker: React.FC = () => {
       </div>
 
       {/* СЕЛЕКТОР ПРОФИЛЕЙ СВИТЧЕЙ КЛАВИАТУРЫ */}
-      <div className="w-full mt-3 flex items-center justify-between gap-1 p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-[11px] font-mono">
+      <div className="w-full mt-2.5 flex items-center justify-between gap-1 p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-[11px] font-mono">
         <span className="text-slate-400 text-[10px] px-1.5 flex items-center gap-1 shrink-0">
           <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
           Свитчи:

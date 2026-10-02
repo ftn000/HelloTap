@@ -1,9 +1,14 @@
 {
   "name": "CodeTap: Симулятор Программиста",
-  "version": "2.12.1",
-  "buildDate": "2026-10-01T23:00:00.000Z",
+  "version": "2.13.0",
+  "buildDate": "2026-10-02T10:08:00.000Z",
   "platform": "yandex-games",
   "features": [
+    "IDE Evolution: 7 dynamic project files across TypeScript, Python PyTorch, Go, C++ Vulkan, Solidity and Rust",
+    "Syntax Highlighting: authentic per-theme syntax tokenization for Cyberpunk, Monokai, Dracula, Matrix, Nordic Frost and Tokyo Night",
+    "IDE Status Bar: real-time git branch tracking, compiler diagnostics, UTF-8 badge and active language indicator",
+    "Tactile Build Feedback: interactive micro-logs on compile button click (build duration, HMR, typecheck)",
+    "Themes: added Nordic Frost and Tokyo Night high-contrast palettes with custom key shortcuts",
     "Fix: Mobile bottom navigation bar (Code, Skills, Badges, Ranks, Hub OS) resolving header button clipping",
     "Fix: Synchronous achievement tier locking preventing duplicate stacked toasts on rapid clicking",
     "UI: Compact non-intrusive pill achievement toasts (max 2 visible) placed above code editor",
