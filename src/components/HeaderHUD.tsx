@@ -30,9 +30,6 @@ interface HeaderHUDProps {
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onOpenDigest, onOpenSave, onOpenLeaderboard, onOpenAchievements, onOpenTechTree, onOpenHeatmap }) => {
   const { codeLines, money, codePerSec, moneyPerSec, globalMultiplier, isInFlow, comboEnergy, adBoostRemainingSec, lang, setLang, t, isMusicPlaying, toggleMusic, currentTrackName, nextMusicTrack, achievements, skillPoints, currentStreak } = useGame();
   const [muted, setMuted] = React.useState(sounds.isMuted);
-  const [langMenuOpen, setLangMenuOpen] = React.useState(false);
-
-  const currentLangObj = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   const totalAchStars = Object.values(achievements).reduce((sum, tier) => sum + tier, 0);
 
@@ -96,43 +93,21 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({ onOpenHub, onOpenShop, onO
             {isInFlow && <span className="text-[10px] text-amber-300 uppercase tracking-wider">FLOW</span>}
           </div>
 
-          {/* Меню смены языка (8 языков) */}
-          <div className="relative">
-            <button
-              onClick={() => setLangMenuOpen(!langMenuOpen)}
-              className="px-2 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-xs font-mono font-bold text-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+          {/* Компактный выпадающий список языков */}
+          <div className="relative inline-flex items-center">
+            <select
+              value={lang}
+              onChange={(e) => setLang(e.target.value as Language)}
+              className="appearance-none bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-xs font-mono font-bold text-slate-200 pl-2.5 pr-6 py-1 rounded-xl cursor-pointer transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500 shadow-sm"
               title="Язык / Language"
             >
-              <span>{currentLangObj.flag}</span>
-              <span>{currentLangObj.short}</span>
-              <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${langMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {langMenuOpen && (
-              <>
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => setLangMenuOpen(false)} 
-                />
-                <div className="absolute right-0 top-full mt-1.5 w-36 py-1 bg-slate-900/95 border border-slate-700 rounded-xl shadow-2xl backdrop-blur-md z-50 flex flex-col text-xs font-sans">
-                  {LANGUAGES.map((l) => (
-                    <button
-                      key={l.code}
-                      onClick={() => {
-                        setLang(l.code);
-                        setLangMenuOpen(false);
-                      }}
-                      className={`px-3 py-1.5 text-left flex items-center gap-2 hover:bg-slate-800 transition-colors cursor-pointer ${
-                        lang === l.code ? 'text-cyan-400 font-bold bg-cyan-950/40' : 'text-slate-300'
-                      }`}
-                    >
-                      <span>{l.flag}</span>
-                      <span>{l.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
+              {LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code} className="bg-slate-900 text-slate-200 py-1">
+                  {l.flag} {l.short} — {l.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 pointer-events-none" />
           </div>
 
           {/* Кнопка Mute */}

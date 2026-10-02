@@ -1,7 +1,7 @@
 {
   "name": "CodeTap: Симулятор Программиста",
-  "version": "2.19.0",
-  "buildDate": "2026-10-02T18:55:00.000Z",
+  "version": "2.19.1",
+  "buildDate": "2026-10-02T19:21:00.000Z",
   "platform": "yandex-games",
   "features": [
     "Full Multilingual Localization: added French, German, Arabic, Chinese, Spanish, and Turkish (8 languages total: RU, EN, FR, DE, AR, ZH, ES, TR) with custom dropdown switcher",
