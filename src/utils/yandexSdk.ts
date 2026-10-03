@@ -73,6 +73,14 @@ interface YandexSDK {
     showBannerAdv?: () => Promise<{ stickyAdvIsShowing: boolean; reason?: string }>;
     hideBannerAdv?: () => Promise<void>;
   };
+  feedback?: {
+    canReview: () => Promise<{ value: boolean; reason?: string }>;
+    requestReview: () => Promise<{ feedbackSent: boolean }>;
+  };
+  shortcut?: {
+    canShowPrompt: () => Promise<{ canShow: boolean }>;
+    showPrompt: () => Promise<{ outcome: 'accepted' | 'dismissed' }>;
+  };
   getPlayer: (options?: { scopes?: boolean }) => Promise<YandexPlayer>;
   getLeaderboards: () => Promise<YandexLeaderboard>;
   deviceInfo: {
@@ -129,6 +137,58 @@ class YandexGamesService {
       console.warn("[YandexSDK] Initialization skipped (running outside Yandex):", err);
     }
     return false;
+  }
+
+  /**
+   * Проверка возможности оставить отзыв об игре
+   */
+  public async canReview(): Promise<boolean> {
+    if (!this.ysdk?.feedback) return false;
+    try {
+      const res = await this.ysdk.feedback.canReview();
+      return !!res.value;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Запрос нативного попапа оценки игры в каталоге Яндекс Игр
+   */
+  public async requestReview(): Promise<boolean> {
+    if (!this.ysdk?.feedback) return false;
+    try {
+      const res = await this.ysdk.feedback.requestReview();
+      return !!res.feedbackSent;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Проверка возможности добавления ярлыка игры на рабочий стол
+   */
+  public async canShowShortcut(): Promise<boolean> {
+    if (!this.ysdk?.shortcut) return false;
+    try {
+      const res = await this.ysdk.shortcut.canShowPrompt();
+      return !!res.canShow;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Диалог добавления ярлыка на рабочий стол
+   */
+  public async showShortcut(): Promise<boolean> {
+    if (!this.ysdk?.shortcut) return false;
+    try {
+      const res = await this.ysdk.shortcut.showPrompt();
+      return res.outcome === 'accepted';
+    } catch {
+      return false;
+    }
   }
 
   public isMobile(): boolean {

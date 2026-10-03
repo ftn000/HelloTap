@@ -161,6 +161,10 @@ export interface TranslationDictionary {
   ipoNotEnough: string;
   switchTitle: string;
   switchDesc: string;
+  rateGameBtn: string;
+  rateGameDesc: string;
+  addShortcutBtn: string;
+  addShortcutDesc: string;
   saveExportTitle: string;
   saveExportDesc: string;
   saveCopyBtn: string;
@@ -361,6 +365,10 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     ipoNotEnough: "ТРЕБУЕТСЯ БОЛЬШЕ КОДА ДЛЯ IPO",
     switchTitle: "МЕХАНИЧЕСКИЕ ПЕРЕКЛЮЧАТЕЛИ КЛАВИАТУРЫ",
     switchDesc: "Выберите тип механических свитчей для изменения звукового профиля синтезатора:",
+    rateGameBtn: "⭐ Оценить игру в Яндекс Играх",
+    rateGameDesc: "Поставьте 5 звезд и поддержите команду разработчиков!",
+    addShortcutBtn: "📱 Добавить ярлык на рабочий стол",
+    addShortcutDesc: "Быстрый запуск игры с главного экрана в 1 клик",
     saveExportTitle: "ЭКСПОРТ СОХРАНЕНИЯ (BASE64)",
     saveExportDesc: "Скопируйте ключ сохранения для переноса прогресса между браузерами и устройствами:",
     saveCopyBtn: "КОПИРОВАТЬ КЛЮЧ СОХРАНЕНИЯ",
@@ -559,6 +567,10 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     ipoNotEnough: "MORE CODE NEEDED FOR IPO",
     switchTitle: "MECHANICAL KEYBOARD SWITCHES",
     switchDesc: "Select switch type to customize real-time Web Audio sound profile:",
+    rateGameBtn: "⭐ Rate Game on Yandex Games",
+    rateGameDesc: "Leave 5 stars to support the dev team!",
+    addShortcutBtn: "📱 Add Shortcut to Desktop",
+    addShortcutDesc: "Instant 1-click launch from home screen",
     saveExportTitle: "EXPORT SAVE (BASE64)",
     saveExportDesc: "Copy your save key to transfer progress between browsers and devices:",
     saveCopyBtn: "COPY SAVE KEY",
@@ -774,6 +786,10 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     ipoNotEnough: "HALKA ARZ İÇİN DAHA FAZLA KOD GEREKİYOR",
     switchTitle: "MEKANİK KLAVYE ANAHTARLARI",
     switchDesc: "Gerçek zamanlı Web Audio ses profilini özelleştirmek için anahtar türünü seçin:",
+    rateGameBtn: "⭐ Yandex'te Oyunu Değerlendir",
+    rateGameDesc: "5 yıldız verin ve geliştirici ekibi destekleyin!",
+    addShortcutBtn: "📱 Masaüstüne Kısayol Ekle",
+    addShortcutDesc: "Ana ekrandan tek tıkla hızlı başlatma",
     saveExportTitle: "KAYDI DIŞA AKTAR (BASE64)",
     saveExportDesc: "İlerlemenizi tarayıcılar ve cihazlar arasında aktarmak için kayıt anahtarınızı kopyalayın:",
     saveCopyBtn: "KAYIT ANAHTARINI KOPYALA",

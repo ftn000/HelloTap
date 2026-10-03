@@ -1331,6 +1331,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sounds.playRelease();
     sounds.triggerHaptic('success');
     yandexSdk.showInterstitial();
+    setTimeout(() => { yandexSdk.requestReview(); }, 2500);
     return { gainedTokens: newTokens, gainedSkillPoints };
   }, [totalCodeEver, prestigeCount, money]);
 

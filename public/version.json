@@ -1,10 +1,10 @@
 {
   "name": "CodeTap: Симулятор Программиста",
-  "version": "2.21.0",
-  "buildDate": "2026-10-03T09:20:00.000Z",
+  "version": "2.22.0",
+  "buildDate": "2026-10-03T11:30:00.000Z",
   "platform": "yandex-games",
   "features": [
-    "Game Balance & FTUE Hook: added instant animated onboarding tap prompt for first-time players, scaled Daily Digest and Time Warp rewards dynamically with current income, plugged 20-minute speedrun inflation exploits, added 30-min cooldown to Daily Digest to safeguard early progression curve",
+    "Yandex Games Platform Polish: integrated Feedback API (5-star player reviews dialog) and Shortcut API (Add to Home Screen / Desktop), with UI actions in Studio Hub and post-IPO prompt",
     "IDE Evolution: 7 dynamic project files across TypeScript, Python PyTorch, Go, C++ Vulkan, Solidity and Rust",
     "Syntax Highlighting: authentic per-theme syntax tokenization for Cyberpunk, Monokai, Dracula, Matrix, Nordic Frost and Tokyo Night",
     "IDE Status Bar: real-time git branch tracking, compiler diagnostics, UTF-8 badge and active language indicator",

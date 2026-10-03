@@ -8,6 +8,7 @@ import { IN_APP_PRODUCTS } from '../utils/yandexPayments';
 import { IDE_THEMES, getThemeTagline, getThemeSoundPresetName } from '../utils/themesList';
 import { ThemeId } from '../types/themes';
 import { sounds } from '../utils/soundEffects';
+import { yandexSdk } from '../utils/yandexSdk';
 
 interface StudioHubModalProps {
   isOpen: boolean;
@@ -784,6 +785,40 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
           {/* TAB 5: СОХРАНЕНИЯ */}
           {activeTab === 'save' && (
             <div className="space-y-4 font-mono text-xs">
+                            {/* ЯНДЕКС ИГРЫ: ОЦЕНКА И ЯРЛЫК */}
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/30 via-slate-900 to-indigo-950/30 border border-amber-500/30 space-y-2.5">
+                <div className="flex items-center gap-2 text-amber-300 font-bold">
+                  <span>⭐</span>
+                  <span>Яндекс Игры / Platform</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    onClick={async () => {
+                      const reviewed = await yandexSdk.requestReview();
+                      if (reviewed) {
+                        sounds.playPurchaseSuccess();
+                      }
+                    }}
+                    className="p-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-200 text-left flex flex-col gap-0.5 transition-all cursor-pointer shadow-sm active:scale-98"
+                  >
+                    <span className="font-bold text-xs">{t.rateGameBtn}</span>
+                    <span className="text-[10px] text-amber-300/80 font-sans">{t.rateGameDesc}</span>
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const added = await yandexSdk.showShortcut();
+                      if (added) {
+                        sounds.playPurchaseSuccess();
+                      }
+                    }}
+                    className="p-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/50 text-indigo-200 text-left flex flex-col gap-0.5 transition-all cursor-pointer shadow-sm active:scale-98"
+                  >
+                    <span className="font-bold text-xs">{t.addShortcutBtn}</span>
+                    <span className="text-[10px] text-indigo-300/80 font-sans">{t.addShortcutDesc}</span>
+                  </button>
+                </div>
+              </div>
+
               <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
                 <div className="flex items-center gap-2 text-cyan-400 font-bold">
                   <Copy className="w-4 h-4" />
