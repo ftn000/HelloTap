@@ -664,10 +664,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUnlockedSkills({});
   }, [unlockedSkills]);
 
-    const claimOfflineEarnings = useCallback((double: boolean) => {
+      const claimOfflineEarnings = useCallback((double: boolean) => {
     if (!offlineReport) return;
 
-    if (double && !hasNoAds) {
+    if (double) {
       yandexSdk.showRewardedVideo(() => {
         const mult = 2;
         const finalCode = offlineReport.codeEarned * mult;
@@ -682,14 +682,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    const mult = double ? 2 : 1;
-    const finalCode = offlineReport.codeEarned * mult;
-    const finalMoney = offlineReport.moneyEarned * mult;
+    const finalCode = offlineReport.codeEarned;
+    const finalMoney = offlineReport.moneyEarned;
     setCodeLines(c => c + finalCode);
     setTotalCodeEver(t => t + finalCode);
     setMoney(m => m + finalMoney);
     setOfflineReport(null);
-  }, [offlineReport, hasNoAds]);
+  }, [offlineReport]);
 
   const TITLES: Record<Language, string> = {
     ru: 'CodeTap: Симулятор Программиста — Gamedev Clicker & Tycoon',
@@ -1264,37 +1263,25 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [timeWarpCooldown, globalMultiplier, codePerClick, codePerSec, moneyPerSec]);
 
   // Яндекс Реклама: Буст x2 на 3 минуты (или мгновенно с No-Ads)
-  const watchAdForDoubleBoost = useCallback(() => {
-    if (hasNoAds) {
-      setAdBoostEndTime(Date.now() + 180 * 1000);
-      sounds.playRelease();
-      sounds.triggerHaptic('success');
-      return;
-    }
+    const watchAdForDoubleBoost = useCallback(() => {
     yandexSdk.showRewardedVideo(() => {
       setAdBoostEndTime(Date.now() + 180 * 1000);
       sounds.playRelease();
       sounds.triggerHaptic('success');
     });
-  }, [hasNoAds]);
+  }, []);
 
   // Яндекс Реклама: Сброс кулдауна Time Warp (или мгновенно с No-Ads)
-  const watchAdForTimeWarpReset = useCallback(() => {
-    if (hasNoAds) {
-      setTimeWarpCooldown(0);
-      sounds.playRelease();
-      sounds.triggerHaptic('success');
-      return;
-    }
+    const watchAdForTimeWarpReset = useCallback(() => {
     yandexSdk.showRewardedVideo(() => {
       setTimeWarpCooldown(0);
       sounds.playRelease();
       sounds.triggerHaptic('success');
     });
-  }, [hasNoAds]);
+  }, []);
 
   // Покупка In-App товара Яндекс Игр
-  const buyInAppProduct = useCallback(async (productId: string): Promise<boolean> => {
+    const buyInAppProduct = useCallback(async (productId: string): Promise<boolean> => {
     try {
       const res = await yandexPayments.buyProduct(productId);
       if (!res.success) return false;
@@ -1306,8 +1293,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else if (productId === "codetap_noads") {
         setHasNoAds(true);
         yandexSdk.hideStickyBanner();
+      } else if (productId === "codetap_stocks_25") {
+        setPrestigeTokens(t => t + 25);
       } else if (productId === "codetap_stocks_100") {
         setPrestigeTokens(t => t + 100);
+      } else if (productId === "codetap_money_100k") {
+        setMoney(m => m + 100000);
       } else if (productId === "codetap_money_1m") {
         setMoney(m => m + 1000000);
       }
@@ -1346,7 +1337,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     sounds.playRelease();
     sounds.triggerHaptic('success');
-    yandexSdk.showInterstitial();
+    if (!hasNoAds) {
+      yandexSdk.showInterstitial();
+    }
     setTimeout(() => { yandexSdk.requestReview(); }, 2500);
     return { gainedTokens: newTokens, gainedSkillPoints };
   }, [totalCodeEver, prestigeCount, money]);

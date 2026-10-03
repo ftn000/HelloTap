@@ -90,13 +90,13 @@ Oyun özellikleri:
 ### 1. Вечный Множитель x2 (Non-consumable)
 * **ID артикула:** `codetap_vip_x2`
 * **Тип:** Нерасходуемый (постоянный)
-* **Цена:** `99 Янов`
+* **Цена:** `129 Янов`
 * **Название (RU):** `Вечный Множитель x2`
 * **Название (EN):** `Permanent x2 Multiplier`
 * **Название (TR):** `Kalıcı x2 Çarpanı`
-* **Описание (RU):** `Удваивает всю генерацию C# и доход студии навсегда`
-* **Описание (EN):** `Doubles all C# production and money income forever`
-* **Описание (TR):** `Tüm kod üretimini ve stüdyo gelirini kalıcı olarak ikiye katlar`
+* **Описание (RU):** `Удваивает всю генерацию C# и доход студии навсегда (стакается с рекламой до x4)`
+* **Описание (EN):** `Doubles all C# production and money income forever (stacks with ads to x4)`
+* **Описание (TR):** `Tüm kod üretimini ve stüdyo gelirini kalıcı olarak ikiye katlar (reklamla x4'e katlanır)`
 
 ### 2. Авто-Кликер Bot Pro 10 CPS (Non-consumable)
 * **ID артикула:** `codetap_autoclicker`
@@ -112,35 +112,57 @@ Oyun özellikleri:
 ### 3. Отключение Рекламы / No-Ads Pass (Non-consumable)
 * **ID артикула:** `codetap_noads`
 * **Тип:** Нерасходуемый (постоянный)
-* **Цена:** `199 Янов`
+* **Цена:** `149 Янов`
 * **Название (RU):** `Отключение Рекламы (No-Ads Pass)`
 * **Название (EN):** `No-Ads Pass`
 * **Название (TR):** `Reklamsız Geçiş (No-Ads)`
-* **Описание (RU):** `Все рекламные бонусы (x2 буст, Time Warp) активируются мгновенно без просмотра видео`
-* **Описание (EN):** `All ad bonuses (x2 boost, Time Warp) activate instantly with no video`
-* **Описание (TR):** `Tüm reklam bonusları video izlemeden anında etkinleştirilir`
+* **Описание (RU):** `Отключает всплывающую рекламу (Interstitial) и нижний баннер (Sticky Banner)`
+* **Описание (EN):** `Removes interstitial popups and bottom sticky banner`
+* **Описание (TR):** `Geçiş reklamlarını ve alt yapışkan başlığı kaldırır`
 
-### 4. Пакет 100 Токенов Акций (Consumable)
+### 4. Стартовый Венчурный Грант (Consumable)
+* **ID артикула:** `codetap_stocks_25`
+* **Тип:** Расходуемый (многоразовый)
+* **Цена:** `79 Янов`
+* **Название (RU):** `Венчурный грант (25 Акций)`
+* **Название (EN):** `Venture Grant (25 Stocks)`
+* **Название (TR):** `Girişim Hibesi (25 Hisse)`
+* **Описание (RU):** `Мгновенно начисляет 25 токенов акций для раннего открытия престиж-апгрейдов`
+* **Описание (EN):** `Instantly awards 25 stock tokens to unlock early prestige perks`
+* **Описание (TR):** `Erken prestij geliştirmeleri için anında 25 hisse jetonu verir`
+
+### 5. Серия А — Раунд Развития (Consumable)
 * **ID артикула:** `codetap_stocks_100`
 * **Тип:** Расходуемый (многоразовый)
-* **Цена:** `49 Янов`
-* **Название (RU):** `Пакет 100 Токенов Акций`
-* **Название (EN):** `100 Stock Tokens Pack`
-* **Название (TR):** `100 Hisse Jetonu Paketi`
-* **Описание (RU):** `Мгновенное начисление 100 токенов акций для взрывного старта`
-* **Описание (EN):** `Instantly grant 100 IPO Stock Tokens for an explosive boost`
-* **Описание (TR):** `Hızlı bir başlangıç için anında 100 halka arz hisse jetonu verir`
+* **Цена:** `250 Янов`
+* **Название (RU):** `Серия А (100 Акций)`
+* **Название (EN):** `Series A (100 Stocks)`
+* **Название (TR):** `Seri A (100 Hisse)`
+* **Описание (RU):** `Крупный пул токенов акций (100 токенов) для масштабной экспансии`
+* **Описание (EN):** `Massive pool of 100 stock tokens for rapid studio expansion`
+* **Описание (TR):** `Hızlı stüdyo büyümesi için 100 hisse jetonluk büyük fon`
 
-### 5. Чемодан Инвестора 1,000,000 ₽ (Consumable)
+### 6. Чемодан Инвестора (Consumable)
+* **ID артикула:** `codetap_money_100k`
+* **Тип:** Расходуемый (многоразовый)
+* **Цена:** `49 Янов`
+* **Название (RU):** `Чемодан Инвестора (100,000 ₽)`
+* **Название (EN):** `Investor Briefcase (100,000 ₽)`
+* **Название (TR):** `Yatırımcı Çantası (100,000 ₽)`
+* **Описание (RU):** `Оборотные средства для быстрого найма сотрудников и покупки серверов`
+* **Описание (EN):** `Working capital for quick hiring and server hardware purchases`
+* **Описание (TR):** `Hızlı personel alımı ve sunucu donanımı için işletme sermayesi`
+
+### 7. Крупный Инвест-Раунд (Consumable)
 * **ID артикула:** `codetap_money_1m`
 * **Тип:** Расходуемый (многоразовый)
-* **Цена:** `29 Янов`
-* **Название (RU):** `Чемодан Инвестора (1,000,000 ₽)`
-* **Название (EN):** `Investor Briefcase (1,000,000 ₽)`
-* **Название (TR):** `Yatırımcı Çantası (1,000,000 ₽)`
-* **Описание (RU):** `Мгновенные оборотные средства для закупки топового оборудования`
-* **Описание (EN):** `Instant working capital to purchase top-tier studio hardware`
-* **Описание (TR):** `Üst düzey ekipman satın almak için anında işletme sermayesi`
+* **Цена:** `300 Янов`
+* **Название (RU):** `Крупный инвест-раунд (1,000,000 ₽)`
+* **Название (EN):** `Mega Investment Round (1,000,000 ₽)`
+* **Название (TR):** `Büyük Yatırım Turu (1,000,000 ₽)`
+* **Описание (RU):** `Огромный финансовый капитал (1,000,000 ₽) для мгновенного разгона капитализации`
+* **Описание (EN):** `Substantial financial capital (1,000,000 ₽) to rocket your market cap`
+* **Описание (TR):** `Piyasa değerini hızla uçuracak devasa finansal sermaye (1,000,000 ₽)`
 
 ---
 
@@ -163,9 +185,11 @@ Oyun özellikleri:
 1. **Реклама за вознаграждение (Rewarded Video):**
    * Буст x2 на 3 минуты в окне Hub.
    * Сброс кулдауна Time Warp.
-   * Игроки с No-Ads Pass получают награды мгновенно.
+   * Удвоение оффлайн-прибыли при входе.
+   * Игроки могут стакать x2 буст с вечным множителем x2 до суммарного x4.
 2. **Полноэкранная реклама (Interstitial):**
    * Показывается при выходе на IPO (престиж), с интервалом не чаще 1 раза в 180 секунд.
+   * Автоматически отключается при покупке No-Ads Pass.
 3. **Липкий баннер (Sticky Banner):**
    * Подключен вызов `showStickyBanner()`. Автоматически скрывается при покупке No-Ads Pass.
 
