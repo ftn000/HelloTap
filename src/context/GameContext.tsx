@@ -664,8 +664,24 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUnlockedSkills({});
   }, [unlockedSkills]);
 
-  const claimOfflineEarnings = useCallback((double: boolean) => {
+    const claimOfflineEarnings = useCallback((double: boolean) => {
     if (!offlineReport) return;
+
+    if (double && !hasNoAds) {
+      yandexSdk.showRewardedVideo(() => {
+        const mult = 2;
+        const finalCode = offlineReport.codeEarned * mult;
+        const finalMoney = offlineReport.moneyEarned * mult;
+        setCodeLines(c => c + finalCode);
+        setTotalCodeEver(t => t + finalCode);
+        setMoney(m => m + finalMoney);
+        setOfflineReport(null);
+        sounds.playRelease();
+        sounds.triggerHaptic('success');
+      });
+      return;
+    }
+
     const mult = double ? 2 : 1;
     const finalCode = offlineReport.codeEarned * mult;
     const finalMoney = offlineReport.moneyEarned * mult;
@@ -673,7 +689,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTotalCodeEver(t => t + finalCode);
     setMoney(m => m + finalMoney);
     setOfflineReport(null);
-  }, [offlineReport]);
+  }, [offlineReport, hasNoAds]);
 
   const TITLES: Record<Language, string> = {
     ru: 'CodeTap: Симулятор Программиста — Gamedev Clicker & Tycoon',

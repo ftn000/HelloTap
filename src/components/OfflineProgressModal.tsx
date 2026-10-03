@@ -20,7 +20,7 @@ export const OfflineProgressModal: React.FC<OfflineProgressModalProps> = ({
   moneyEarned,
   onClaim
 }) => {
-  const { lang, t } = useGame();
+  const { lang, t, hasNoAds } = useGame();
   if (!isOpen) return null;
 
   const hours = Math.floor(offlineSec / 3600);
