@@ -88,7 +88,8 @@ export const MainClicker: React.FC = () => {
   const { 
     handleClick, 
     comboEnergy, 
-    isInFlow, 
+    isInFlow,
+    manualClicks,
     codePerClick, 
     codePerSec, 
     hasAutoClicker, 
@@ -774,6 +775,20 @@ export const MainClicker: React.FC = () => {
             );
           })}
         </div>
+
+                {/* СТАРТОВАЯ ПОДСКАЗКА ДЛЯ НОВИЧКА (ХУК ВО ВРЕМЯ FTUE) */}
+        {manualClicks < 4 && (
+          <div className="relative z-30 w-full mb-1 py-1.5 px-3 rounded-xl bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 text-xs font-mono font-bold flex items-center justify-center gap-2 animate-bounce shadow-[0_0_12px_rgba(6,182,212,0.4)] text-center">
+            <span>👆</span>
+            <span>
+              {lang === 'ru' 
+                ? 'Нажимайте сюда или жмите [Пробел], чтобы писать код!' 
+                : lang === 'tr' 
+                ? 'Kod yazmak için buraya dokunun veya [Boşluk] tuşuna basın!' 
+                : 'Tap here or press [Space] to write code!'}
+            </span>
+          </div>
+        )}
 
         {/* ШАГ 4: ТАКТИЛЬНАЯ КНОПКА КОМПИЛЯЦИИ С БЕГУЩИМ ЛОГОМ СБОРКИ */}
         <div className="relative z-20 w-full mt-1">

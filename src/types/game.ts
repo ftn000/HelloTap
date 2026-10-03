@@ -59,6 +59,7 @@ export interface GameSaveData {
   systems: Record<string, number>;
   lastSeenTime: number;
   timeWarpCooldown: number;
+  dailyDigestCooldown?: number;
   dailyDigestClaims: number;
   switchType?: 'blue' | 'red' | 'brown' | 'laser' | 'typewriter';
   hasVipX2?: boolean;

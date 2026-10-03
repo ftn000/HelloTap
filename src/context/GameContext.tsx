@@ -511,6 +511,8 @@ interface GameContextType {
   upgrades: ShopUpgrade[];
   systems: StudioSystem[];
   dailyDigestClaims: number;
+  dailyDigestRemainingSec: number;
+  manualClicks: number;
   timeWarpRemainingSec: number;
   adBoostRemainingSec: number;
   switchType: 'blue' | 'red' | 'brown' | 'laser' | 'typewriter';
@@ -592,6 +594,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [upgrades, setUpgrades] = useState<ShopUpgrade[]>(INITIAL_UPGRADES);
   const [systems, setSystems] = useState<StudioSystem[]>(INITIAL_SYSTEMS);
   const [dailyDigestClaims, setDailyDigestClaims] = useState<number>(0);
+  const [dailyDigestCooldown, setDailyDigestCooldown] = useState<number>(0);
   const [timeWarpCooldown, setTimeWarpCooldown] = useState<number>(0);
   const [adBoostEndTime, setAdBoostEndTime] = useState<number>(0);
   const [switchType, setSwitchTypeState] = useState<'blue' | 'red' | 'brown' | 'laser' | 'typewriter'>('blue');
@@ -968,6 +971,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.prestigeCount) setPrestigeCount(data.prestigeCount);
         if (data.prestigeTokens) setPrestigeTokens(data.prestigeTokens);
         if (data.dailyDigestClaims) setDailyDigestClaims(data.dailyDigestClaims);
+        if (data.dailyDigestCooldown) setDailyDigestCooldown(data.dailyDigestCooldown);
         if (data.timeWarpCooldown) setTimeWarpCooldown(data.timeWarpCooldown);
         if (data.hasVipX2) setHasVipX2(true);
         if (data.hasAutoClicker) setHasAutoClicker(true);
@@ -1042,6 +1046,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         systems: systems.reduce((acc, s) => ({ ...acc, [s.id]: s.level }), {}),
         lastSeenTime: Date.now(),
         timeWarpCooldown,
+        dailyDigestCooldown,
         dailyDigestClaims,
         switchType,
         themeId,
@@ -1203,27 +1208,33 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Daily Digest
   const claimDailyDigest = useCallback(() => {
-    const bonusCode = 55000 * globalMultiplier;
-    const bonusMoney = 85000 * globalMultiplier;
+    const now = Date.now();
+    if (now < dailyDigestCooldown) return { bonusCode: 0, bonusMoney: 0 };
+
+    const baseCodeGrant = Math.max(120, Math.round(codePerSec * 150 + codePerClick * 35));
+    const baseMoneyGrant = Math.max(200, Math.round(moneyPerSec * 150 + codePerClick * 50));
+    const bonusCode = Math.round(baseCodeGrant * globalMultiplier);
+    const bonusMoney = Math.round(baseMoneyGrant * globalMultiplier);
 
     setCodeLines(c => c + bonusCode);
     setMoney(m => m + bonusMoney);
     setComboEnergy(1.0);
+    setDailyDigestCooldown(now + 1800 * 1000);
     setDailyDigestClaims(d => d + 1);
     recordContribution(5);
 
     sounds.playRelease();
     sounds.triggerHaptic('success');
     return { bonusCode, bonusMoney };
-  }, [globalMultiplier, recordContribution]);
+  }, [dailyDigestCooldown, codePerSec, codePerClick, moneyPerSec, globalMultiplier, recordContribution]);
 
   // Time Warp
   const triggerTimeWarp = useCallback((): boolean => {
     const now = Date.now();
     if (now < timeWarpCooldown) return false;
 
-    const simulatedCode = Math.max(30000 * globalMultiplier, codePerSec * 7200 * 0.75);
-    const simulatedMoney = Math.max(50000 * globalMultiplier, moneyPerSec * 7200 * 0.75);
+    const simulatedCode = Math.round(Math.max(codePerClick * 200, codePerSec * 3600) * globalMultiplier);
+    const simulatedMoney = Math.round(Math.max(codePerClick * 300, moneyPerSec * 3600) * globalMultiplier);
 
     setCodeLines(c => c + simulatedCode);
     setMoney(m => m + simulatedMoney);
@@ -1234,7 +1245,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sounds.playRelease();
     sounds.triggerHaptic('success');
     return true;
-  }, [timeWarpCooldown, globalMultiplier, codePerSec, moneyPerSec]);
+  }, [timeWarpCooldown, globalMultiplier, codePerClick, codePerSec, moneyPerSec]);
 
   // Яндекс Реклама: Буст x2 на 3 минуты (или мгновенно с No-Ads)
   const watchAdForDoubleBoost = useCallback(() => {
@@ -1525,6 +1536,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         upgrades,
         systems,
         dailyDigestClaims,
+        dailyDigestRemainingSec: Math.max(0, Math.ceil((dailyDigestCooldown - Date.now()) / 1000)),
+        manualClicks,
         timeWarpRemainingSec,
         adBoostRemainingSec,
         switchType,
