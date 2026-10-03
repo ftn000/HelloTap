@@ -7,6 +7,7 @@ export interface AchievementTierDef {
   target: number;
   rewardDescRu: string;
   rewardDescEn: string;
+  rewardDescTr?: string;
   bonusMultiplier: number;
 }
 
@@ -16,8 +17,10 @@ export interface AchievementDef {
   category: AchievementCategory;
   titleRu: string;
   titleEn: string;
+  titleTr?: string;
   descRu: string;
   descEn: string;
+  descTr?: string;
   tiers: [AchievementTierDef, AchievementTierDef, AchievementTierDef];
   statKey: string;
 }

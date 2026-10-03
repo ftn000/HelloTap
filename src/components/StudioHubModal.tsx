@@ -216,9 +216,9 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                   const canAfford = codeLines >= cost && s.level < s.maxLevel;
                   const isMax = s.level >= s.maxLevel;
 
-                  const sTitle = lang === 'ru' ? (s.titleRu || s.title) : (s.titleEn || s.title);
-                  const sDesc = lang === 'ru' ? (s.descriptionRu || s.description) : (s.descriptionEn || s.description);
-                  const sBonus = lang === 'ru' ? (s.bonusDescRu || s.bonusDesc) : (s.bonusDescEn || s.bonusDesc);
+                  const sTitle = lang === 'ru' ? (s.titleRu || s.title) : lang === 'tr' ? (s.titleTr || s.titleEn || s.title) : (s.titleEn || s.title);
+                  const sDesc = lang === 'ru' ? (s.descriptionRu || s.description) : lang === 'tr' ? (s.descriptionTr || s.descriptionEn || s.description) : (s.descriptionEn || s.description);
+                  const sBonus = lang === 'ru' ? (s.bonusDescRu || s.bonusDesc) : lang === 'tr' ? (s.bonusDescTr || s.bonusDescEn || s.bonusDesc) : (s.bonusDescEn || s.bonusDesc);
 
                   return (
                     <div
@@ -311,8 +311,8 @@ export const StudioHubModal: React.FC<StudioHubModalProps> = ({ isOpen, onClose,
                     (prod.id === 'codetap_autoclicker' && hasAutoClicker) ||
                     (prod.id === 'codetap_noads' && hasNoAds);
 
-                  const title = lang === 'ru' ? prod.titleRu : prod.titleEn;
-                  const desc = lang === 'ru' ? prod.descRu : prod.descEn;
+                  const title = lang === 'ru' ? prod.titleRu : lang === 'tr' ? (prod.titleTr || prod.titleEn) : prod.titleEn;
+                  const desc = lang === 'ru' ? prod.descRu : lang === 'tr' ? (prod.descTr || prod.descEn) : prod.descEn;
                   const isBusy = purchasingId === prod.id;
 
                   return (

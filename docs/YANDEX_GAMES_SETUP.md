@@ -6,13 +6,13 @@
 
 ## 1. Основная информация
 
-| Параметр | Значение (RU) | Value (EN) |
-|---|---|---|
-| **Название** | `CodeTap: Симулятор Программиста` | `CodeTap: Programmer Simulator & Tycoon` |
-| **Короткое описание** | `Пишите код, развивайте IT-студию, покупайте серверы и выходите на биржу IPO!` | `Write code, scale your IT studio, buy servers and go public in high-tech IPO!` |
-| **Возрастной рейтинг** | 6+ (или 0+) | 6+ |
-| **Категории** | Кликеры, Симуляторы, Экономические | Clickers, Simulators, Tycoon |
-| **Теги** | `кликер`, `симулятор`, `программист`, `it`, `код`, `тайкун`, `бизнес`, `офис`, `деньги` | `clicker`, `simulator`, `coder`, `programming`, `tycoon`, `dev`, `idle`, `tech` |
+| Параметр | Значение (RU) | Value (EN) | Değer (TR) |
+|---|---|---|---|
+| **Название** | `CodeTap: Симулятор Программиста` | `CodeTap: Programmer Simulator & Tycoon` | `CodeTap: Yazılımcı Simülatörü` |
+| **Короткое описание** | `Пишите код, развивайте IT-студию, покупайте серверы и выходите на биржу IPO!` | `Write code, scale your IT studio, buy servers and go public in high-tech IPO!` | `Kod yazın, BT stüdyonuzu büyütün, sunucular alın ve halka arz (IPO) yapın!` |
+| **Возрастной рейтинг** | 6+ (или 0+) | 6+ | 6+ |
+| **Категории** | Кликеры, Симуляторы, Экономические | Clickers, Simulators, Tycoon | Tıklayıcı, Simülatör, Şirket |
+| **Теги** | `кликер`, `симулятор`, `программист`, `it`, `код`, `тайкун`, `бизнес`, `офис`, `деньги` | `clicker`, `simulator`, `coder`, `programming`, `tycoon`, `dev`, `idle`, `tech` | `tıklayıcı`, `simülatör`, `yazılımcı`, `kod`, `şirket`, `ofis`, `para`, `it` |
 
 ### Полное описание (RU):
 ```text
@@ -25,6 +25,32 @@
 🏢 Hub Студии: развивайте офисы, маркетинг, кибербезопасность и заведите офисных котиков.
 📈 Выход на IPO: привлекайте венчурных инвесторов, продавайте акции и получайте постоянный буст престижа.
 🏆 Глобальный Зал Славы: соревнуйтесь с другими разработчиками в таблице лидеров Яндекс Игр!
+```
+
+### Full Description (EN):
+```text
+Become the founder of a tech startup! In "CodeTap: Programmer Simulator & Tycoon", every tap compiles clean code and generates revenue.
+
+Game features:
+⚡ Code compilation mechanics: write code manually or automate workflows with bots and quantum servers.
+⌨️ Mechanical switch synthesizer: switch between Blue, Red, Brown, and Laser sound presets in real-time!
+🔥 Flow State: keep your typing pace to activate a massive x3.0 multiplier combo.
+🏢 Studio Hub OS: upgrade offices, marketing, cybersecurity, and adopt office cats.
+📈 IPO Prestige: attract venture investors, sell shares, and unlock permanent prestige perks.
+🏆 Global Hall of Fame: compete against coders worldwide on the Yandex Games leaderboard!
+```
+
+### Tam Açıklama (TR):
+```text
+Bir teknoloji girişiminin kurucusu olun! "CodeTap: Yazılımcı Simülatörü"nde her tıklama temiz kod derler ve gelir üretir.
+
+Oyun özellikleri:
+⚡ Derleme mekaniği: kodu manuel yazın veya botlar ve kuantum sunucularıyla otomasyona bağlayın.
+⌨️ Mekanik anahtar sentezleyici: Blue, Red, Brown ve Laser ses profilleri arasında anında geçiş yapın!
+🔥 Akış Hali (Flow State): x3.0 çarpan kombolarını tetiklemek için yazma hızınızı koruyun.
+🏢 Stüdyo Merkezi: ofisleri, pazarlamayı, siber güvenliği geliştirin ve ofis kedileri sahiplenin.
+📈 Halka Arz (IPO): girişim sermayedarlarını çekin, hisse satın ve kalıcı prestij bonusları kazanın.
+🏆 Küresel Onur Listesi: Yandex Games liderlik tablosunda dünyanın dört bir yanındaki geliştiricilerle yarışın!
 ```
 
 ---
@@ -67,8 +93,10 @@
 * **Цена:** `99 Янов`
 * **Название (RU):** `Вечный Множитель x2`
 * **Название (EN):** `Permanent x2 Multiplier`
+* **Название (TR):** `Kalıcı x2 Çarpanı`
 * **Описание (RU):** `Удваивает всю генерацию C# и доход студии навсегда`
 * **Описание (EN):** `Doubles all C# production and money income forever`
+* **Описание (TR):** `Tüm kod üretimini ve stüdyo gelirini kalıcı olarak ikiye katlar`
 
 ### 2. Авто-Кликер Bot Pro 10 CPS (Non-consumable)
 * **ID артикула:** `codetap_autoclicker`
@@ -76,8 +104,10 @@
 * **Цена:** `149 Янов`
 * **Название (RU):** `Авто-Кликер Bot Pro (10 CPS)`
 * **Название (EN):** `Auto-Clicker Bot Pro (10 CPS)`
+* **Название (TR):** `Otomatik Tıklayıcı Bot Pro (10 CPS)`
 * **Описание (RU):** `Кликает автоматически 10 раз в секунду без участия игрока`
 * **Описание (EN):** `Clicks automatically 10 times per second in the background`
+* **Описание (TR):** `Oyuncunun müdahalesi olmadan saniyede 10 kez otomatik tıklar`
 
 ### 3. Отключение Рекламы / No-Ads Pass (Non-consumable)
 * **ID артикула:** `codetap_noads`
@@ -85,8 +115,10 @@
 * **Цена:** `199 Янов`
 * **Название (RU):** `Отключение Рекламы (No-Ads Pass)`
 * **Название (EN):** `No-Ads Pass`
+* **Название (TR):** `Reklamsız Geçiş (No-Ads)`
 * **Описание (RU):** `Все рекламные бонусы (x2 буст, Time Warp) активируются мгновенно без просмотра видео`
 * **Описание (EN):** `All ad bonuses (x2 boost, Time Warp) activate instantly with no video`
+* **Описание (TR):** `Tüm reklam bonusları video izlemeden anında etkinleştirilir`
 
 ### 4. Пакет 100 Токенов Акций (Consumable)
 * **ID артикула:** `codetap_stocks_100`
@@ -94,8 +126,10 @@
 * **Цена:** `49 Янов`
 * **Название (RU):** `Пакет 100 Токенов Акций`
 * **Название (EN):** `100 Stock Tokens Pack`
+* **Название (TR):** `100 Hisse Jetonu Paketi`
 * **Описание (RU):** `Мгновенное начисление 100 токенов акций для взрывного старта`
 * **Описание (EN):** `Instantly grant 100 IPO Stock Tokens for an explosive boost`
+* **Описание (TR):** `Hızlı bir başlangıç için anında 100 halka arz hisse jetonu verir`
 
 ### 5. Чемодан Инвестора 1,000,000 ₽ (Consumable)
 * **ID артикула:** `codetap_money_1m`
@@ -103,8 +137,10 @@
 * **Цена:** `29 Янов`
 * **Название (RU):** `Чемодан Инвестора (1,000,000 ₽)`
 * **Название (EN):** `Investor Briefcase (1,000,000 ₽)`
+* **Название (TR):** `Yatırımcı Çantası (1,000,000 ₽)`
 * **Описание (RU):** `Мгновенные оборотные средства для закупки топового оборудования`
 * **Описание (EN):** `Instant working capital to purchase top-tier studio hardware`
+* **Описание (TR):** `Üst düzey ekipman satın almak için anında işletme sermayesi`
 
 ---
 
@@ -115,6 +151,7 @@
 * **Техническое имя:** `codetap_score`
 * **Название таблицы (RU):** `Скомпилировано строк кода`
 * **Название таблицы (EN):** `Compiled Code Lines`
+* **Название таблицы (TR):** `Derlenen Kod Satırları`
 * **Тип:** `Числовой` (Numeric)
 * **Сортировка:** `По убыванию` (Descending — чем больше очков, тем выше место)
 * **Десятичные знаки:** `0`

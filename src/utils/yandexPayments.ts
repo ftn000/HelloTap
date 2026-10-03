@@ -7,8 +7,10 @@ export interface InAppProduct {
   id: string;
   titleRu: string;
   titleEn: string;
+  titleTr: string;
   descRu: string;
   descEn: string;
+  descTr: string;
   priceYans: number;
   icon: string;
   isConsumable: boolean;
@@ -19,8 +21,10 @@ export const IN_APP_PRODUCTS: InAppProduct[] = [
     id: "codetap_vip_x2",
     titleRu: "Вечный Множитель x2",
     titleEn: "Permanent x2 Multiplier",
+    titleTr: "Kalıcı x2 Çarpanı",
     descRu: "Удваивает всю генерацию C# и доход студии навсегда",
     descEn: "Doubles all C# production and money income forever",
+    descTr: "Tüm C# üretimini ve stüdyo gelirini sonsuza kadar ikiye katlar",
     priceYans: 99,
     icon: "👑",
     isConsumable: false
@@ -29,8 +33,10 @@ export const IN_APP_PRODUCTS: InAppProduct[] = [
     id: "codetap_autoclicker",
     titleRu: "Авто-Кликер Bot Pro (10 CPS)",
     titleEn: "Auto-Clicker Bot Pro (10 CPS)",
+    titleTr: "Otomatik Tıklayıcı Bot Pro (10 CPS)",
     descRu: "Кликает автоматически 10 раз в секунду без участия игрока",
     descEn: "Clicks automatically 10 times per second in the background",
+    descTr: "Oyuncunun müdahalesi olmadan saniyede 10 kez otomatik tıklar",
     priceYans: 149,
     icon: "⚡",
     isConsumable: false
@@ -39,8 +45,10 @@ export const IN_APP_PRODUCTS: InAppProduct[] = [
     id: "codetap_noads",
     titleRu: "Отключение Рекламы (No-Ads Pass)",
     titleEn: "No-Ads Pass",
+    titleTr: "Reklamsız Geçiş (No-Ads Pass)",
     descRu: "Все рекламные бонусы (x2 буст, Time Warp) мгновенно без просмотра видео",
     descEn: "All ad bonuses (x2 boost, Time Warp) activate instantly with no video",
+    descTr: "Tüm reklam bonusları video izlemeden anında etkinleşir",
     priceYans: 199,
     icon: "🚫",
     isConsumable: false
@@ -49,8 +57,10 @@ export const IN_APP_PRODUCTS: InAppProduct[] = [
     id: "codetap_stocks_100",
     titleRu: "Пакет 100 Токенов Акций",
     titleEn: "100 Stock Tokens Pack",
+    titleTr: "100 Hisse Jetonu Paketi",
     descRu: "Мгновенное начисление 100 токенов акций для взрывного старта",
     descEn: "Instantly grant 100 IPO Stock Tokens for an explosive boost",
+    descTr: "Hızlı bir başlangıç için anında 100 IPO hisse jetonu sağlar",
     priceYans: 49,
     icon: "📈",
     isConsumable: true
@@ -59,8 +69,10 @@ export const IN_APP_PRODUCTS: InAppProduct[] = [
     id: "codetap_money_1m",
     titleRu: "Чемодан Инвестора (1,000,000 ₽)",
     titleEn: "Investor Briefcase (1,000,000 ₽)",
+    titleTr: "Yatırımcı Çantası (1.000.000 ₽)",
     descRu: "Мгновенные оборотные средства для закупки топового оборудования",
     descEn: "Instant working capital to purchase top-tier studio hardware",
+    descTr: "En üst düzey stüdyo donanımlarını satın almak için anında işletme sermayesi",
     priceYans: 29,
     icon: "💼",
     isConsumable: true

@@ -12,6 +12,7 @@ export interface CodeProjectFile {
   unlockRequirement: string;
   unlockRequirementRu?: string;
   unlockRequirementEn?: string;
+  unlockRequirementTr?: string;
   requiredCodeLines: number;
   codeLines: string[];
 }
@@ -27,6 +28,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
     unlockRequirement: 'Стартовый файл инди-разработчика',
     unlockRequirementRu: 'Стартовый файл инди-разработчика',
     unlockRequirementEn: 'Indie developer starter file',
+    unlockRequirementTr: 'Bağımsız geliştirici başlangıç dosyası',
     requiredCodeLines: 0,
     codeLines: [
       'const developer = new IndieHacker({ coffee: 100 });',
@@ -46,6 +48,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
     unlockRequirement: 'Разблокируется при 1,000+ строк кода',
     unlockRequirementRu: 'Разблокируется при 1,000+ строк кода',
     unlockRequirementEn: 'Unlocks at 1,000+ lines of code',
+    unlockRequirementTr: '1.000+ satır kodda açılır',
     requiredCodeLines: 1000,
     codeLines: [
       'name: Release Production Pipeline',
@@ -67,6 +70,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
     unlockRequirement: 'Разблокируется при 25,000+ строк кода',
     unlockRequirementRu: 'Разблокируется при 25,000+ строк кода',
     unlockRequirementEn: 'Unlocks at 25,000+ lines of code',
+    unlockRequirementTr: '25.000+ satır kodda açılır',
     requiredCodeLines: 25000,
     codeLines: [
       'import torch',
@@ -86,6 +90,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
     unlockRequirement: 'Разблокируется при 150,000+ строк кода',
     unlockRequirementRu: 'Разблокируется при 150,000+ строк кода',
     unlockRequirementEn: 'Unlocks at 150,000+ lines of code',
+    unlockRequirementTr: '150.000+ satır kodda açılır',
     requiredCodeLines: 150000,
     codeLines: [
       'package main',
@@ -106,6 +111,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
     unlockRequirement: 'Разблокируется при 1,000,000+ строк кода',
     unlockRequirementRu: 'Разблокируется при 1,000,000+ строк кода',
     unlockRequirementEn: 'Unlocks at 1,000,000+ lines of code',
+    unlockRequirementTr: '1.000.000+ satır kodda açılır',
     requiredCodeLines: 1000000,
     codeLines: [
       '#include <vulkan/vulkan.hpp>',
@@ -126,6 +132,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
     unlockRequirement: 'Разблокируется при 10,000,000+ строк кода',
     unlockRequirementRu: 'Разблокируется при 10,000,000+ строк кода',
     unlockRequirementEn: 'Unlocks at 10,000,000+ lines of code',
+    unlockRequirementTr: '10.000.000+ satır kodda açılır',
     requiredCodeLines: 10000000,
     codeLines: [
       '// SPDX-License-Identifier: MIT',
@@ -147,6 +154,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
     unlockRequirement: 'Разблокируется при 100,000,000+ строк кода',
     unlockRequirementRu: 'Разблокируется при 100,000,000+ строк кода',
     unlockRequirementEn: 'Unlocks at 100,000,000+ lines of code',
+    unlockRequirementTr: '100.000.000+ satır kodda açılır',
     requiredCodeLines: 100000000,
     codeLines: [
       'pub struct QubitMatrix<T: Singularity> {',
@@ -163,6 +171,7 @@ export const CODE_PROJECT_FILES: CodeProjectFile[] = [
 
 export function getUnlockRequirement(file: CodeProjectFile, lang: Language): string {
   if (lang === 'ru') return file.unlockRequirementRu || file.unlockRequirement;
+  if (lang === 'tr') return file.unlockRequirementTr || file.unlockRequirementEn || file.unlockRequirement;
   return file.unlockRequirementEn || file.unlockRequirement;
 }
 

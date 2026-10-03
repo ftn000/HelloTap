@@ -55,7 +55,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
     upgrades, 
     buyUpgrade, 
     totalCodeEver,
-    lang 
+    lang,
+    t 
   } = useGame();
 
   const [search, setSearch] = useState<string>('');
@@ -117,7 +118,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
         id: 'git_checkout_main',
         category: 'Git',
         title: 'Git: Checkout main',
-        subtitle: lang === 'ru' ? 'Вернуться на главную ветку main' : 'Switch back to main branch',
+        subtitle: lang === 'ru' ? 'Вернуться на главную ветку main' : lang === 'tr' ? 'Ana main dalına geri dön' : 'Switch back to main branch',
         icon: <GitBranch className="w-4 h-4 text-cyan-400" />,
         action: () => {
           createBranch('main');
@@ -128,8 +129,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
     list.push({
       id: 'git_new_branch',
       category: 'Git',
-      title: lang === 'ru' ? 'Git: Создать новую feature-ветку' : 'Git: Create New Feature Branch',
-      subtitle: lang === 'ru' ? 'Создать новую ветку разработки (+25% к выработке кода)' : 'Create new development branch (+25% LOC boost)',
+      title: lang === 'ru' ? 'Git: Создать новую feature-ветку' : lang === 'tr' ? 'Git: Yeni Özellik Dalı Oluştur' : 'Git: Create New Feature Branch',
+      subtitle: lang === 'ru' ? 'Создать новую ветку разработки (+25% к выработке кода)' : lang === 'tr' ? 'Yeni geliştirme dalı oluştur (+%25 kod üretimi artışı)' : 'Create new development branch (+25% LOC boost)',
       icon: <GitBranch className="w-4 h-4 text-cyan-400" />,
       badge: '+25% BOOST',
       action: () => {
@@ -140,8 +141,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
     list.push({
       id: 'git_activity_heatmap',
       category: 'Git',
-      title: lang === 'ru' ? 'GitHub: Открыть график контрибуций (Heatmap)' : 'GitHub: Open Contribution Heatmap',
-      subtitle: lang === 'ru' ? '365-дневная сетка коммитов и расчет репутации' : '365-day commit grid and dev score',
+      title: lang === 'ru' ? 'GitHub: Открыть график контрибуций (Heatmap)' : lang === 'tr' ? 'GitHub: Katkı Isı Haritasını Aç' : 'GitHub: Open Contribution Heatmap',
+      subtitle: lang === 'ru' ? '365-дневная сетка коммитов и расчет репутации' : lang === 'tr' ? '365 günlük commit ızgarası ve geliştirici skoru' : '365-day commit grid and dev score',
       icon: <GitBranch className="w-4 h-4 text-emerald-400" />,
       badge: 'PROFILE',
       action: () => {
@@ -153,8 +154,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
     list.push({
       id: 'cicd_run_pipeline',
       category: 'CI/CD',
-      title: lang === 'ru' ? 'CI/CD: Запустить полный пайплайн сборки' : 'CI/CD: Run Full Build Pipeline',
-      subtitle: lang === 'ru' ? 'Принудительный запуск 4 шагов GitHub Actions' : 'Force trigger all 4 GitHub Actions steps',
+      title: lang === 'ru' ? 'CI/CD: Запустить полный пайплайн сборки' : lang === 'tr' ? 'CI/CD: Tam Derleme İş Akışını Başlat' : 'CI/CD: Run Full Build Pipeline',
+      subtitle: lang === 'ru' ? 'Принудительный запуск 4 шагов GitHub Actions' : lang === 'tr' ? 'Tüm 4 GitHub Actions adımını manuel tetikle' : 'Force trigger all 4 GitHub Actions steps',
       icon: <RotateCw className="w-4 h-4 text-cyan-400" />,
       badge: 'RUN',
       action: () => {
@@ -165,8 +166,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
     list.push({
       id: 'cicd_fix_build',
       category: 'CI/CD',
-      title: lang === 'ru' ? 'CI/CD: Исправить Broken Build (Hotfix)' : 'CI/CD: Fix Broken Build (Hotfix)',
-      subtitle: lang === 'ru' ? 'Устранение упавшего шага сборки с наградой' : 'Resolve failed build step with reward',
+      title: lang === 'ru' ? 'CI/CD: Исправить Broken Build (Hotfix)' : lang === 'tr' ? 'CI/CD: Hatalı Yapıyı Düzelt (Hotfix)' : 'CI/CD: Fix Broken Build (Hotfix)',
+      subtitle: lang === 'ru' ? 'Устранение упавшего шага сборки с наградой' : lang === 'tr' ? 'Başarısız yapı adımını ödülle çöz' : 'Resolve failed build step with reward',
       icon: <Zap className="w-4 h-4 text-red-400" />,
       badge: 'HOTFIX',
       action: () => {
@@ -178,8 +179,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
     list.push({
       id: 'ide_refactor_blitz',
       category: 'IDE',
-      title: lang === 'ru' ? 'IDE: Запустить Refactor Blitz (10x Буст)' : 'IDE: Start Refactor Blitz (10x Boost)',
-      subtitle: lang === 'ru' ? 'Активировать 15-секундную фазу ускоренного рефакторинга' : 'Activate 15-second fast refactor phase',
+      title: lang === 'ru' ? 'IDE: Запустить Refactor Blitz (10x Буст)' : lang === 'tr' ? 'IDE: Refactor Blitz Başlat (10x Güçlendirme)' : 'IDE: Start Refactor Blitz (10x Boost)',
+      subtitle: lang === 'ru' ? 'Активировать 15-секундную фазу ускоренного рефакторинга' : lang === 'tr' ? '15 saniyelik hızlı yeniden düzenleme fazını etkinleştir' : 'Activate 15-second fast refactor phase',
       icon: <Zap className="w-4 h-4 text-amber-400" />,
       badge: '10x MULT',
       action: () => {
@@ -190,8 +191,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
     list.push({
       id: 'ide_overclock',
       category: 'IDE',
-      title: lang === 'ru' ? 'System: Включить Turbo Overclock x3.0' : 'System: Enable Turbo Overclock x3.0',
-      subtitle: lang === 'ru' ? 'Принудительный форсаж процессора кликов на 14 секунд' : 'Boost click engine for 14 seconds',
+      title: lang === 'ru' ? 'System: Включить Turbo Overclock x3.0' : lang === 'tr' ? 'Sistem: Turbo Hız Aşırtmayı Etkinleştir x3.0' : 'System: Enable Turbo Overclock x3.0',
+      subtitle: lang === 'ru' ? 'Принудительный форсаж процессора кликов на 14 секунд' : lang === 'tr' ? 'Tıklama motorunu 14 saniye boyunca hızlandır' : 'Boost click engine for 14 seconds',
       icon: <Flame className="w-4 h-4 text-red-400" />,
       badge: 'x3.0 CLICKS',
       action: () => {
@@ -202,8 +203,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
     list.push({
       id: 'code_quick_tap',
       category: 'Code',
-      title: lang === 'ru' ? 'Code: Ручной коммит и компиляция' : 'Code: Manual Commit & Compile',
-      subtitle: lang === 'ru' ? 'Совершить мгновенный цикл компиляции кода' : 'Trigger instant code compilation cycle',
+      title: lang === 'ru' ? 'Code: Ручной коммит и компиляция' : lang === 'tr' ? 'Kod: Manuel Commit ve Derleme' : 'Code: Manual Commit & Compile',
+      subtitle: lang === 'ru' ? 'Совершить мгновенный цикл компиляции кода' : lang === 'tr' ? 'Anında kod derleme döngüsünü tetikle' : 'Trigger instant code compilation cycle',
       icon: <Terminal className="w-4 h-4 text-cyan-300" />,
       action: () => {
         handleClick();
@@ -214,8 +215,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
     list.push({
       id: 'audio_next_track',
       category: 'Audio',
-      title: lang === 'ru' ? 'Audio: Следующий Lo-Fi саундтрек' : 'Audio: Next Lo-Fi Soundtrack',
-      subtitle: lang === 'ru' ? 'Переключить чиптюн-синтезатор на следующую тему' : 'Switch chiptune synth to next theme',
+      title: lang === 'ru' ? 'Audio: Следующий Lo-Fi саундтрек' : lang === 'tr' ? 'Ses: Sonraki Lo-Fi Parçası' : 'Audio: Next Lo-Fi Soundtrack',
+      subtitle: lang === 'ru' ? 'Переключить чиптюн-синтезатор на следующую тему' : lang === 'tr' ? 'Sentezleyiciyi sonraki temaya geçir' : 'Switch chiptune synth to next theme',
       icon: <Music className="w-4 h-4 text-fuchsia-400" />,
       action: () => {
         nextMusicTrack();
@@ -245,7 +246,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
       list.push({
         id: 'upgrade_buy_first',
         category: 'Gear',
-        title: `Gear: ${lang === 'ru' ? 'Улучшить' : 'Upgrade'} ${uName} (Lvl ${nextAvailableUpgrade.level + 1})`,
+        title: `Gear: ${lang === 'ru' ? 'Улучшить' : lang === 'tr' ? 'Yükselt' : 'Upgrade'} ${uName} (Lvl ${nextAvailableUpgrade.level + 1})`,
         subtitle: uDesc,
         icon: <Coffee className="w-4 h-4 text-amber-300" />,
         action: () => {
@@ -260,7 +261,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
         id: `theme_${th.id}`,
         category: 'Themes',
         title: `Theme: ${th.name} (${th.icon})`,
-        subtitle: `${getThemeTagline(th, lang)} • ${lang === 'ru' ? 'Звук' : 'Sound'}: ${getThemeSoundPresetName(th, lang)}`,
+        subtitle: `${getThemeTagline(th, lang)} • ${lang === 'ru' ? 'Звук' : lang === 'tr' ? 'Ses' : 'Sound'}: ${getThemeSoundPresetName(th, lang)}`,
         icon: <Palette className="w-4 h-4 text-indigo-400" />,
         action: () => {
           setThemeId(th.id as ThemeId);
@@ -275,7 +276,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
         id: `file_${file.id}`,
         category: 'Files',
         title: `File: ${file.filename} (${file.language})`,
-        subtitle: isUnlocked ? (lang === 'ru' ? 'Открыть файл в редакторе' : 'Open file in editor') : `${lang === 'ru' ? 'Требуется' : 'Requires'}: ${getUnlockRequirement(file, lang)}`,
+        subtitle: isUnlocked ? (lang === 'ru' ? 'Открыть файл в редакторе' : lang === 'tr' ? 'Dosyayı düzenleyicide aç' : 'Open file in editor') : `${lang === 'ru' ? 'Требуется' : lang === 'tr' ? 'Gereksinim' : 'Requires'}: ${getUnlockRequirement(file, lang)}`,
         icon: <FileCode className="w-4 h-4 text-blue-400" />,
         badge: isUnlocked ? undefined : 'LOCKED',
         action: () => {
@@ -363,7 +364,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
               setSelectedIdx(0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder={lang === 'ru' ? "Введите команду или действие... (напр. branch, merge, blitz, theme)" : "Type a command or action... (e.g. branch, merge, blitz, theme)"}
+            placeholder={lang === 'ru' ? "Введите команду или действие... (напр. branch, merge, blitz, theme)" : lang === 'tr' ? "Bir komut veya eylem yazın... (örn. branch, merge, blitz, theme)" : "Type a command or action... (e.g. branch, merge, blitz, theme)"}
             className="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 font-mono focus:outline-none"
           />
           <button
@@ -381,7 +382,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
         >
           {filteredCommands.length === 0 ? (
             <div className="p-6 text-center text-slate-500">
-              {lang === 'ru' ? 'Команда не найдена. Попробуйте другой запрос.' : 'No commands found. Try another query.'}
+              {lang === 'ru' ? 'Команда не найдена. Попробуйте другой запрос.' : lang === 'tr' ? 'Komut bulunamadı. Başka bir sorgu deneyin.' : 'No commands found. Try another query.'}
             </div>
           ) : (
             filteredCommands.map((cmd, idx) => {
@@ -433,9 +434,9 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({ onSele
         {/* Подвал с подсказками клавиш */}
         <div className="px-4 py-2 border-t border-slate-800/80 bg-slate-950/60 flex items-center justify-between text-[10px] font-mono text-slate-500">
           <div className="flex items-center gap-3">
-            <span>↑↓ {lang === 'ru' ? 'Навигация' : 'Navigate'}</span>
-            <span>↵ {lang === 'ru' ? 'Выбор' : 'Select'}</span>
-            <span>ESC {lang === 'ru' ? 'Закрыть' : 'Close'}</span>
+            <span>↑↓ {t.navHint}</span>
+            <span>↵ {t.selectHint}</span>
+            <span>ESC {t.closeHint}</span>
           </div>
           <span className="text-cyan-400/80">VS Code Palette [Ctrl+Shift+P / F1]</span>
         </div>

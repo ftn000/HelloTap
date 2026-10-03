@@ -35,7 +35,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <Terminal className="w-4 h-4" />
           </div>
           <span className="text-[10px] font-mono font-medium mt-1 text-slate-400 group-hover:text-cyan-300">
-            {lang === 'ru' ? 'Код' : 'Code'}
+            {lang === 'ru' ? 'Код' : lang === 'tr' ? 'Kod' : 'Code'}
           </span>
         </button>
 
@@ -57,7 +57,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             </span>
           )}
           <span className="text-[10px] font-mono font-medium mt-1 text-slate-400 group-hover:text-indigo-300">
-            {lang === 'ru' ? 'Навыки' : 'Skills'}
+            {lang === 'ru' ? 'Навыки' : lang === 'tr' ? 'Yetenekler' : 'Skills'}
           </span>
         </button>
 
@@ -75,7 +75,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             </span>
           )}
           <span className="text-[10px] font-mono font-medium mt-1 text-slate-400 group-hover:text-amber-300">
-            {lang === 'ru' ? 'Ачивки' : 'Badges'}
+            {lang === 'ru' ? 'Ачивки' : lang === 'tr' ? 'Başarımlar' : 'Badges'}
           </span>
         </button>
 
@@ -88,7 +88,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <Trophy className="w-4 h-4" />
           </div>
           <span className="text-[10px] font-mono font-medium mt-1 text-slate-400 group-hover:text-amber-300">
-            {lang === 'ru' ? 'Топ' : 'Ranks'}
+            {lang === 'ru' ? 'Топ' : lang === 'tr' ? 'Sıralama' : 'Ranks'}
           </span>
         </button>
 
@@ -101,7 +101,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <Building2 className="w-4 h-4" />
           </div>
           <span className="text-[10px] font-mono font-bold mt-1 text-cyan-300">
-            {lang === 'ru' ? 'Хаб OS' : 'Hub OS'}
+            {lang === 'ru' ? 'Хаб OS' : lang === 'tr' ? 'Merkez OS' : 'Hub OS'}
           </span>
         </button>
       </div>

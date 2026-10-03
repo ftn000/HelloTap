@@ -3,11 +3,13 @@ export interface ShopUpgrade {
   name: string;
   nameRu?: string;
   nameEn?: string;
+  nameTr?: string;
   category: 'click' | 'idle' | 'synergy';
   icon: string;
   description: string;
   descriptionRu?: string;
   descriptionEn?: string;
+  descriptionTr?: string;
   level: number;
   maxLevel: number;
   baseCostCode: number;
@@ -26,17 +28,20 @@ export interface StudioSystem {
   title: string;
   titleRu?: string;
   titleEn?: string;
+  titleTr?: string;
   icon: string;
   category: HubCategoryType;
   description: string;
   descriptionRu?: string;
   descriptionEn?: string;
+  descriptionTr?: string;
   level: number;
   maxLevel: number;
   reqCode: number;
   bonusDesc: string;
   bonusDescRu?: string;
   bonusDescEn?: string;
+  bonusDescTr?: string;
   cooldownSec?: number;
   lastActionTimestamp?: number;
 }

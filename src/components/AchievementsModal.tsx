@@ -71,13 +71,13 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({ isOpen, on
           <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-0.5 text-[11px] scrollbar-none">
             {(['all', 'clicks', 'code', 'economy', 'upgrades', 'systems', 'prestige'] as const).map(cat => {
               const label = {
-                all: lang === 'ru' ? `Все (${ACHIEVEMENTS.length})` : `All (${ACHIEVEMENTS.length})`,
-                clicks: lang === 'ru' ? 'Клики' : 'Clicks',
-                code: lang === 'ru' ? 'Код' : 'Code',
-                economy: lang === 'ru' ? 'Экономика' : 'Economy',
-                upgrades: lang === 'ru' ? 'Оборудование' : 'Gear',
-                systems: lang === 'ru' ? 'Системы' : 'Systems',
-                prestige: lang === 'ru' ? 'Престиж' : 'Prestige'
+                all: lang === 'ru' ? `Все (${ACHIEVEMENTS.length})` : lang === 'tr' ? `Tümü (${ACHIEVEMENTS.length})` : `All (${ACHIEVEMENTS.length})`,
+                clicks: lang === 'ru' ? 'Клики' : lang === 'tr' ? 'Tıklamalar' : 'Clicks',
+                code: lang === 'ru' ? 'Код' : lang === 'tr' ? 'Kod' : 'Code',
+                economy: lang === 'ru' ? 'Экономика' : lang === 'tr' ? 'Ekonomi' : 'Economy',
+                upgrades: lang === 'ru' ? 'Оборудование' : lang === 'tr' ? 'Ekipman' : 'Gear',
+                systems: lang === 'ru' ? 'Системы' : lang === 'tr' ? 'Sistemler' : 'Systems',
+                prestige: lang === 'ru' ? 'Престиж' : lang === 'tr' ? 'Prestij' : 'Prestige'
               }[cat];
 
               return (
@@ -107,8 +107,8 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({ isOpen, on
             const nextTarget = progress.nextTarget;
             const percent = progress.percent;
 
-            const title = lang === 'ru' ? ach.titleRu : ach.titleEn;
-            const desc = lang === 'ru' ? ach.descRu : ach.descEn;
+            const title = lang === 'ru' ? ach.titleRu : lang === 'tr' ? (ach.titleTr || ach.titleEn) : ach.titleEn;
+            const desc = lang === 'ru' ? ach.descRu : lang === 'tr' ? (ach.descTr || ach.descEn) : ach.descEn;
 
             return (
               <div
@@ -131,7 +131,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({ isOpen, on
                         <span className="text-sm font-bold text-slate-100">{title}</span>
                         {isCompleted ? (
                           <span className="text-[10px] px-2 py-0.5 rounded font-bold bg-amber-500 text-slate-950">
-                            ★★★ {lang === 'ru' ? 'ЗАКРЫТО' : 'MASTERED'}
+                            ★★★ {lang === 'ru' ? 'ЗАКРЫТО' : lang === 'tr' ? 'TAMAMLANDI' : 'MASTERED'}
                           </span>
                         ) : (
                           <span className="text-[10px] px-1.5 py-0.5 rounded font-bold bg-slate-800 text-amber-400 border border-slate-700">
@@ -178,7 +178,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({ isOpen, on
                           {formatNumber(tDef.target)}
                         </div>
                         <div className="text-[9px] text-emerald-400 leading-tight">
-                          {lang === 'ru' ? tDef.rewardDescRu : tDef.rewardDescEn}
+                          {lang === 'ru' ? tDef.rewardDescRu : lang === 'tr' ? (tDef.rewardDescTr || tDef.rewardDescEn) : tDef.rewardDescEn}
                         </div>
                       </div>
                     );
@@ -189,7 +189,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({ isOpen, on
                 {!isCompleted && (
                   <div className="space-y-1 pt-1">
                     <div className="flex items-center justify-between text-[10px] text-slate-400">
-                      <span>{lang === 'ru' ? 'Прогресс до след. звезды:' : 'Progress to next star:'}</span>
+                      <span>{lang === 'ru' ? 'Прогресс до след. звезды:' : lang === 'tr' ? 'Sonraki yıldıza ilerleme:' : 'Progress to next star:'}</span>
                       <span className="font-mono text-cyan-300">{formatNumber(currentVal)} / {formatNumber(nextTarget)} ({percent.toFixed(0)}%)</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800">

@@ -88,6 +88,8 @@ export const CICDPipeline: React.FC = () => {
           setFailedJobName(INITIAL_JOBS[idx].name);
           setStatusMessage(lang === 'ru' 
             ? `❌ Broken Build: Pipeline #${newRunId} упал на [${INITIAL_JOBS[idx].name}] — кликните для починки!`
+            : lang === 'tr'
+            ? `❌ Hatalı Yapı: İş Akışı #${newRunId} [${INITIAL_JOBS[idx].name}] adımında çöktü — düzeltmek için tıklayın!`
             : `❌ Broken Build: Pipeline #${newRunId} failed at [${INITIAL_JOBS[idx].name}] — click to fix!`);
           isRunningRef.current = false;
           sounds.playPipelineFail();
@@ -182,7 +184,7 @@ export const CICDPipeline: React.FC = () => {
               onPointerDown={(e) => e.stopPropagation()}
               onClick={handleFixBrokenBuild}
               className="px-2.5 py-1 rounded-lg bg-red-500 hover:bg-red-400 text-black font-black text-[10px] tracking-wider animate-bounce shadow-[0_0_14px_rgba(239,68,68,0.8)] flex items-center gap-1 cursor-pointer transition-transform active:scale-95"
-              title={lang === 'ru' ? "Устранить аварию CI/CD и получить награду за хотфикс" : "Fix CI/CD failure and get hotfix bounty"}
+              title={lang === 'ru' ? "Устранить аварию CI/CD и получить награду за хотфикс" : lang === 'tr' ? "CI/CD hatasını çöz ve hotfix ödülünü al" : "Fix CI/CD failure and get hotfix bounty"}
             >
               <AlertTriangle className="w-3.5 h-3.5 text-black shrink-0" />
               <span>FIX BUILD!</span>
@@ -193,7 +195,7 @@ export const CICDPipeline: React.FC = () => {
               onClick={() => runPipeline()}
               disabled={pipelineState === 'running'}
               className="px-2 py-0.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-cyan-300 text-[10px] font-semibold flex items-center gap-1 border border-slate-700/60 transition-colors disabled:opacity-50 cursor-pointer"
-              title={lang === 'ru' ? "Запустить ручной прогон CI/CD пайплайна" : "Run manual CI/CD pipeline"}
+              title={lang === 'ru' ? "Запустить ручной прогон CI/CD пайплайна" : lang === 'tr' ? "Manuel CI/CD iş akışını çalıştır" : "Run manual CI/CD pipeline"}
             >
               <RotateCw className={`w-2.5 h-2.5 ${pipelineState === 'running' ? 'animate-spin text-cyan-400' : ''}`} />
               <span>Run</span>
@@ -227,7 +229,7 @@ export const CICDPipeline: React.FC = () => {
               onPointerDown={isFailed ? (e) => e.stopPropagation() : undefined}
               role={isFailed ? "button" : undefined}
               tabIndex={isFailed ? 0 : undefined}
-              title={isFailed ? (lang === 'ru' ? "Кликните здесь, чтобы устранить сбой сборки!" : "Click here to fix broken build!") : undefined}
+              title={isFailed ? (lang === 'ru' ? "Кликните здесь, чтобы устранить сбой сборки!" : lang === 'tr' ? "Derleme hatasını düzeltmek için buraya tıklayın!" : "Click here to fix broken build!") : undefined}
               className={`p-1.5 rounded-xl border flex flex-col items-center justify-center text-center transition-all ${statusStyle} ${
                 isFailed ? 'cursor-pointer hover:scale-105 active:scale-95' : ''
               }`}

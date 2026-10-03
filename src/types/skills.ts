@@ -5,11 +5,13 @@ export interface SkillNode {
   name: string;
   nameRu?: string;
   nameEn?: string;
+  nameTr?: string;
   branch: SkillBranch;
   icon: string;
   description: string;
   descriptionRu?: string;
   descriptionEn?: string;
+  descriptionTr?: string;
   maxLevel: number;
   costPerLevel: number;
   effectType: 

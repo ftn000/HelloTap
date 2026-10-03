@@ -1,10 +1,10 @@
 {
   "name": "CodeTap: Симулятор Программиста",
-  "version": "2.19.1",
-  "buildDate": "2026-10-02T19:21:00.000Z",
+  "version": "2.20.0",
+  "buildDate": "2026-10-03T08:50:00.000Z",
   "platform": "yandex-games",
   "features": [
-    "Full Multilingual Localization: added French, German, Arabic, Chinese, Spanish, and Turkish (8 languages total: RU, EN, FR, DE, AR, ZH, ES, TR) with custom dropdown switcher",
+    "Streamlined Localization: optimized languages to Russian, English, and Turkish (RU, EN, TR) with 100% full coverage across all UI, shop upgrades, studio systems, tech tree skills, achievements, random events, themes, unlock requirements, and Yandex metadata",
     "IDE Evolution: 7 dynamic project files across TypeScript, Python PyTorch, Go, C++ Vulkan, Solidity and Rust",
     "Syntax Highlighting: authentic per-theme syntax tokenization for Cyberpunk, Monokai, Dracula, Matrix, Nordic Frost and Tokyo Night",
     "IDE Status Bar: real-time git branch tracking, compiler diagnostics, UTF-8 badge and active language indicator",

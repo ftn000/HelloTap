@@ -189,9 +189,8 @@ export const MainClicker: React.FC = () => {
 
         const nextFile = unlocked[nextIdx];
         setActiveFileId(nextFile.id);
-        setLineIdx(0);
         sounds.playAutoClickTick();
-        setCompileLog(`📂 [${isTab ? 'TAB' : 'Ctrl+P'}] ${lang === 'ru' ? 'Открыт' : 'Opened'}: ${nextFile.filename} (${nextFile.language})`);
+        setCompileLog(t.fileOpenedLog.replace('{0}', isTab ? 'TAB' : 'Ctrl+P').replace('{1}', nextFile.filename).replace('{2}', nextFile.language));
       }
     };
 

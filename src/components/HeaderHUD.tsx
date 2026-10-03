@@ -8,11 +8,6 @@ import { Language } from '../utils/i18n';
 const LANGUAGES: { code: Language; flag: string; label: string; short: string }[] = [
   { code: 'ru', flag: '🇷🇺', label: 'Русский', short: 'RU' },
   { code: 'en', flag: '🇬🇧', label: 'English', short: 'EN' },
-  { code: 'fr', flag: '🇫🇷', label: 'Français', short: 'FR' },
-  { code: 'de', flag: '🇩🇪', label: 'Deutsch', short: 'DE' },
-  { code: 'ar', flag: '🇸🇦', label: 'العربية', short: 'AR' },
-  { code: 'zh', flag: '🇨🇳', label: '中文', short: 'ZH' },
-  { code: 'es', flag: '🇪🇸', label: 'Español', short: 'ES' },
   { code: 'tr', flag: '🇹🇷', label: 'Türkçe', short: 'TR' },
 ];
 

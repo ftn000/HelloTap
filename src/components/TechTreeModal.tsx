@@ -135,8 +135,8 @@ export const TechTreeModal: React.FC<TechTreeModalProps> = ({ isOpen, onClose })
               const canAfford = skillPoints >= node.costPerLevel;
               const canUpgrade = !isMax && reqMet && canAfford;
 
-              const nName = lang === 'ru' ? (node.nameRu || node.name) : (node.nameEn || node.name);
-              const nDesc = lang === 'ru' ? (node.descriptionRu || node.description) : (node.descriptionEn || node.description);
+              const nName = lang === 'ru' ? (node.nameRu || node.name) : lang === 'tr' ? (node.nameTr || node.nameEn || node.name) : (node.nameEn || node.name);
+              const nDesc = lang === 'ru' ? (node.descriptionRu || node.description) : lang === 'tr' ? (node.descriptionTr || node.descriptionEn || node.description) : (node.descriptionEn || node.description);
 
               return (
                 <div

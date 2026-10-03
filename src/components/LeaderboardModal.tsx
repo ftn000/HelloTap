@@ -50,7 +50,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
               onClick={fetchScores}
               disabled={isLoading}
               className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
-              title={lang === 'ru' ? 'Обновить' : 'Refresh'}
+              title={lang === 'ru' ? 'Обновить' : lang === 'tr' ? 'Yenile' : 'Refresh'}
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             </button>

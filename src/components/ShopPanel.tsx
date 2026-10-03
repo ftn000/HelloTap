@@ -24,8 +24,8 @@ export const ShopPanel: React.FC = () => {
           const canAfford = codeLines >= costCode && money >= costMoney && u.level < u.maxLevel;
           const isMax = u.level >= u.maxLevel;
 
-          const uName = lang === 'ru' ? (u.nameRu || u.name) : (u.nameEn || u.name);
-          const uDesc = lang === 'ru' ? (u.descriptionRu || u.description) : (u.descriptionEn || u.description);
+          const uName = lang === 'ru' ? (u.nameRu || u.name) : lang === 'tr' ? (u.nameTr || u.nameEn || u.name) : (u.nameEn || u.name);
+          const uDesc = lang === 'ru' ? (u.descriptionRu || u.description) : lang === 'tr' ? (u.descriptionTr || u.descriptionEn || u.description) : (u.descriptionEn || u.description);
 
           return (
             <div

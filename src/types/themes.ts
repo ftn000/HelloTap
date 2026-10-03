@@ -6,6 +6,7 @@ export interface IdeTheme {
   tagline: string;
   taglineRu?: string;
   taglineEn?: string;
+  taglineTr?: string;
   icon: string;
   terminalBg: string;
   terminalBorder: string;
@@ -32,4 +33,5 @@ export interface IdeTheme {
   soundPresetName: string;
   soundPresetNameRu?: string;
   soundPresetNameEn?: string;
+  soundPresetNameTr?: string;
 }
